@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt import get_mac_address
 from zigbeeLauncher.mqtt.WiserZigbeeLauncher import simulator_command
+from zigbeeLauncher.logging import flaskLogger as logger
 
 
 class FirmwareResource(Resource):
@@ -54,10 +55,13 @@ class FirmwareResource(Resource):
         devices = args.get("devices")
         for mac in devices:
             device = DBDevice(mac=mac).retrieve()
-            if device and device[0]["ip"] not in simulators:
-                simulators[device[0]['ip']] = [mac]
+            if device:
+                if device[0]["ip"] not in simulators:
+                    simulators[device[0]['ip']] = [mac]
+                else:
+                    simulators[device[0]['ip']].append(mac)
             else:
-                simulators[device[0]['ip']].append(mac)
+                return {"error": "device "+mac+" not exist"}, 500
         print("simulator:", simulators)
 
         try:
@@ -69,14 +73,17 @@ class FirmwareResource(Resource):
                     # 调用POST /firmwares将文件发送给同一个局域网的simulator
                     simulator = DBSimulator(mac=mac).retrieve()
                     if simulator:
-                        r = requests.post('http://'+simulator[0]['ip']+':5000/api/1/firmwares', files=files)
-                        if r.status_code == 200:
-                            simulator_command(mac, {
-                                "command": "firmware", "payload": {
-                                    "filename": args.get('filename'),
-                                    "devices": simulators[mac]
-                                }
-                            })
+                        try:
+                            r = requests.post('http://'+simulator[0]['ip']+':5000/api/1/firmwares', files=files, timeout=5)
+                            if r.status_code == 200:
+                                simulator_command(mac, {
+                                    "command": "firmware", "payload": {
+                                        "filename": args.get('filename'),
+                                        "devices": simulators[mac]
+                                    }
+                                })
+                        except Exception as e:
+                            logger.warn("Failed to POST file to %s", simulator[0]['ip'])
                 else:
                     simulator_command(mac, {
                         "command": "firmware", "payload": {
