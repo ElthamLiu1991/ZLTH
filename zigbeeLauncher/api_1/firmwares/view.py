@@ -72,11 +72,18 @@ class FirmwareResource(Resource):
                         r = requests.post('http://'+simulator.ip+':5000/api/1/firmwares', files=files)
                         if r.status_code == 200:
                             simulator_command(mac, {
-                                "command": "files", "payload": {
+                                "command": "firmware", "payload": {
                                     "filename": args.get('filename'),
-                                    "devices": simulators[simulator]
+                                    "devices": simulators[mac]
                                 }
                             })
+                else:
+                    simulator_command(mac, {
+                        "command": "firmware", "payload": {
+                            "filename": args.get('filename'),
+                            "devices": simulators[mac]
+                        }
+                    })
             return {"success": {}}, 200
         except Exception as e:
             return {"error": str(e)}, 500

@@ -87,7 +87,7 @@ def simulator_command(client, ip, payload):
     data_obj = data["data"]
     command = data_obj["command"]
     command_payload = data_obj["payload"]
-    if command == "files" and command_payload:
+    if command == "firmware" and command_payload:
         if "data" in command_payload:
             if "filename" in command_payload:
                 filename = command_payload["filename"]
@@ -96,9 +96,11 @@ def simulator_command(client, ip, payload):
             # save data to file
             with open('./firmwares/' + filename, 'wb') as f:
                 f.write(base64.b64decode(command_payload["data"]))
+        else:
+            filename = command_payload["filename"]
         for device in command_payload["devices"]:
             dongle_command_handle(device=device, timestamp=data["timestamp"], uuid=data["uuid"], data={
-                "command": "files",
+                "command": "firmware",
                 "payload": {
                     "filename": filename
                 }

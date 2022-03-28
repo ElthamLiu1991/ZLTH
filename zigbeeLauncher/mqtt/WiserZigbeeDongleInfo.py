@@ -33,7 +33,7 @@ class Info:
                     "hwversion": '0',
                     "label": '',
                     "state": self.dongle.state,
-                    "config": 0
+                    "configured": 0
                 })
 
     def response(self, device, userdata):

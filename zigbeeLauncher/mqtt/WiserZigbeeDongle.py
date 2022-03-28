@@ -33,7 +33,7 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
     payload = data["payload"]
     if device not in dongles_dict:
         raise Exception("device not exist")
-    if dongles_dict[device].state == 2 and command != "reset" and command != "files":
+    if dongles_dict[device].state == 2 and command != "reset" and command != "firmware":
         # cannot operate device when device in bootloader mode
         raise Exception("device is in bootloader mode")
     if command == "identify":
@@ -59,7 +59,7 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
                 request=protocol.reset_request_handle,
                 timeout=protocol.timeout), timestamp, uuid, None)
 
-    elif command == "files":
+    elif command == "firmware":
         if "data" in payload:
             if "filename" in payload:
                 filename = payload["filename"]
@@ -121,7 +121,7 @@ class Dongles(Protocol):
         transport.serial.rts = False
 
     def data_received(self, data: bytes) -> None:
-        logger.info("Receive serial data from:%s, %s: %s", self.port, self.name, repr(data))
+        # logger.info("Receive serial data from:%s, %s: %s", self.port, self.name, repr(data))
         if "Serial upload aborted" in repr(data):
             logger.info("%s, %s: Serial upload aborted", self.port, self.name)
             bootloader_stop_transfer_response(self.name)
