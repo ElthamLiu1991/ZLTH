@@ -1,0 +1,27 @@
+Windows
+
+1. install python3.9 or later
+2. run cmd: python -m venv myvenv
+3. active virtual environment: myvenv\Scripts\activate
+4. install dependency modules: pip install -r requirements.txt
+5. run tool: python run_flask.py
+
+Linux
+1. install python3.9 or later
+2. run shell: python -m venv myvenv
+3. active virtual environment: source myvenv/bin/activate
+4. install dependency modules: pip install -r requirements.txt
+5. run tool: python run_flask.py
+
+
+Only run simulator client on Linux:
+1. install python3.9 or later
+2. run shell: python -m venv myvenv
+3. active virtual environment: source myvenv/bin/activate
+4. install dependency modules: pip install -r requirements.txt
+5. run tool: python run_mqtt.py
+
+
+Web URL: http://<your ip>:5000/api/1/devices
+
+Ues HTTP API to control dongles via Postman!!
