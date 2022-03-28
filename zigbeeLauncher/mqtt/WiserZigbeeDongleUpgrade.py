@@ -105,8 +105,8 @@ class Upgrade:
             logger.info("Total %d, success:%d, percentage: %d", self.counter, success_count, percentage)
             # call update process
             self.percentage = percentage
-            if get_value("update_callback"):
-                get_value("update_callback")(self.dongle.name, {"process": percentage})
+            if get_value("dongle_update_callback"):
+                get_value("dongle_update_callback")(self.dongle.name, {"process": percentage})
 
 
 class WiserFile:

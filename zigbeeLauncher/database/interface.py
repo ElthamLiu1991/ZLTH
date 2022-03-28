@@ -17,8 +17,6 @@ class DBInterface:
     def _add(self, data):
         try:
             with app.app_context():
-                if self.filter:
-                    self._delete()
                 db.session.add(data)
                 db.session.commit()
         except Exception as e:
@@ -61,16 +59,20 @@ class DBDevice(DBInterface):
 
     def add(self, data):
         try:
-            device = Device(data["ip"],
-                            data["name"],
-                            data["mac"],
-                            data["label"],
-                            data["connected"],
-                            data["configured"],
-                            data["state"],
-                            data["swversion"],
-                            data["hwversion"])
-            self._add(device)
+            if self.retrieve():
+                # update
+                self.update(data)
+            else:
+                device = Device(data["ip"],
+                                data["name"],
+                                data["mac"],
+                                data["label"],
+                                data["connected"],
+                                data["configured"],
+                                data["state"],
+                                data["swversion"],
+                                data["hwversion"])
+                self._add(device)
         except Exception as e:
             log.warning("inset device to database failed:%s", e)
 
@@ -90,13 +92,17 @@ class DBSimulator(DBInterface):
 
     def add(self, data):
         try:
-            simulator = Simulator(data["ip"],
-                            data["name"],
-                            data["mac"],
-                            data["label"],
-                            data["connected"],
-                            data["version"])
-            self._add(simulator)
+            if self.retrieve():
+                # update
+                self.update(data)
+            else:
+                simulator = Simulator(data["ip"],
+                                      data["name"],
+                                      data["mac"],
+                                      data["label"],
+                                      data["connected"],
+                                      data["version"])
+                self._add(simulator)
         except Exception as e:
             log.warning("inset simulator to database failed:%s", e)
 

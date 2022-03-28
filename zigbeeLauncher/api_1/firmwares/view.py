@@ -69,7 +69,7 @@ class FirmwareResource(Resource):
                     # 调用POST /firmwares将文件发送给同一个局域网的simulator
                     simulator = DBSimulator(mac=mac).retrieve()
                     if simulator:
-                        r = requests.post('http://'+simulator.ip+':5000/api/1/firmwares', files=files)
+                        r = requests.post('http://'+simulator[0]['ip']+':5000/api/1/firmwares', files=files)
                         if r.status_code == 200:
                             simulator_command(mac, {
                                 "command": "firmware", "payload": {

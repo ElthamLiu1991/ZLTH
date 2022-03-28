@@ -1,9 +1,28 @@
-from flask import Flask
+from flask import Flask, render_template
 from .database import db, ma
 from .settings import DevelopmentConfig
 
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_folder='./dist',
+            template_folder='./dist',
+            static_url_path='')
+app.jinja_env.variable_start_string = '{['
+app.jinja_env.variable_end_string = ']}'
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/<path:fallback>')
+def fallback(fallback):       # Vue Router 的 mode 为 'hash' 时可移除该方法
+    if fallback.startswith('css/') or fallback.startswith('js/')\
+            or fallback.startswith('img/') or fallback == 'favicon.ico':
+        return app.render_template(fallback)
+    else:
+        return app.render_template('index.html')
 
 
 def create_app():
