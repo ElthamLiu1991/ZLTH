@@ -1,5 +1,6 @@
 import base64
 import os
+import time
 import uuid
 
 import rapidjson
@@ -28,13 +29,14 @@ def synchronization(client):
         data = pack_payload(pack_simulator_info())
         topic = mqtt_version + "/" + client_ip + "/simulator/info"
         client.publish(topic, data)
+        """
         logger.info("Packing all dongles info from database")
         # upload_port_info()
         dongles = DBDevice().retrieve()
         for dongle in dongles:
             if dongle["ip"] == client_ip:
                 dongle_info_callback(dongle["mac"], dongle)
-
+        """
     except Exception as e:
         logger.exception("Error:%s", e)
     finally:
@@ -50,11 +52,19 @@ def simulator(client, ip, payload):
     :return:
     """
     try:
+        """
         data = pack_payload(pack_simulator_info())
         topic = mqtt_version + "/" + client_ip + "/simulator/info"
         client.publish(topic, data)
         logger.info("Packing all dongles info...")
         upload_port_info()
+        """
+        logger.info("Packing all dongles info from database")
+        # upload_port_info()
+        dongles = DBDevice(ip=ip).retrieve()
+        for dongle in dongles:
+            if dongle["ip"] == client_ip:
+                dongle_info_callback(dongle["mac"], dongle)
     except Exception as e:
         logger.exception("Error:%s", e)
     finally:

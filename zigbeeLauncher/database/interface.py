@@ -61,6 +61,8 @@ class DBDevice(DBInterface):
         try:
             if self.retrieve():
                 # update
+                if 'id' in data.keys():
+                    del data['id']
                 self.update(data)
             else:
                 device = Device(data["ip"],
@@ -94,6 +96,8 @@ class DBSimulator(DBInterface):
         try:
             if self.retrieve():
                 # update
+                if 'id' in data.keys():
+                    del data['id']
                 self.update(data)
             else:
                 simulator = Simulator(data["ip"],

@@ -18,6 +18,10 @@ def simulator_info(client, ip, payload):
         data = json.loads(payload)
         data_obj = data["data"]
         DBSimulator(mac=data_obj["mac"]).add(data_obj)
+        # 删除所有相关的devices
+        DBDevice(ip=data_obj['mac']).delete()
+        # 获取devices
+        request_simulator_info(client, ip)
     except Exception as e:
         logger.error("payload validation failed: %s", e)
     finally:
