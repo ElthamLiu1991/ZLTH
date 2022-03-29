@@ -18,8 +18,8 @@ from .WiserZigbeeLauncherMqtt import WiserMQTT
 def init(role):
     if role == "simulator" or role == "launcher":
         from zigbeeLauncher.database.interface import DBDevice, DBSimulator
-        DBDevice().delete()
-        DBSimulator().delete()
+        DBDevice(ip=client_mac).delete()
+        DBSimulator(mac=client_mac).delete()
         if not get_value("connected"):
             logger.info("Run %s MQTT client" % role)
             thread = WiserMQTT('broker.emqx.io', 1883, client_ip, role)

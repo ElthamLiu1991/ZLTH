@@ -6,7 +6,7 @@ from . import db
 from .device import Device, DeviceSchema
 from zigbeeLauncher.logging import databaseLogger as log
 from zigbeeLauncher import app
-from .simulator import Simulator
+from .simulator import Simulator, SimulatorSchema
 
 
 class DBInterface:
@@ -43,14 +43,13 @@ class DBInterface:
             db.session.rollback()
         pass
 
-    def _retrieve(self):
+    def _retrieve(self, schema):
         with app.app_context():
-            device_schema = DeviceSchema(many=True)
             if self.filter:
                 result = self.table.query.filter_by(**self.filter)
             else:
                 result = self.table.query.all()
-            return device_schema.dump(result)
+            return schema.dump(result)
 
 
 class DBDevice(DBInterface):
@@ -85,7 +84,7 @@ class DBDevice(DBInterface):
         self._delete()
 
     def retrieve(self):
-        return self._retrieve()
+        return self._retrieve(DeviceSchema(many=True))
 
 
 class DBSimulator(DBInterface):
@@ -117,4 +116,4 @@ class DBSimulator(DBInterface):
         self._delete()
 
     def retrieve(self):
-        return self._retrieve()
+        return self._retrieve(SimulatorSchema(many=True))

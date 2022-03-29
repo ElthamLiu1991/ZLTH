@@ -129,13 +129,16 @@ def simulator_device_command(client, ip, payload, device):
 
 
 def pack_simulator_info():
+    version = '1.0'
+    with open('./version/version.txt', 'r') as f:
+        version = f.read()
     data = {
         "ip": get_ip_address(),
         "mac": client_mac,
         "name": "simulator-" + client_ip,
         "connected": 1,
         "label": "",
-        "version": "1.0"
+        "version": version
     }
     return data
 

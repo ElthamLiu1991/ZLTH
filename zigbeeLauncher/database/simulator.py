@@ -19,7 +19,7 @@ class Simulator(db.Model):
         self.version = version
 
 
-class DeviceSchema(ma.SQLAlchemyAutoSchema):
+class SimulatorSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Simulator
         load_instance = True

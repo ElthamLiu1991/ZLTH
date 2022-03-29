@@ -15,11 +15,15 @@ def show_devices():
     :return: device所有数据
     """
     if request.args:
-        paras = {}
-        for key in request.args:
-            paras[key] = request.args[key]
-        return jsonify(pack_response(0, DBDevice(**paras).retrieve()))
-    return jsonify(pack_response(0, DBDevice().retrieve()))
+        try:
+            paras = {}
+            for key in request.args:
+                paras[key] = request.args[key]
+            return pack_response(0, DBDevice(**paras).retrieve())
+        except Exception as e:
+            logger.exception("request error")
+            return pack_response(90000, error="bad parameters:"+str(request.args)), 500
+    return pack_response(0, DBDevice().retrieve())
     # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
