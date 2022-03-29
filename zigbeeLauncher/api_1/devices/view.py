@@ -1,9 +1,11 @@
+import rapidjson
 from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
 from zigbeeLauncher.api_1.devices import devices
 from zigbeeLauncher.database.interface import DBDevice
 from zigbeeLauncher.mqtt.WiserZigbeeLauncher import dongle_command
 from zigbeeLauncher.logging import flaskLogger as logger
+from zigbeeLauncher.api_1.response import pack_response
 
 
 @devices.route("/", methods=['GET'])
@@ -16,15 +18,18 @@ def show_devices():
         paras = {}
         for key in request.args:
             paras[key] = request.args[key]
-        return jsonify(DBDevice(**paras).retrieve())
-    return jsonify(DBDevice().retrieve())
+        return jsonify(pack_response(0, DBDevice(**paras).retrieve()))
+    return jsonify(pack_response(0, DBDevice().retrieve()))
     # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
 class DeviceResource(Resource):
 
     def get(self, mac):
-        return jsonify(DBDevice(mac=mac).retrieve())
+        if DBDevice(mac=mac).retrieve():
+            return pack_response(0, DBDevice(mac=mac).retrieve()[0]), 200
+        else:
+            return pack_response(10000, device=mac), 404
 
     def put(self, mac):
         parser = reqparse.RequestParser()
@@ -36,12 +41,10 @@ class DeviceResource(Resource):
             try:
                 if device[0]['connected']:
                     dongle_command(device[0]["ip"], mac, args)
-                    return {"success": {}}, 200
+                    return pack_response(0), 200
                 else:
-                    return {"error":"Device is offline"}, 400
+                    return pack_response(10001, device=mac), 500
             except Exception as e:
-                return {"error": str(e)}, 500
+                return pack_response(90000, error=str(e)), 500
         else:
-            return {}, 404
-
-        return [], 400
+            return pack_response(10000, device=mac), 404

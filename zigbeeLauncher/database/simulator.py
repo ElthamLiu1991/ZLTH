@@ -2,7 +2,7 @@ from . import db, ma
 
 
 class Simulator(db.Model):
-    id = db.Column('simulator_id', db.Integer, primary_key=True)
+    id = db.Column('id', db.Integer, primary_key=True)
     ip = db.Column(db.String(20))
     name = db.Column(db.String(30))
     mac = db.Column(db.String(30))

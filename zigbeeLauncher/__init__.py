@@ -7,6 +7,7 @@ app = Flask(__name__,
             static_folder='./dist',
             template_folder='./dist',
             static_url_path='')
+
 app.jinja_env.variable_start_string = '{['
 app.jinja_env.variable_end_string = ']}'
 

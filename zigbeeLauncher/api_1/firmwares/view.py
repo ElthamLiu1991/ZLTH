@@ -6,6 +6,7 @@ import werkzeug.datastructures
 from flask_restful import Api, Resource, reqparse
 from werkzeug.utils import secure_filename
 
+from zigbeeLauncher.api_1.response import pack_response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt import get_mac_address
 from zigbeeLauncher.mqtt.WiserZigbeeLauncher import simulator_command
@@ -22,7 +23,7 @@ class FirmwareResource(Resource):
         data = []
         for root, dirs, files in os.walk('./firmwares'):
             data = data + files
-            return data, 200
+            return pack_response(0, data)
 
     def post(self):
         """
@@ -37,9 +38,10 @@ class FirmwareResource(Resource):
         try:
             filename = secure_filename(content.filename)
             content.save(os.path.join('./firmwares', filename))
-            return {"success": {}}, 200
+            return pack_response(0)
         except Exception as e:
-            return {"error": str(e)}, 500
+            logger.exception("request error")
+            return pack_response(90000, error=str(e)), 500
 
     def put(self):
         """
@@ -56,41 +58,46 @@ class FirmwareResource(Resource):
         for mac in devices:
             device = DBDevice(mac=mac).retrieve()
             if device:
-                if device[0]["ip"] not in simulators:
-                    simulators[device[0]['ip']] = [mac]
+                device = device[0]
+                if not device["connected"]:
+                    return pack_response(10001, device=mac), 500
+                if device["ip"] not in simulators:
+                    if get_mac_address() != device['ip']:
+                        try:
+                            files = {
+                                'file': open('./firmwares/' + args.get('filename'), 'rb')
+                            }
+                            # 调用POST /firmwares将文件发送给同一个局域网的simulator
+                            simulator = DBSimulator(mac=device['ip']).retrieve()
+                            if simulator:
+                                simulator = simulator[0]
+                                if not simulator['connected']:
+                                    return pack_response(20001, device=simulator['mac']), 500
+                                try:
+                                    r = requests.post('http://' + simulator['ip'] + ':5000/api/1/firmwares',
+                                                      files=files, timeout=5)
+                                    if r.status_code != 200:
+                                        return pack_response(20002, device=simulator['mac'], error=""), 500
+                                except Exception as e:
+                                    logger.exception("request error")
+                                    return pack_response(20003, device=simulator['mac']), 500
+                            else:
+                                return pack_response(20000, device=device['ip']), 500
+                        except Exception as e:
+                            logger.exception("request error")
+                            return pack_response(90000, error=str(e)), 500
+                    simulators[device['ip']] = [mac]
                 else:
-                    simulators[device[0]['ip']].append(mac)
+                    simulators[device['ip']].append(mac)
             else:
-                return {"error": "device "+mac+" not exist"}, 500
+                return pack_response(10000, device=mac), 500
         print("simulator:", simulators)
 
-        try:
-            files = {
-                'file': open('./firmwares/'+args.get('filename'), 'rb')
-            }
-            for mac in simulators.keys():
-                if get_mac_address() != mac:
-                    # 调用POST /firmwares将文件发送给同一个局域网的simulator
-                    simulator = DBSimulator(mac=mac).retrieve()
-                    if simulator:
-                        try:
-                            r = requests.post('http://'+simulator[0]['ip']+':5000/api/1/firmwares', files=files, timeout=5)
-                            if r.status_code == 200:
-                                simulator_command(mac, {
-                                    "command": "firmware", "payload": {
-                                        "filename": args.get('filename'),
-                                        "devices": simulators[mac]
-                                    }
-                                })
-                        except Exception as e:
-                            logger.warn("Failed to POST file to %s", simulator[0]['ip'])
-                else:
-                    simulator_command(mac, {
-                        "command": "firmware", "payload": {
-                            "filename": args.get('filename'),
-                            "devices": simulators[mac]
-                        }
-                    })
-            return {"success": {}}, 200
-        except Exception as e:
-            return {"error": str(e)}, 500
+        for mac in simulators.keys():
+            simulator_command(mac, {
+                "command": "firmware", "payload": {
+                    "filename": args.get('filename'),
+                    "devices": simulators[mac]
+                }
+            })
+        return pack_response(0)
