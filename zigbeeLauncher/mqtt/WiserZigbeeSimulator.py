@@ -7,7 +7,7 @@ import rapidjson
 
 from . import router, mqtt_version, client_ip, client_mac, payload_validate
 from .WiserZigbeeGlobal import pack_payload, get_value, except_handle, get_ip_address
-from .WiserZigbeeDongle import upload_port_info, dongle_command_handle
+from .WiserZigbeeDongle import upload_port_info, dongle_command_handle, pack_port_info
 from zigbeeLauncher.logging import simulatorLogger as logger
 from ..database.interface import DBDevice
 
@@ -141,8 +141,11 @@ def pack_simulator_info():
         "name": "simulator-" + client_ip,
         "connected": 1,
         "label": "",
-        "version": version
+        "version": version,
+        "devices": pack_port_info()
     }
+    # 打包dongles信息
+
     return data
 
 

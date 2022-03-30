@@ -93,9 +93,13 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
 
 class Dongles(Protocol):
     def __init__(self):
-        self.name = ""
-        self.serial_number = ""
+        self.name = ""  # mac
+        self.port = ""  # name
         self.state = 1
+        self.label = ""
+        self.configured = 0
+        self.swversion = ""
+        self.hwversion = ""
         self.flag = None
 
     def set_attributes(self, **kwargs):
@@ -169,7 +173,7 @@ class Dongles(Protocol):
                         print("receive data CRC check failed:%s" % record)
                         logger.warning("CRC check failed for %s", record)
                     else:
-                        protocol.decode(self.name, record)
+                        protocol.decode(self, record)
         elif data == b'\x04' or data == b'\x15' or data == b'\x18' or data == b'C':
             if self.state != 3:
                 self.state = 3
@@ -230,6 +234,23 @@ def scan():
             logger.exception("Serial management error:%s", e)
 
         time.sleep(0.1)
+
+
+def pack_port_info():
+    devices = []
+    for key in dongles_dict.keys():
+        device = {
+            'name': dongles_dict[key].port,
+            'mac': dongles_dict[key].name,
+            'connected': True,
+            'configured': dongles_dict[key].configured,
+            'hwversion': dongles_dict[key].hwversion,
+            'swversion': dongles_dict[key].swversion,
+            'label': dongles_dict[key].label,
+            'state': dongles_dict[key].state
+        }
+        devices.append(device)
+    return devices
 
 
 def upload_port_info(dongle=None):

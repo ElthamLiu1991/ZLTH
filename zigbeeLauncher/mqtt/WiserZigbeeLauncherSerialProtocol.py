@@ -49,13 +49,13 @@ def error(device, data):
 
 
 class WiserZigbeeDongleSerial:
-    def __init__(self, name, seq, length, payload):
-        self.name = name
+    def __init__(self, dongle, seq, length, payload):
+        self.dongle = dongle
         self.seq = int(seq, 16)
         self.length = int(length, 16)
         self.payload = payload
         logger.info("Get serial data from %s, seq=%d, length=%d, payload:%s",
-                    self.name, self.seq, self.length, self.payload)
+                    self.dongle.name, self.seq, self.length, self.payload)
 
 
 def crc16Xmodem_verify(data):
@@ -95,7 +95,7 @@ def encode(command, payload):
     return sequence, start_frame + data
 
 
-def decode(name, data):
+def decode(dongle, data):
     pri_command = data[:2]
     sec_command = data[2:4]
     seq_number = data[4:6]
@@ -104,7 +104,7 @@ def decode(name, data):
     crc = data[-4:]
     logger.info("decode:%s%s, %s, %s, %s, %s", pri_command, sec_command, seq_number, payload_len, payload, crc)
     response.call(pri_command + sec_command,
-                  WiserZigbeeDongleSerial(name, seq_number, payload_len, payload))
+                  WiserZigbeeDongleSerial(dongle, seq_number, payload_len, payload))
 
 
 def reset_request_handle(payload=None):
@@ -136,8 +136,11 @@ def info_response_handle(data):
         "swversion": data.payload[:6],
         "hwversion": "1.0.0"
     }
-    if (data.seq, data.name) in commands:
-        commands[(data.seq, data.name)].get_response(rsp)
+    # 修改dongle属性
+    data.dongle.swversion = rsp['swversion']
+    data.dongle.hwversion = rsp['hwversion']
+    if (data.seq, data.dongle.name) in commands:
+        commands[(data.seq, data.dongle.name)].get_response(rsp)
     pass
 
 
@@ -151,8 +154,9 @@ def label_response_handle(data):
     rsp = {
         "label": unhexlify(data.payload[:-2].encode('utf-8')).decode('utf-8')
     }
-    if (data.seq, data.name) in commands:
-        commands[(data.seq, data.name)].get_response(rsp)
+    data.dongle.configured = rsp['label']
+    if (data.seq, data.dongle.name) in commands:
+        commands[(data.seq, data.dongle.name)].get_response(rsp)
     pass
 
 
@@ -178,8 +182,10 @@ def state_response_handle(data):
         "state": int(data.payload[:2], 16),
         "configured": int(data.payload[2:], 16)
     }
-    if (data.seq, data.name) in commands:
-        commands[(data.seq, data.name)].get_response(rsp)
+    data.dongle.state = rsp['state']
+    data.dongle.configured = rsp['configured']
+    if (data.seq, data.dongle.name) in commands:
+        commands[(data.seq, data.dongle.name)].get_response(rsp)
 
 
 @response.cmd(local_setting_command + status_response)
@@ -191,5 +197,5 @@ def status_response_handle(data):
             "code": status,
             "description": "please refer error code specification"
         }
-    if (data.seq, data.name) in commands:
-        commands[(data.seq, data.name)].get_response(rsp)
+    if (data.seq, data.dongle.name) in commands:
+        commands[(data.seq, data.dongle.name)].get_response(rsp)
