@@ -173,16 +173,22 @@ class Dongles(Protocol):
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 1})
             self.data = self.data + data
+            logger.info("receive data:%s", repr(data))
             while len(self.data) >= 2:
                 if self.data[0] == 0xaa and self.data[1] == 0x55:
                     if len(self.data) >= 6 and len(self.data) >= (6+self.data[5]+2):
                         record = hexlify(self.data[2:6+self.data[5]+2]).upper().decode()
                         if not protocol.crc16Xmodem_verify(record):
-                            print("receive data CRC check failed:%s" % record)
                             logger.warning("CRC check failed for %s", record)
                         else:
                             protocol.decode(self, record)
                         self.data = self.data[6+self.data[5]+2:]
+                    else:
+                        logger.warning("incomplete package %s", repr(self.data))
+                        break
+                else:
+                    logger.warning("incomplete package %s", repr(self.data))
+                    break
 
     def connection_lost(self, exc: Optional[Exception]) -> None:
         global dongles_dict
