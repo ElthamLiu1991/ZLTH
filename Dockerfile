@@ -5,6 +5,7 @@ ADD requirements.txt ./
 RUN pip install -r requirements.txt
 ADD launcher.py .
 ADD version/ ./version
+ADD templates/ ./templates
 ADD zigbeeLauncher/ ./zigbeeLauncher
 
 CMD [ "python", "launcher.py" ]
