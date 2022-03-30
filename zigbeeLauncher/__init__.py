@@ -1,11 +1,14 @@
+import os
+
 from flask import Flask, render_template
 from .database import db, ma
 from .settings import DevelopmentConfig
 
+base_dir = os.path.abspath('./')
 
 app = Flask(__name__,
-            static_folder='../templates',
-            template_folder='../templates',
+            static_folder=os.path.join(base_dir, 'templates'),
+            template_folder=os.path.join(base_dir, 'templates'),
             static_url_path='')
 
 app.jinja_env.variable_start_string = '{['
