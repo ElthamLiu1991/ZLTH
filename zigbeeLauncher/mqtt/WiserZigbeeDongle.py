@@ -170,12 +170,14 @@ class Dongles(Protocol):
                         logger.warning("CRC check failed for %s", record)
                     else:
                         protocol.decode(self.name, record)
-        else:
+        elif data == b'\x04' or data == b'\x15' or data == b'\x18' or data == b'C':
             if self.state != 3:
                 self.state = 3
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
             self.flag = data
+        else:
+            logger.warn("receive unknown data:%s", repr(data))
 
     def connection_lost(self, exc: Optional[Exception]) -> None:
         global dongles_dict
