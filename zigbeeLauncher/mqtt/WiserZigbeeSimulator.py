@@ -59,12 +59,15 @@ def simulator(client, ip, payload):
         logger.info("Packing all dongles info...")
         upload_port_info()
         """
-        logger.info("Packing all dongles info from database")
-        # upload_port_info()
+        logger.info("Packing all dongles info from port list")
+        upload_port_info()
+        """
         dongles = DBDevice(ip=ip).retrieve()
         for dongle in dongles:
             if dongle["ip"] == client_ip:
                 dongle_info_callback(dongle["mac"], dongle)
+        """
+
     except Exception as e:
         logger.exception("Error:%s", e)
     finally:
