@@ -154,7 +154,7 @@ def label_response_handle(data):
     rsp = {
         "label": unhexlify(data.payload[:-2].encode('utf-8')).decode('utf-8')
     }
-    data.dongle.configured = rsp['label']
+    data.dongle.label = rsp['label']
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)
     pass

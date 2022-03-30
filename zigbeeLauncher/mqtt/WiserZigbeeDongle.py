@@ -101,6 +101,7 @@ class Dongles(Protocol):
         self.swversion = ""
         self.hwversion = ""
         self.flag = None
+        self.data = ""
 
     def set_attributes(self, **kwargs):
         for key in kwargs.keys():
@@ -181,6 +182,22 @@ class Dongles(Protocol):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
             self.flag = data
         else:
+            self.data = self.data+repr(data)
+            if "AA55" in hexlify(self.data).upper().decode():
+                if self.state != 1:
+                    # update to 1
+                    self.state = 1
+                    if get_value("dongle_update_callback"):
+                        get_value("dongle_update_callback")(self.name, {"state": 1})
+                # sometimes serial will receive more than 1 record at once
+                for record in hexlify(self.data).upper().decode().split("AA55"):
+                    if record != "":
+                        if not protocol.crc16Xmodem_verify(record):
+                            print("receive data CRC check failed:%s" % record)
+                            logger.warning("CRC check failed for %s", record)
+                        else:
+                            protocol.decode(self, record)
+                self.data = ""
             logger.warn("receive unknown data:%s", repr(data))
 
     def connection_lost(self, exc: Optional[Exception]) -> None:
