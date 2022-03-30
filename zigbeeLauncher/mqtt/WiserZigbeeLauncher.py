@@ -19,9 +19,10 @@ def simulator_info(client, ip, payload):
         data_obj = data["data"]
         DBSimulator(mac=data_obj["mac"]).add(data_obj)
         # 删除所有相关的devices
-        DBDevice(ip=data_obj['mac']).delete()
-        # 获取devices
-        request_simulator_info(client, ip)
+        if ip != client_ip:
+            DBDevice(ip=data_obj['mac']).delete()
+            # 获取devices
+            request_simulator_info(client, ip)
     except Exception as e:
         logger.error("payload validation failed: %s", e)
     finally:
@@ -56,6 +57,7 @@ def simulator_update(client, ip, payload):
         # update database
         data = json.loads(payload)
         DBDevice(ip=ip).update(data["data"])
+        DBSimulator(mac=ip).update(data["data"])
     except Exception as e:
         logger.error('Falied to update simulator:%s', e)
 
@@ -67,6 +69,8 @@ def simulator_device_update(client, ip, payload, device):
         # update database
         data = json.loads(payload)
         # 先判断dongle是否存在
+        if 'process' in data['data']:
+            return
         if DBDevice(mac=device).retrieve():
             DBDevice(mac=device).update(data["data"])
         else:
