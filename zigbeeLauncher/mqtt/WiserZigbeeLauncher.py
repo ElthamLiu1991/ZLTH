@@ -17,11 +17,13 @@ def simulator_info(client, ip, payload):
         # 加入数据库
         data = json.loads(payload)
         data_obj = data["data"]
+        if 'devices' in data_obj:
+            devices = data_obj["devices"]
+            for device in devices:
+                device['ip'] = ip
+                DBDevice(mac=device["mac"]).add(device)
+            del data_obj["devices"]
         DBSimulator(mac=data_obj["mac"]).add(data_obj)
-        devices = data_obj["devices"]
-        for device in devices:
-            device['ip'] = ip
-            DBDevice(mac=device["mac"]).add(device)
         # 删除所有相关的devices
         #if ip != client_ip:
             #DBDevice(ip=data_obj['mac']).delete()

@@ -101,7 +101,7 @@ class Dongles(Protocol):
         self.swversion = ""
         self.hwversion = ""
         self.flag = None
-        self.data = ""
+        self.data = b''
 
     def set_attributes(self, **kwargs):
         for key in kwargs.keys():
@@ -160,45 +160,29 @@ class Dongles(Protocol):
                 self.state = 2
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
-
-        elif "AA55" in hexlify(data).upper().decode():
-            if self.state != 1:
-                # update to 1
-                self.state = 1
-                if get_value("dongle_update_callback"):
-                    get_value("dongle_update_callback")(self.name, {"state": 1})
-            # sometimes serial will receive more than 1 record at once
-            for record in hexlify(data).upper().decode().split("AA55"):
-                if record != "":
-                    if not protocol.crc16Xmodem_verify(record):
-                        print("receive data CRC check failed:%s" % record)
-                        logger.warning("CRC check failed for %s", record)
-                    else:
-                        protocol.decode(self, record)
-        elif data == b'\x04' or data == b'\x15' or data == b'\x18' or data == b'C':
+        elif self.state != 1: # data == b'\x04' or data == b'\x15' or data == b'\x18' or data == b'C':
             if self.state != 3:
                 self.state = 3
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
             self.flag = data
         else:
-            self.data = self.data+repr(data)
-            if "AA55" in hexlify(self.data).upper().decode():
-                if self.state != 1:
-                    # update to 1
-                    self.state = 1
-                    if get_value("dongle_update_callback"):
-                        get_value("dongle_update_callback")(self.name, {"state": 1})
-                # sometimes serial will receive more than 1 record at once
-                for record in hexlify(self.data).upper().decode().split("AA55"):
-                    if record != "":
+            if self.state != 1:
+                # update to 1
+                self.state = 1
+                if get_value("dongle_update_callback"):
+                    get_value("dongle_update_callback")(self.name, {"state": 1})
+            self.data = self.data + data
+            while len(self.data) >= 2:
+                if self.data[0] == 0xaa and self.data[1] == 0x55:
+                    if len(self.data) >= 6 and len(self.data) >= (6+self.data[5]+2):
+                        record = hexlify(self.data[2:6+self.data[5]+2]).upper().decode()
                         if not protocol.crc16Xmodem_verify(record):
                             print("receive data CRC check failed:%s" % record)
                             logger.warning("CRC check failed for %s", record)
                         else:
                             protocol.decode(self, record)
-                self.data = ""
-            logger.warn("receive unknown data:%s", repr(data))
+                        self.data = self.data[6+self.data[5]+2:]
 
     def connection_lost(self, exc: Optional[Exception]) -> None:
         global dongles_dict
