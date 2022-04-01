@@ -1,0 +1,1 @@
+cmd /k "cd /d emqx-4.4.1-otp23.0-windows-amd64_\emqx&&pause&&bin\emqx start"
