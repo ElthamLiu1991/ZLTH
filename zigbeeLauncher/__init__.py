@@ -3,6 +3,7 @@ import os
 from flask import Flask, render_template
 from .database import db, ma
 from .settings import DevelopmentConfig
+from flask_cors import CORS
 
 base_dir = os.path.abspath('./')
 
@@ -13,6 +14,8 @@ app = Flask(__name__,
 
 app.jinja_env.variable_start_string = '{['
 app.jinja_env.variable_end_string = ']}'
+
+CORS(app, supports_credentials=True)
 
 
 @app.route('/')
@@ -42,6 +45,5 @@ def create_app():
     app.register_blueprint(v1)
     # run Simulator
     from .mqtt import init
-    init("simulator")
-    init("launcher")
+    init()
     return app

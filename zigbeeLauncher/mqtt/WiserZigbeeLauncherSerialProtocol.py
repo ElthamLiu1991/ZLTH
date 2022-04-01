@@ -182,7 +182,8 @@ def state_response_handle(data):
         "state": int(data.payload[:2], 16),
         "configured": int(data.payload[2:], 16)
     }
-    data.dongle.state = rsp['state']
+    if rsp['state'] == 0 and rsp['state'] == 1:
+        data.dongle.state = 1
     data.dongle.configured = rsp['configured']
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)

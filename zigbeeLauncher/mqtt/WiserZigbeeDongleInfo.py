@@ -15,15 +15,13 @@ class Info:
         self.retry = 0
 
     def timeout(self, device, timestamp, uuid):
-        if self.dongle.state == 1:
-            if self.retry < 10:
-                logger.warn('%s, %s:Get info timeout, retry:%d', self.dongle.port, self.dongle.name, self.retry)
-                time.sleep(1)
-                self.retry = self.retry + 1
-                self.get_info()
-            else:
-                logger.error('Get info failed')
+        if self.retry < 5:
+            logger.warn('%s, %s:Get info timeout, retry:%d', self.dongle.port, self.dongle.name, self.retry)
+            time.sleep(1)
+            self.retry = self.retry + 1
+            self.get_info()
         else:
+            logger.error('Get info failed')
             if self.callback:
                 self.callback(self.dongle.name, {
                     "name": self.dongle.port,

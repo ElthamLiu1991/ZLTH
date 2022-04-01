@@ -29,13 +29,10 @@ def get_value(name, defValue=None):
 
 # 获取IP地址
 def get_ip_address():
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    finally:
-        s.close()
-        return ip
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    logger.info("get ip:%s", ip)
+    return ip
 
 
 # 获取MAC地址

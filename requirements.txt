@@ -10,7 +10,9 @@ click==8.0.4
 colorama==0.4.4
 config==0.5.1
 crcmod==1.7
+decorator==5.1.1
 Flask==2.0.3
+Flask-Cors==3.0.10
 flask-marshmallow==0.14.0
 Flask-MQTT==1.1.1
 Flask-RESTful==0.3.9
@@ -44,6 +46,7 @@ pytz==2021.3
 pywin32-ctypes==0.2.0
 PyYAML==6.0
 requests==2.27.1
+self==2020.12.3
 six==1.16.0
 sql==0.4.0
 SQLAlchemy==1.4.31

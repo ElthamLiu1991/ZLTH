@@ -100,37 +100,44 @@ def simulator_device_error(client, ip, payload, device):
 
 def request_synchronization(client):
     topic = mqtt_version + "/synchronization"
+    logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=None, qos=2)
 
 
 def request_simulator_info(client, ip):
     topic = mqtt_version + "/" + ip + "/simulator"
+    logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=None, qos=2)
 
 
 def request_dongle_info(client, ip, dongle):
     topic = mqtt_version + "/" + ip + "/simulator/devices/" + dongle
+    logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=None, qos=2)
 
 
 def simulator_command(simulator, body):
-    client = get_value('launcher')
-    if client:
-        data = pack_payload(body)
-        topic = mqtt_version + "/" + simulator + "/simulator/command"
-        logger.info("Publish: topic:%s", topic)
-        client.publish(topic, data)
+    brokers = get_value('brokers')
+    if brokers:
+        for value in brokers.values():
+            data = pack_payload(body)
+            topic = mqtt_version + "/" + simulator + "/simulator/command"
+            logger.info("Publish: topic:%s", topic)
+            value.publish(topic, data)
+            break
     else:
         logger.warn("Launcher MQTT client not ready")
 
 
 def dongle_command(simulator, name, body):
     print("this is dongle command", simulator, name, body)
-    client = get_value('launcher')
-    if client:
-        data = pack_payload(body)
-        topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
-        logger.info("Publish: topic:%s", topic)
-        client.publish(topic, data)
+    brokers = get_value('brokers')
+    if brokers:
+        for value in brokers.values():
+            data = pack_payload(body)
+            topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
+            logger.info("Publish: topic:%s", topic)
+            value.publish(topic, data)
+            break
     else:
         logger.warn("Launcher MQTT client not ready")

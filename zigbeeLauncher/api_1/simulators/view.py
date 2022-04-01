@@ -28,7 +28,7 @@ def show_simulators():
     for simulator in items:
         simulator['devices'] = []
         # 获取devices
-        devices = DBDevice(ip=simulator['mac']).retrieve()
+        devices = DBDevice(ip=simulator['ip']).retrieve()
         for device in devices:
             simulator['devices'].append(device['mac'])
     return jsonify(pack_response(0, items))
@@ -42,7 +42,7 @@ class SimulatorResource(Resource):
             simulator = DBSimulator(mac=mac).retrieve()[0]
             simulator['devices'] = []
             # 获取devices
-            devices = DBDevice(ip=simulator['mac']).retrieve()
+            devices = DBDevice(ip=simulator['ip']).retrieve()
             for device in devices:
                 simulator['devices'].append(device['mac'])
             return pack_response(0, simulator), 200

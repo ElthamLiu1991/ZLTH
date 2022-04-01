@@ -17,7 +17,10 @@ def simulator_error_callback(device, msg):
     data = pack_payload(msg)
     topic = mqtt_version + "/" + client_ip + "/simulator/error"
     logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
-    get_value("simulator").publish(topic, data, qos=2)
+    brokers = get_value('brokers')
+    if brokers:
+        for broker in brokers.keys():
+            brokers[broker].publish(topic, data, qos=2)
 
 
 def synchronization(client):
@@ -154,14 +157,20 @@ def dongle_info_callback(name, msg):
     data = pack_payload(msg)
     topic = mqtt_version + "/" + client_ip + "/simulator/devices/" + name + "/info"
     logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
-    get_value("simulator").publish(topic, data, qos=2)
+    brokers = get_value('brokers')
+    if brokers:
+        for broker in brokers.keys():
+            brokers[broker].publish(topic, data, qos=2)
 
 
 def dongle_update_callback(name, msg):
     data = pack_payload(msg)
     topic = mqtt_version + "/" + client_ip + "/simulator/devices/" + name + "/update"
     logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
-    get_value("simulator").publish(topic, data, qos=2)
+    brokers = get_value('brokers')
+    if brokers:
+        for broker in brokers.keys():
+            brokers[broker].publish(topic, data, qos=2)
 
 
 def dongle_error_callback(name, msg):
@@ -169,4 +178,7 @@ def dongle_error_callback(name, msg):
     data = pack_payload(msg)
     topic = mqtt_version + "/" + client_ip + "/simulator/devices/" + name + "/error"
     logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
-    get_value("simulator").publish(topic, data, qos=2)
+    brokers = get_value('brokers')
+    if brokers:
+        for broker in brokers.keys():
+            brokers[broker].publish(topic, data, qos=2)

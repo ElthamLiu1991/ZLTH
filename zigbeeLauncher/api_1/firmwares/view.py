@@ -68,19 +68,19 @@ class FirmwareResource(Resource):
                                 'file': open('./firmwares/' + args.get('filename'), 'rb')
                             }
                             # 调用POST /firmwares将文件发送给同一个局域网的simulator
-                            simulator = DBSimulator(mac=device['ip']).retrieve()
+                            simulator = DBSimulator(ip=device['ip']).retrieve()
                             if simulator:
                                 simulator = simulator[0]
                                 if not simulator['connected']:
-                                    return pack_response(20001, device=simulator['mac']), 500
+                                    return pack_response(20001, device=simulator['ip']), 500
                                 try:
                                     r = requests.post('http://' + simulator['ip'] + ':5000/api/1/firmwares',
                                                       files=files, timeout=5)
                                     if r.status_code != 200:
-                                        return pack_response(20002, device=simulator['mac'], error=""), 500
+                                        return pack_response(20002, device=simulator['ip'], error=""), 500
                                 except Exception as e:
                                     logger.exception("request error")
-                                    return pack_response(20003, device=simulator['mac']), 500
+                                    return pack_response(20003, device=simulator['ip']), 500
                             else:
                                 return pack_response(20000, device=device['ip']), 500
                         except Exception as e:

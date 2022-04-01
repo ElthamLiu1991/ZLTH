@@ -160,7 +160,7 @@ class Dongles(Protocol):
                 self.state = 2
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
-        elif self.state != 1: # data == b'\x04' or data == b'\x15' or data == b'\x18' or data == b'C':
+        elif self.state != 1 and (b'\x04' in data or b'\x06' in data or b'\x15' in data or b'\x18' in data or b'C' in data):
             if self.state != 3:
                 self.state = 3
                 if get_value("dongle_update_callback"):
