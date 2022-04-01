@@ -1,4 +1,6 @@
 import threading
+import time
+
 import paho.mqtt.client as mqtt
 
 from . import set_value, get_value, mqtt_version, client_ip, router
@@ -38,7 +40,14 @@ class WiserMQTT(threading.Thread):
             set_value(self.role, client)
             client.loop_forever()
         except TimeoutError:
-            logger.fatal("MQTT connect timeout, please try again later")
+            logger.warning("MQTT connect timeout, try again")
+            time.sleep(5)
+            self.run()
+        except ConnectionRefusedError:
+            logger.warning("MQTT connect refused, try again")
+            time.sleep(5)
+            self.run()
+
 
     @staticmethod
     def on_connect(client, userdata, flags, rc):
