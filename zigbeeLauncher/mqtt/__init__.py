@@ -7,6 +7,7 @@ from zeroconf import ServiceBrowser, Zeroconf, ServiceInfo, IPVersion
 from zigbeeLauncher.logging import mqttLogger as logger
 import rapidjson as json
 from .WiserZigbeeGlobal import _init, get_value, set_value, Router, Response, get_ip_address, get_mac_address
+
 mqtt_version = "v1.0"
 payload_validate = json.Validator('{"required":["timestamp", "uuid", "data"]}')
 client_mac = get_mac_address()
@@ -21,6 +22,14 @@ while True:
         break
     logger.warning("get ip address failed, waiting")
     time.sleep(1)
+
+from zigbeeLauncher.database.interface import DBDevice, DBSimulator
+# 将所有数据设置为offline
+DBSimulator().update({"connected": False})
+DBDevice().update({"connected": False})
+# 删除本地数据
+DBDevice(ip=client_mac).delete()
+DBSimulator(mac=client_mac).delete()
 
 from .WiserZigbeeLauncherMqtt import WiserMQTT
 
@@ -46,8 +55,12 @@ class MyListener:
             thread = WiserMQTT(addr, cast(int, info.port), get_mac_address(), 'launcher')
             thread.start()
             """
-            logger.info("Run %s MQTT client: simulator")
-            thread = WiserMQTT(addr, cast(int, info.port), client_ip, 'simulator')
+            logger.info("Run MQTT client: simulator")
+            if addr == client_ip:
+                logger.info("connect to 127.0.0.1 broker")
+                thread = WiserMQTT('127.0.0.1', cast(int, info.port), client_ip, 'simulator')
+            else:
+                thread = WiserMQTT(addr, cast(int, info.port), client_ip, 'simulator')
             thread.start()
 
     def update_service(self, zeroconf, type, name):
@@ -71,10 +84,6 @@ ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", MyListener())
 
 
 def init():
-    # 删除本地数据
-    from zigbeeLauncher.database.interface import DBDevice, DBSimulator
-    DBDevice(ip=client_mac).delete()
-    DBSimulator(mac=client_mac).delete()
     logger.info("register launcher service")
     info = ServiceInfo(
         "_launcher._tcp.local.",
