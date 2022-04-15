@@ -6,7 +6,7 @@ import werkzeug.datastructures
 from flask_restful import Api, Resource, reqparse
 from werkzeug.utils import secure_filename
 
-from zigbeeLauncher.api_1.response import pack_response
+from ..response import pack_response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt import get_mac_address
 from zigbeeLauncher.mqtt.WiserZigbeeLauncher import simulator_command

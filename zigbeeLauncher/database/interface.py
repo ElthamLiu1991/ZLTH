@@ -7,6 +7,8 @@ from .device import Device, DeviceSchema
 from zigbeeLauncher.logging import databaseLogger as log
 from zigbeeLauncher import app
 from .simulator import Simulator, SimulatorSchema
+from .zigbee import Zigbee, ZigbeeSchema, ZigbeeEndpoint, ZigbeeEndpointSchema, ZigbeeEndpointCluster, \
+    ZigbeeEndpointClusterSchema, ZigbeeEndpointClusterAttribute, ZigbeeEndpointClusterAttributeSchema
 
 
 class DBInterface:
@@ -59,21 +61,17 @@ class DBDevice(DBInterface):
     def add(self, data):
         try:
             if self.retrieve():
-                # update
-                if 'id' in data.keys():
-                    del data['id']
-                self.update(data)
-            else:
-                device = Device(data["ip"],
-                                data["name"],
-                                data["mac"],
-                                data["label"],
-                                data["connected"],
-                                data["configured"],
-                                data["state"],
-                                data["swversion"],
-                                data["hwversion"])
-                self._add(device)
+                self.delete()
+            device = Device(data["ip"],
+                            data["name"],
+                            data["mac"],
+                            data["label"],
+                            data["connected"],
+                            data["configured"],
+                            data["state"],
+                            data["swversion"],
+                            data["hwversion"])
+            self._add(device)
         except Exception as e:
             log.warning("inset device to database failed:%s", e)
 
@@ -94,18 +92,14 @@ class DBSimulator(DBInterface):
     def add(self, data):
         try:
             if self.retrieve():
-                # update
-                if 'id' in data.keys():
-                    del data['id']
-                self.update(data)
-            else:
-                simulator = Simulator(data["ip"],
-                                      data["name"],
-                                      data["mac"],
-                                      data["label"],
-                                      data["connected"],
-                                      data["version"])
-                self._add(simulator)
+                self.delete()
+            simulator = Simulator(data["ip"],
+                                  data["name"],
+                                  data["mac"],
+                                  data["label"],
+                                  data["connected"],
+                                  data["version"])
+            self._add(simulator)
         except Exception as e:
             log.warning("inset simulator to database failed:%s", e)
 
@@ -117,3 +111,115 @@ class DBSimulator(DBInterface):
 
     def retrieve(self):
         return self._retrieve(SimulatorSchema(many=True))
+
+
+class DBZigbee(DBInterface):
+    def __init__(self, **kwargs):
+        super(DBZigbee, self).__init__(table=Zigbee, **kwargs)
+
+    def add(self, data):
+        try:
+            if self.retrieve():
+                self.delete()
+            zigbee = Zigbee(data['mac'],
+                            data['device_type'],
+                            data['channel'],
+                            data['pan_id'],
+                            data['extended_pan_id'],
+                            data['node_id'])
+            self._add(zigbee)
+        except Exception as e:
+            log.exception("inset zigbee to database failed:%s", e)
+
+    def update(self, data):
+        self._update(data)
+
+    def delete(self):
+        self._delete()
+
+    def retrieve(self):
+        return self._retrieve(ZigbeeSchema(many=True))
+
+
+class DBZigbeeEndpoint(DBInterface):
+    def __init__(self, **kwargs):
+        super(DBZigbeeEndpoint, self).__init__(table=ZigbeeEndpoint, **kwargs)
+
+    def add(self, data):
+        try:
+            if self.retrieve():
+                self.delete()
+            zigbeeEndpoint = ZigbeeEndpoint(data['mac'],
+                                            data['endpoint'],
+                                            data['profile'],
+                                            data['device_id'],
+                                            data['device_version'])
+            self._add(zigbeeEndpoint)
+        except Exception as e:
+            log.exception("inset zigbeeEndpoint to database failed:%s", e)
+
+    def update(self, data):
+        self._update(data)
+
+    def delete(self):
+        self._delete()
+
+    def retrieve(self):
+        return self._retrieve(ZigbeeEndpointSchema(many=True))
+
+
+class DBZigbeeEndpointCluster(DBInterface):
+    def __init__(self, **kwargs):
+        super(DBZigbeeEndpointCluster, self).__init__(table=ZigbeeEndpointCluster, **kwargs)
+
+    def add(self, data):
+        try:
+            if self.retrieve():
+                self.delete()
+            zigbeeEndpointCluster = ZigbeeEndpointCluster(data['mac'],
+                                                          data['endpoint'],
+                                                          data['server'],
+                                                          data['cluster'],
+                                                          data['manufacturer'],
+                                                          data["manufacturer_code"])
+            self._add(zigbeeEndpointCluster)
+        except Exception as e:
+            log.exception("inset zigbeeEndpointCluster to database failed:%s", e)
+
+    def update(self, data):
+        self._update(data)
+
+    def delete(self):
+        self._delete()
+
+    def retrieve(self):
+        return self._retrieve(ZigbeeEndpointClusterSchema(many=True))
+
+
+class DBZigbeeEndpointClusterAttribute(DBInterface):
+    def __init__(self, **kwargs):
+        super(DBZigbeeEndpointClusterAttribute, self).__init__(table=ZigbeeEndpointClusterAttribute, **kwargs)
+
+    def add(self, data):
+        try:
+            if self.retrieve():
+                self.delete()
+            zigbeeEndpointClusterAttribute = ZigbeeEndpointClusterAttribute(data['mac'],
+                                                                            data['endpoint'],
+                                                                            data['server'],
+                                                                            data['cluster'],
+                                                                            data['attribute'],
+                                                                            data['type'],
+                                                                            data['value'])
+            self._add(zigbeeEndpointClusterAttribute)
+        except Exception as e:
+            log.exception("inset zigbeeEndpointClusterAttribute to database failed:%s", e)
+
+    def update(self, data):
+        self._update(data)
+
+    def delete(self):
+        self._delete()
+
+    def retrieve(self):
+        return self._retrieve(ZigbeeEndpointClusterAttributeSchema(many=True))

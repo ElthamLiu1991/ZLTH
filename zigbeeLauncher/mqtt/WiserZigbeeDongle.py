@@ -1,10 +1,9 @@
 import asyncio
 import base64
-import os
 import platform
 import time
 from asyncio import transports, Protocol
-from binascii import hexlify, unhexlify
+from binascii import hexlify
 from threading import Thread
 from typing import Optional
 
@@ -14,11 +13,14 @@ import serial_asyncio
 
 from zigbeeLauncher.logging import dongleLogger as logger
 from zigbeeLauncher.mqtt.WiserZigbeeDongleInfo import Info
-from . import WiserZigbeeLauncherSerialProtocol as protocol
+from zigbeeLauncher.serial_protocol import SerialProtocol as protocol
 from .WiserZigbeeDongleCommands import Command, send_command, commands_init
 from .WiserZigbeeDongleUpgrade import Upgrade, bootloader_stop_transfer, bootloader_stop_transfer_response, \
     bootloader_finish_transfer, bootloader_start_transfer_response, WiserFile
 from .WiserZigbeeGlobal import set_value, get_value, except_handle
+from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
+from zigbeeLauncher.serial_protocol.SerialProtocol01 import *
+from zigbeeLauncher.serial_protocol.SerialProtocol02 import *
 
 
 def dongle_error_callback(device, msg):
@@ -39,7 +41,7 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
     if command == "identify":
         send_command(Command(
             dongle=dongles_dict[device],
-            request=protocol.identify_request_handle,
+            request=identify_request_handle,
             response=protocol.error,
             timeout=protocol.timeout), timestamp, uuid, None)
     elif command == "reset":
@@ -56,7 +58,7 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
         else:
             send_command(Command(
                 dongle=dongles_dict[device],
-                request=protocol.reset_request_handle,
+                request=reset_request_handle,
                 timeout=protocol.timeout), timestamp, uuid, None)
 
     elif command == "firmware":
@@ -79,14 +81,35 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
     elif command == "label":
         send_command(Command(
             dongle=dongles_dict[device],
-            request=protocol.label_write_handle,
+            request=label_write_handle,
             response=protocol.error,
             timeout=protocol.timeout,
             done=lambda: send_command(Command(
                     dongle=dongles_dict[device],
-                    request=protocol.label_request_handle,
+                    request=label_request_handle,
                     response=protocol.error,
                     timeout=protocol.timeout))), timestamp, uuid, payload["data"])
+    elif command == "attribute":
+        send_command(Command(
+            dongle=dongles_dict[device],
+            request=attribute_write_request_handle,
+            response=protocol.error,
+            timeout=protocol.timeout
+        ), timestamp, uuid, payload)
+    elif command == "join":
+        send_command(Command(
+            dongle=dongles_dict[device],
+            request=join_network_request_handle,
+            response=protocol.error,
+            timeout=protocol.timeout
+        ), timestamp, uuid, payload)
+    elif command == "leave":
+        send_command(Command(
+            dongle=dongles_dict[device],
+            request=leave_network_request_handle,
+            response=protocol.error,
+            timeout=protocol.timeout
+        ), timestamp, uuid, None)
     else:
         raise Exception("unsupported command:"+command)
 
@@ -154,7 +177,7 @@ class Dongles(Protocol):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
         elif "Gecko Bootloader" in repr(data):
             logger.info("%s, %s: Gecko Bootloader", self.port, self.name)
-            protocol.reset_bootloader_request_response(self.name)
+            reset_bootloader_request_response(self.name)
             if self.state != 2:
                 # update to 2
                 self.state = 2

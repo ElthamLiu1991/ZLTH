@@ -40,9 +40,12 @@ def create_app():
     ma.init_app(app)
     from .database.device import Device
     from .database.simulator import Simulator
+    from .database.zigbee import Zigbee, ZigbeeEndpoint
     db.create_all(app=app)
     from .api_1 import api as v1
     app.register_blueprint(v1)
+    from .api_1_1 import api as v1_1
+    app.register_blueprint(v1_1)
     # run Simulator
     from .mqtt import init
     init()

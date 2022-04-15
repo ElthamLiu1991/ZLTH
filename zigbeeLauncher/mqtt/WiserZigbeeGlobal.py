@@ -112,7 +112,8 @@ class Response(object):
         func = self.url_map.get(url)
         if not func:
             raise ValueError('No response function: %s', url)
-        return func(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
 
 
 def except_handle(error_handle):

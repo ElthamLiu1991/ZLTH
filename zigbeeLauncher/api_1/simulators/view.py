@@ -1,38 +1,39 @@
 import rapidjson
 from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
-from zigbeeLauncher.api_1.simulators import simulators
+from . import simulators
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt.WiserZigbeeLauncher import simulator_command
 from zigbeeLauncher.logging import flaskLogger as logger
-from zigbeeLauncher.api_1.response import pack_response
+from ..response import pack_response
 
 
-@simulators.route("/", methods=['GET'])
-def show_simulators():
-    """
-    获取数据库device表并传给前端
-    :return: device所有数据
-    """
-    if request.args:
-        try:
-            paras = {}
-            for key in request.args:
-                paras[key] = request.args[key]
-            items = DBSimulator(**paras).retrieve()
-        except Exception as e:
-            logger.exception("request error")
-            return pack_response(90000, error="bad parameters:"+str(request.args)), 500
-    else:
-        items = DBSimulator().retrieve()
-    for simulator in items:
-        simulator['devices'] = []
-        # 获取devices
-        devices = DBDevice(ip=simulator['ip']).retrieve()
-        for device in devices:
-            simulator['devices'].append(device['mac'])
-    return jsonify(pack_response(0, items))
-    # return render_template('show_all_devices.html', devices=Device.query.all())
+class SimulatorsResource(Resource):
+
+    def get(self, mac):
+        """
+        获取数据库device表并传给前端
+        :return: device所有数据
+        """
+        if request.args:
+            try:
+                paras = {}
+                for key in request.args:
+                    paras[key] = request.args[key]
+                items = DBSimulator(**paras).retrieve()
+            except Exception as e:
+                logger.exception("request error")
+                return pack_response(90000, error="bad parameters:"+str(request.args)), 500
+        else:
+            items = DBSimulator().retrieve()
+        for simulator in items:
+            simulator['devices'] = []
+            # 获取devices
+            devices = DBDevice(ip=simulator['ip']).retrieve()
+            for device in devices:
+                simulator['devices'].append(device['mac'])
+        return jsonify(pack_response(0, items))
+        # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
 class SimulatorResource(Resource):

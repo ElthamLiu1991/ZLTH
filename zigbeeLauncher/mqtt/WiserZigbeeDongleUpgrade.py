@@ -1,13 +1,10 @@
-import asyncio
-import random
 import time
 from threading import Thread
 
 from xmodem import XMODEM
 
 from .WiserZigbeeDongleInfo import Info
-from .WiserZigbeeLauncherSerialProtocol import reset_bootloader_request_handle, \
-    info_request_handle
+from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
 from .WiserZigbeeDongleCommands import Command, send_command, commands
 from .WiserZigbeeGlobal import get_value
 from zigbeeLauncher.logging import dongleLogger as logger

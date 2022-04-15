@@ -6,7 +6,13 @@ codes = {
     20001: "simulator {device} is offline",
     20002: "simulator {device} error: {error}",
     20003: "simulator {device} unreachable",
-    90000: "internal error: {error}"
+    30000: "attribute {attribute} not exist",
+    40000: "{device} not in any network",
+    40001: "{device} already in a network",
+    90000: "internal error: {error}",
+    90001: "missing mandatory item in payload",
+    90002: "unsupported command: {command}",
+
 }
 
 

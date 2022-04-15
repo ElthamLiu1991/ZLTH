@@ -1,7 +1,9 @@
 import time
 
-from .WiserZigbeeLauncherSerialProtocol import info_request_handle, \
-    state_request_handle, label_request_handle
+from zigbeeLauncher.serial_protocol.SerialProtocol02 import endpoint_list_request_handle, \
+    endpoint_descriptor_request_handle
+from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
+from zigbeeLauncher.serial_protocol.SerialProtocol01 import *
 from .WiserZigbeeDongleCommands import Command, send_command
 from zigbeeLauncher.logging import dongleLogger as logger
 
@@ -13,6 +15,7 @@ class Info:
         self.info = {"name": dongle.port, "mac": dongle.name}
         self.get_info()
         self.retry = 0
+        self.counter = 0
 
     def timeout(self, device, timestamp, uuid):
         if self.retry < 5:
@@ -35,7 +38,14 @@ class Info:
                 })
 
     def response(self, device, userdata):
-        self.info.update(userdata)
+        if 'descriptor' not in userdata:
+            self.info = dict(**self.info, **userdata)
+        else:
+            if 'endpoints' not in self.info['zigbee']:
+                self.info['zigbee']['endpoints'] = [userdata['descriptor']]
+            else:
+                self.info['zigbee']['endpoints'].append(userdata['descriptor'])
+        # self.info.update(userdata)
         logger.info(self.info)
 
     def call_callback(self):
@@ -68,4 +78,36 @@ class Info:
             request=state_request_handle,
             response=self.response,
             timeout=self.timeout,
-            done=self.call_callback))
+            done=self.get_network_state))
+
+    def get_network_state(self):
+        send_command(Command(
+            dongle=self.dongle,
+            request=network_status_request_handle,
+            response=self.response,
+            timeout=self.timeout,
+            done=self.get_endpoint_list))
+
+    def get_endpoint_list(self):
+        send_command(Command(
+            dongle=self.dongle,
+            request=endpoint_list_request_handle,
+            response=self.response,
+            timeout=self.timeout,
+            done=self.get_endpoint_descriptor))
+
+    def get_endpoint_descriptor(self):
+        for endpoint in self.info['endpoint']:
+            send_command(Command(
+                dongle=self.dongle,
+                request=endpoint_descriptor_request_handle,
+                response=self.response,
+                timeout=self.timeout,
+                done=self.counting), payload=endpoint)
+
+    def counting(self):
+        self.counter = self.counter + 1
+        if self.counter == len(self.info['endpoint']):
+            print("descriptor finish")
+            del self.info['endpoint']
+            self.call_callback()
