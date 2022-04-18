@@ -16,7 +16,7 @@ zigbee_api.add_resource(ZigbeesResource, '/zigbees/')
 zigbee_api.add_resource(ZigbeeResource, '/zigbees/<string:mac>')
 
 simulator_api = Api(api)
-simulator_api.add_resource(SimulatorsResource, '/simulators')
+simulator_api.add_resource(SimulatorsResource, '/simulators/')
 simulator_api.add_resource(SimulatorResource, '/simulators/<string:mac>')
 
 files_api = Api(api)

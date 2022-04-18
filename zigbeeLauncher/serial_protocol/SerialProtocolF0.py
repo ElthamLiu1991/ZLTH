@@ -90,7 +90,7 @@ def state_request_handle(payload=None):
 @response.cmd(local_setting_command + state_response)
 def state_response_handle(data):
     rsp = {
-        "configured": int(data.payload[2:], 16)
+        "configured": bool(int(data.payload[2:], 16))
     }
     data.dongle.configured = rsp['configured']
     if (data.seq, data.dongle.name) in commands:

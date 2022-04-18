@@ -9,7 +9,7 @@ from . import router, mqtt_version, client_ip, client_mac, payload_validate
 from .WiserZigbeeGlobal import pack_payload, get_value, except_handle, get_ip_address
 from .WiserZigbeeDongle import upload_port_info, dongle_command_handle, pack_port_info
 from zigbeeLauncher.logging import simulatorLogger as logger
-from ..database.interface import DBDevice
+from ..database.interface import DBDevice, DBSimulator
 
 
 def simulator_error_callback(device, msg):
@@ -121,6 +121,17 @@ def simulator_command(client, ip, payload):
                     "filename": filename
                 }
             })
+    elif command == 'label':
+        label = command_payload['data']
+        DBSimulator(ip=ip).update({'label':data['data']['payload']['data']})
+        # update
+        data = pack_payload({'label': label})
+        topic = mqtt_version + "/" + client_ip + "/simulator/" + ip + "/update"
+        logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
+        brokers = get_value('brokers')
+        if brokers:
+            for broker in brokers.keys():
+                brokers[broker].publish(topic, data, qos=2)
     else:
         logger.warn("unsupported command:%s", command)
         raise Exception("unsupported command: " + command)
@@ -138,12 +149,16 @@ def pack_simulator_info():
     version = '1.0'
     with open('./version/version.txt', 'r') as f:
         version = f.read()
+    simulator = DBSimulator(mac=client_mac).retrieve()
+    label = ''
+    if simulator:
+        label = simulator[0]['label']
     data = {
         "ip": get_ip_address(),
         "mac": client_mac,
         "name": "simulator-" + client_ip,
         "connected": 1,
-        "label": "",
+        "label": label,
         "version": version,
         "devices": pack_port_info()
     }

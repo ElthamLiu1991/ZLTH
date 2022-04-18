@@ -10,7 +10,7 @@ from ..response import pack_response
 
 class SimulatorsResource(Resource):
 
-    def get(self, mac):
+    def get(self):
         """
         获取数据库device表并传给前端
         :return: device所有数据
@@ -59,7 +59,7 @@ class SimulatorResource(Resource):
         if simulator:
             try:
                 if simulator[0]['connected']:
-                    simulator_command(mac, args)
+                    simulator_command(simulator[0]['ip'], args)
                     return pack_response(0), 200
                 else:
                     return pack_response(20001, device=mac), 500
