@@ -119,6 +119,7 @@ class Dongles(Protocol):
         self.name = ""  # mac
         self.port = ""  # name
         self.state = 1
+        self.new_state = 1
         self.label = ""
         self.configured = 0
         self.swversion = ""
@@ -153,48 +154,53 @@ class Dongles(Protocol):
         if "Serial upload aborted" in repr(data):
             logger.info("%s, %s: Serial upload aborted", self.port, self.name)
             bootloader_stop_transfer_response(self.name)
-            if self.state != 2:
+            if self.new_state != 2:
                 # update to 2
-                self.state = 2
+                self.new_state = 2
+                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
 
         elif "Serial upload complete" in repr(data):
             logger.info("%s, %s: Serial upload complete", self.port, self.name)
             self.flag = b'\x06'
-            if self.state != 2:
+            if self.new_state != 2:
                 # update to 2
-                self.state = 2
+                self.new_state = 2
+                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
 
         elif "begin upload" in repr(data):
             logger.info("%s, %s: Serial upload begin", self.port, self.name)
             bootloader_start_transfer_response(self.name)
-            if self.state != 3:
-                self.state = 3
+            if self.new_state != 3:
+                self.new_state = 3
+                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
         elif "Gecko Bootloader" in repr(data):
             logger.info("%s, %s: Gecko Bootloader", self.port, self.name)
             reset_bootloader_request_response(self.name)
-            if self.state != 2:
+            if self.new_state != 2:
                 # update to 2
-                self.state = 2
+                self.new_state = 2
+                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
-        elif self.state != 1 and (b'\x04' in data or b'\x06' in data or b'\x15' in data or b'\x18' in data or b'C' in data):
-            if self.state != 3:
-                self.state = 3
+        elif self.new_state != 1 and (b'\x04' in data or b'\x06' in data or b'\x15' in data or b'\x18' in data or b'C' in data):
+            if self.new_state != 3:
+                self.new_state = 3
+                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
             self.flag = data
         else:
-            if self.state != 1:
+            if self.new_state != self.state:
                 # update to 1
-                self.state = 1
+                self.new_state = self.state
                 if get_value("dongle_update_callback"):
-                    get_value("dongle_update_callback")(self.name, {"state": 1})
+                    get_value("dongle_update_callback")(self.name, {"state": self.state})
             self.data = self.data + data
             logger.info("receive data:%s", repr(data))
             while len(self.data) >= 2:

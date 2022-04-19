@@ -39,6 +39,7 @@ def network_status_response_handle(data):
         rsp.update({"state": 7})
     elif state == "11":
         rsp.update({"state": 4})
+    data.dongle.set_attributes(state=rsp['state'])
     zigbee = {}
     device_type = data.payload[index:index + 2]
     index = index + 2

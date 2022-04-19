@@ -8,6 +8,7 @@ from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
 from .WiserZigbeeDongleCommands import Command, send_command, commands
 from .WiserZigbeeGlobal import get_value
 from zigbeeLauncher.logging import dongleLogger as logger
+from ..serial_protocol.SerialProtocol01 import leave_network_request_handle
 
 
 def bootloader_start_transfer(payload=None):
@@ -39,8 +40,14 @@ class Upgrade:
         self.counter = len(file.data)/128
         self.percentage = -1
         self.done = False
+        # self.leave_network()
         self.enter_bootloader()
         self.retry = 0
+
+    def leave_network(self):
+        send_command(Command(
+            dongle=self.dongle,
+            request=leave_network_request_handle))
 
     def enter_bootloader(self):
         # if device already in bootloader mode, stop current transfer first

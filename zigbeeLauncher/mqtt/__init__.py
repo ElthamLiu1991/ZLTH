@@ -29,7 +29,7 @@ DBSimulator().update({"connected": False})
 DBDevice().update({"connected": False})
 # 删除本地数据
 DBDevice(ip=client_mac).delete()
-DBSimulator(mac=client_mac).delete()
+# DBSimulator(mac=client_mac).delete()
 
 from .WiserZigbeeLauncherMqtt import WiserMQTT
 

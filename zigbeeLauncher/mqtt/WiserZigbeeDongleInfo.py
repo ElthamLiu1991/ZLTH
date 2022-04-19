@@ -18,13 +18,26 @@ class Info:
         self.counter = 0
 
     def timeout(self, device, timestamp, uuid):
-        if self.retry < 5:
-            logger.warn('%s, %s:Get info timeout, retry:%d', self.dongle.port, self.dongle.name, self.retry)
-            time.sleep(1)
-            self.retry = self.retry + 1
-            self.get_info()
+        if self.dongle.state != 2 and self.dongle.state != 3:
+            if self.retry < 5:
+                logger.warn('%s, %s:Get info timeout, retry:%d', self.dongle.port, self.dongle.name, self.retry)
+                time.sleep(1)
+                self.retry = self.retry + 1
+                self.get_info()
+            else:
+                logger.error('Get info failed')
+                if self.callback:
+                    self.callback(self.dongle.name, {
+                        "name": self.dongle.port,
+                        "mac": self.dongle.name,
+                        "connected": True,
+                        "swversion": '0',
+                        "hwversion": '0',
+                        "label": '',
+                        "state": self.dongle.state,
+                        "configured": 0
+                    })
         else:
-            logger.error('Get info failed')
             if self.callback:
                 self.callback(self.dongle.name, {
                     "name": self.dongle.port,

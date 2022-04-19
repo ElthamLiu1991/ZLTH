@@ -149,10 +149,10 @@ def pack_simulator_info():
     version = '1.0'
     with open('./version/version.txt', 'r') as f:
         version = f.read()
-    simulator = DBSimulator(mac=client_mac).retrieve()
+    result = DBSimulator(mac=client_mac).retrieve()
     label = ''
-    if simulator:
-        label = simulator[0]['label']
+    if result:
+        label = result[0]['label']
     data = {
         "ip": get_ip_address(),
         "mac": client_mac,
