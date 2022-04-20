@@ -44,6 +44,8 @@ def create_app():
     db.create_all(app=app)
     from .api_1 import api as v1
     app.register_blueprint(v1)
+    from .api_2 import api as v2
+    app.register_blueprint(v2)
     # run Simulator
     from .mqtt import init
     init()

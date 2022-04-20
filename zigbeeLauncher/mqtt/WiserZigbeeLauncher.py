@@ -201,7 +201,11 @@ def simulator_command(simulator, body):
     brokers = get_value('brokers')
     if brokers:
         for value in brokers.values():
-            data = pack_payload(body)
+            payload = {}
+            if 'payload' in body:
+                payload = body['payload']
+            new_payload = {body['command']: payload}
+            data = pack_payload(new_payload)
             topic = mqtt_version + "/" + simulator + "/simulator/command"
             logger.info("Publish: topic:%s", topic)
             value.publish(topic, data)
@@ -211,6 +215,37 @@ def simulator_command(simulator, body):
 
 
 def dongle_command(simulator, name, body):
+    print("this is dongle command", simulator, name, body)
+    brokers = get_value('brokers')
+    if brokers:
+        for value in brokers.values():
+            payload = {}
+            if 'payload' in body:
+                payload = body['payload']
+            new_payload = {body['command']: payload}
+            data = pack_payload(new_payload)
+            topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
+            logger.info("Publish: topic:%s", topic)
+            value.publish(topic, data)
+            break
+    else:
+        logger.warn("Launcher MQTT client not ready")
+
+
+def simulator_command_2(simulator, body):
+    brokers = get_value('brokers')
+    if brokers:
+        for value in brokers.values():
+            data = pack_payload(body)
+            topic = mqtt_version + "/" + simulator + "/simulator/command"
+            logger.info("Publish: topic:%s", topic)
+            value.publish(topic, data)
+            break
+    else:
+        logger.warn("Launcher MQTT client not ready")
+
+
+def dongle_command_2(simulator, name, body):
     print("this is dongle command", simulator, name, body)
     brokers = get_value('brokers')
     if brokers:

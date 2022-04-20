@@ -1,3 +1,4 @@
+import sys
 import threading
 import time
 from typing import cast
@@ -84,6 +85,9 @@ ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", MyListener())
 
 
 def init():
+    if sys.platform.startswith('darwin'):
+        thread = WiserMQTT('127.0.0.1', 1883, client_ip, 'simulator')
+        thread.start()
     logger.info("register launcher service")
     info = ServiceInfo(
         "_launcher._tcp.local.",

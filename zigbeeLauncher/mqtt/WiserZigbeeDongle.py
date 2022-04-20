@@ -31,87 +31,88 @@ def dongle_error_callback(device, msg):
 
 @except_handle(dongle_error_callback)
 def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
-    command = data["command"]
-    payload = data["payload"]
     if device not in dongles_dict:
         raise Exception("device not exist")
-    if dongles_dict[device].state == 2 and command != "reset" and command != "firmware":
-        # cannot operate device when device in bootloader mode
-        raise Exception("device is in bootloader mode")
-    if command == "identify":
-        send_command(Command(
-            dongle=dongles_dict[device],
-            request=identify_request_handle,
-            response=protocol.error,
-            timeout=protocol.timeout), timestamp, uuid, None)
-    elif command == "reset":
-        if dongles_dict[device].state == 2:
-            # 在bootloader模式下reset需要先停止当前的transfer
+    for key in data.keys():
+        command = key
+        payload = data[key]
+        if dongles_dict[device].state == 2 and command != "reset" and command != "firmware":
+            # cannot operate device when device in bootloader mode
+            raise Exception("device is in bootloader mode")
+        if command == "identify":
             send_command(Command(
                 dongle=dongles_dict[device],
-                request=bootloader_stop_transfer,
+                request=identify_request_handle,
+                response=protocol.error,
+                timeout=protocol.timeout), timestamp, uuid, None)
+        elif command == "reset":
+            if dongles_dict[device].state == 2:
+                # 在bootloader模式下reset需要先停止当前的transfer
+                send_command(Command(
+                    dongle=dongles_dict[device],
+                    request=bootloader_stop_transfer,
+                    timeout=protocol.timeout,
+                    done=lambda: send_command(Command(
+                        dongle=dongles_dict[device],
+                        request=bootloader_finish_transfer,
+                        timeout=protocol.timeout), timestamp, uuid, None)), timestamp, uuid, None)
+            else:
+                send_command(Command(
+                    dongle=dongles_dict[device],
+                    request=reset_request_handle,
+                    timeout=protocol.timeout), timestamp, uuid, None)
+
+        elif command == "firmware":
+            if "data" in payload:
+                if "filename" in payload:
+                    filename = payload["filename"]
+                else:
+                    filename = uuid.uuid1()
+                filename = './firmwares/' + filename
+                # save data to file
+                with open(filename, 'wb') as f:
+                    f.write(base64.b64decode(payload["data"]))
+                file = WiserFile(filename)
+                Upgrade(dongles_dict[device], file)
+            else:
+                filename = './firmwares/' + payload['filename']
+                file = WiserFile(filename)
+                Upgrade(dongles_dict[device], file)
+
+        elif command == "label":
+            send_command(Command(
+                dongle=dongles_dict[device],
+                request=label_write_handle,
+                response=protocol.error,
                 timeout=protocol.timeout,
                 done=lambda: send_command(Command(
-                    dongle=dongles_dict[device],
-                    request=bootloader_finish_transfer,
-                    timeout=protocol.timeout), timestamp, uuid, None)), timestamp, uuid, None)
-        else:
+                        dongle=dongles_dict[device],
+                        request=label_request_handle,
+                        response=protocol.error,
+                        timeout=protocol.timeout))), timestamp, uuid, payload["data"])
+        elif command == "attribute":
             send_command(Command(
                 dongle=dongles_dict[device],
-                request=reset_request_handle,
-                timeout=protocol.timeout), timestamp, uuid, None)
-
-    elif command == "firmware":
-        if "data" in payload:
-            if "filename" in payload:
-                filename = payload["filename"]
-            else:
-                filename = uuid.uuid1()
-            filename = './firmwares/' + filename
-            # save data to file
-            with open(filename, 'wb') as f:
-                f.write(base64.b64decode(payload["data"]))
-            file = WiserFile(filename)
-            Upgrade(dongles_dict[device], file)
+                request=attribute_write_request_handle,
+                response=protocol.error,
+                timeout=protocol.timeout
+            ), timestamp, uuid, payload)
+        elif command == "join":
+            send_command(Command(
+                dongle=dongles_dict[device],
+                request=join_network_request_handle,
+                response=protocol.error,
+                timeout=protocol.timeout
+            ), timestamp, uuid, payload)
+        elif command == "leave":
+            send_command(Command(
+                dongle=dongles_dict[device],
+                request=leave_network_request_handle,
+                response=protocol.error,
+                timeout=protocol.timeout
+            ), timestamp, uuid, None)
         else:
-            filename = './firmwares/' + payload['filename']
-            file = WiserFile(filename)
-            Upgrade(dongles_dict[device], file)
-
-    elif command == "label":
-        send_command(Command(
-            dongle=dongles_dict[device],
-            request=label_write_handle,
-            response=protocol.error,
-            timeout=protocol.timeout,
-            done=lambda: send_command(Command(
-                    dongle=dongles_dict[device],
-                    request=label_request_handle,
-                    response=protocol.error,
-                    timeout=protocol.timeout))), timestamp, uuid, payload["data"])
-    elif command == "attribute":
-        send_command(Command(
-            dongle=dongles_dict[device],
-            request=attribute_write_request_handle,
-            response=protocol.error,
-            timeout=protocol.timeout
-        ), timestamp, uuid, payload)
-    elif command == "join":
-        send_command(Command(
-            dongle=dongles_dict[device],
-            request=join_network_request_handle,
-            response=protocol.error,
-            timeout=protocol.timeout
-        ), timestamp, uuid, payload)
-    elif command == "leave":
-        send_command(Command(
-            dongle=dongles_dict[device],
-            request=leave_network_request_handle,
-            response=protocol.error,
-            timeout=protocol.timeout
-        ), timestamp, uuid, None)
-    else:
-        raise Exception("unsupported command:"+command)
+            raise Exception("unsupported command:"+command)
 
 
 class Dongles(Protocol):
@@ -157,7 +158,6 @@ class Dongles(Protocol):
             if self.new_state != 2:
                 # update to 2
                 self.new_state = 2
-                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
 
@@ -167,7 +167,6 @@ class Dongles(Protocol):
             if self.new_state != 2:
                 # update to 2
                 self.new_state = 2
-                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
 
@@ -176,7 +175,6 @@ class Dongles(Protocol):
             bootloader_start_transfer_response(self.name)
             if self.new_state != 3:
                 self.new_state = 3
-                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
         elif "Gecko Bootloader" in repr(data):
@@ -185,13 +183,11 @@ class Dongles(Protocol):
             if self.new_state != 2:
                 # update to 2
                 self.new_state = 2
-                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 2})
-        elif self.new_state != 1 and (b'\x04' in data or b'\x06' in data or b'\x15' in data or b'\x18' in data or b'C' in data):
+        elif self.new_state == 2 or self.new_state == 3 and (b'\x04' in data or b'\x06' in data or b'\x15' in data or b'\x18' in data or b'C' in data):
             if self.new_state != 3:
                 self.new_state = 3
-                self.state = self.new_state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": 3})
             self.flag = data

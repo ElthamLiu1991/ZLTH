@@ -181,7 +181,8 @@ class DBZigbeeEndpointCluster(DBInterface):
                                                           data['server'],
                                                           data['cluster'],
                                                           data['manufacturer'],
-                                                          data["manufacturer_code"])
+                                                          data["manufacturer_code"],
+                                                          data['name'])
             self._add(zigbeeEndpointCluster)
         except Exception as e:
             log.exception("inset zigbeeEndpointCluster to database failed:%s", e)
@@ -210,7 +211,8 @@ class DBZigbeeEndpointClusterAttribute(DBInterface):
                                                                             data['cluster'],
                                                                             data['attribute'],
                                                                             data['type'],
-                                                                            data['value'])
+                                                                            data['value'],
+                                                                            data['name'])
             self._add(zigbeeEndpointClusterAttribute)
         except Exception as e:
             log.exception("inset zigbeeEndpointClusterAttribute to database failed:%s", e)

@@ -78,8 +78,9 @@ def endpoint_descriptor_response_handle(data):
             manufacturer = True
         attributes = []
         if cluster == '0006':
-            attributes.append({'attribute': '0000', 'type': '10', 'value': "0"})
-        endpoint['server_clusters'].append({'cluster': cluster, 'manufacturer': manufacturer,
+            attributes.append({'attribute': '0000', 'name': 'onoff', 'type': '10', 'value': "0"})
+        # TODO: get cluster name
+        endpoint['server_clusters'].append({'cluster': cluster, 'name': cluster, 'manufacturer': manufacturer,
                                             'manufacturer_code': manufacturer_code, 'attributes': attributes})
     i = 0
     endpoint['client_clusters'] = []
@@ -95,8 +96,9 @@ def endpoint_descriptor_response_handle(data):
             manufacturer = True
         attributes = []
         if cluster == '0006':
-            attributes.append({'attribute': '0000', 'type': '10', 'value': "0"})
-        endpoint['client_clusters'].append({'cluster': cluster, 'manufacturer': manufacturer,
+            attributes.append({'attribute': '0000', 'name': 'onoff', 'type': '10', 'value': "0"})
+        # TODO: get cluster name
+        endpoint['client_clusters'].append({'cluster': cluster, 'name': cluster, 'manufacturer': manufacturer,
                                             'manufacturer_code': manufacturer_code, 'attributes': attributes})
     rsp['descriptor'] = endpoint
     if (data.seq, data.dongle.name) in commands:
@@ -152,9 +154,9 @@ def attribute_response_handle(data):
     index = index + 4
     attribute_property = data.payload[index:index+2]
     index = index + 2
-    attribute['type'] = data.payload[index:index+2]
+    type = data.payload[index:index+2]
     index = index + 2
-    if get_bytes(attribute['type']) == 0:
+    if get_bytes(type) == 0:
         # string type
         attribute['value'] = unhexlify(data.payload[index:].encode('utf-8')).decode('utf-8')
     else:

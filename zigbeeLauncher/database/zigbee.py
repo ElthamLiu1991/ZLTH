@@ -55,15 +55,17 @@ class ZigbeeEndpointCluster(db.Model):
     cluster = db.Column(db.String(5))
     manufacturer = db.Column(db.Boolean())
     manufacturer_code = db.Column(db.String(5))
+    name = db.Column(db.String(30))
 
     def __init__(self, mac, endpoint, server, cluster, manufacturer,
-                 manufacturer_code):
+                 manufacturer_code, name):
         self.mac = mac
         self.endpoint = endpoint
         self.server = server
         self.cluster = cluster
         self.manufacturer = manufacturer
         self.manufacturer_code = manufacturer_code
+        self.name = name
 
 
 class ZigbeeEndpointClusterSchema(ma.SQLAlchemyAutoSchema):
@@ -81,8 +83,9 @@ class ZigbeeEndpointClusterAttribute(db.Model):
     attribute = db.Column(db.String(5))
     type = db.Column(db.String(2))
     value = db.Column(db.String(30))
+    name = db.Column(db.String(30))
 
-    def __init__(self, mac, endpoint, server, cluster, attribute, type, value):
+    def __init__(self, mac, endpoint, server, cluster, attribute, type, value, name):
         self.mac = mac
         self.endpoint = endpoint
         self.server = server
@@ -90,6 +93,7 @@ class ZigbeeEndpointClusterAttribute(db.Model):
         self.attribute = attribute
         self.type = type
         self.value = value
+        self.name = name
 
 
 class ZigbeeEndpointClusterAttributeSchema(ma.SQLAlchemyAutoSchema):

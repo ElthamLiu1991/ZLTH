@@ -101,40 +101,40 @@ def simulator_command(client, ip, payload):
     payload_validate(payload)
     data = rapidjson.loads(payload)
     data_obj = data["data"]
-    command = data_obj["command"]
-    command_payload = data_obj["payload"]
-    if command == "firmware" and command_payload:
-        if "data" in command_payload:
-            if "filename" in command_payload:
-                filename = command_payload["filename"]
+    for key in data_obj.keys():
+        command = key
+        command_payload = data_obj[key]
+        if command == "firmware" and command_payload:
+            if "data" in command_payload:
+                if "filename" in command_payload:
+                    filename = command_payload["filename"]
+                else:
+                    filename = uuid.uuid1()
+                # save data to file
+                with open('./firmwares/' + filename, 'wb') as f:
+                    f.write(base64.b64decode(command_payload["data"]))
             else:
-                filename = uuid.uuid1()
-            # save data to file
-            with open('./firmwares/' + filename, 'wb') as f:
-                f.write(base64.b64decode(command_payload["data"]))
+                filename = command_payload["filename"]
+            for device in command_payload["devices"]:
+                dongle_command_handle(device=device, timestamp=data["timestamp"], uuid=data["uuid"], data={
+                    "firmware": {
+                        "filename": filename
+                    }
+                })
+        elif command == 'label':
+            label = command_payload['data']
+            DBSimulator(ip=ip).update({'label':data['data']['label']['data']})
+            # update
+            data = pack_payload({'label': label})
+            topic = mqtt_version + "/" + client_ip + "/simulator/" + ip + "/update"
+            logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
+            brokers = get_value('brokers')
+            if brokers:
+                for broker in brokers.keys():
+                    brokers[broker].publish(topic, data, qos=2)
         else:
-            filename = command_payload["filename"]
-        for device in command_payload["devices"]:
-            dongle_command_handle(device=device, timestamp=data["timestamp"], uuid=data["uuid"], data={
-                "command": "firmware",
-                "payload": {
-                    "filename": filename
-                }
-            })
-    elif command == 'label':
-        label = command_payload['data']
-        DBSimulator(ip=ip).update({'label':data['data']['payload']['data']})
-        # update
-        data = pack_payload({'label': label})
-        topic = mqtt_version + "/" + client_ip + "/simulator/" + ip + "/update"
-        logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
-        brokers = get_value('brokers')
-        if brokers:
-            for broker in brokers.keys():
-                brokers[broker].publish(topic, data, qos=2)
-    else:
-        logger.warn("unsupported command:%s", command)
-        raise Exception("unsupported command: " + command)
+            logger.warn("unsupported command:%s", command)
+            raise Exception("unsupported command: " + command)
 
 
 @router.route('/simulator/devices/+/command')
