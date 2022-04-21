@@ -189,10 +189,24 @@ attribute_schema = {
             ]
           }
 
+data_request_schema = {
+            "type": "object",
+            "properties": {
+              "data_request": {
+                "type": "object",
+                "properties": {},
+                "description": "data request command"
+              }
+            },
+            "required": [
+              "data_request"
+            ]
+          }
+
 
 class ZigbeeResource(Resource):
 
-    commands = ['join', 'leave', 'attribute']
+    commands = ['join', 'leave', 'attribute', 'data_request']
 
     def get(self, mac):
         zigbee = DBZigbee(mac=mac).retrieve()
@@ -264,6 +278,8 @@ class ZigbeeResource(Resource):
                                         return pack_response(30000, attribute=payload['attribute']), 500
                                     payload['manufacturer_code'] = cluster[0]['manufacturer_code']
                                     payload['type'] = attribute[0]['type']
+                            elif command == 'data_request':
+                                pass
                         except SchemaError as e:
                             logger.exception('illegal schema: %s', e.message)
                             return pack_response(90003, error=e.message)

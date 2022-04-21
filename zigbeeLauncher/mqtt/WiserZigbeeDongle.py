@@ -111,6 +111,13 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
                 response=protocol.error,
                 timeout=protocol.timeout
             ), timestamp, uuid, None)
+        elif command == "data_request":
+            send_command(Command(
+                dongle=dongles_dict[device],
+                request=data_request_handle,
+                response=protocol.error,
+                timeout=protocol.timeout
+            ), timestamp, uuid, None)
         else:
             raise Exception("unsupported command:"+command)
 
