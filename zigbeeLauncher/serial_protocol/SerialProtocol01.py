@@ -9,6 +9,7 @@ join_network_request = "02"
 form_network_request = "03"
 permit_join_request = "04"
 leave_network_request = "05"
+data_request = '09'
 
 
 def network_status_request_handle(payload=None):
@@ -120,3 +121,7 @@ def permit_join_request_handle(payload):
 
 def leave_network_request_handle(payload=None):
     return encode(network_config_command + leave_network_request, payload)
+
+
+def data_request_handle(payload=None):
+    return encode(network_config_command + data_request, payload)

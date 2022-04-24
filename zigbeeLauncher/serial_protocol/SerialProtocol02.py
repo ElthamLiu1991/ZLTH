@@ -79,6 +79,10 @@ def endpoint_descriptor_response_handle(data):
         attributes = []
         if cluster == '0006':
             attributes.append({'attribute': '0000', 'name': 'onoff', 'type': '10', 'value': "0"})
+        if cluster == '0402':
+            attributes.append({'attribute': '0000', 'name': 'temperature', 'type': '29', 'value': "0"})
+        if cluster == '0405':
+            attributes.append({'attribute': '0000', 'name': 'humidity', 'type': '21', 'value': "0"})
         # TODO: get cluster name
         endpoint['server_clusters'].append({'cluster': cluster, 'name': cluster, 'manufacturer': manufacturer,
                                             'manufacturer_code': manufacturer_code, 'attributes': attributes})
@@ -95,8 +99,6 @@ def endpoint_descriptor_response_handle(data):
         else:
             manufacturer = True
         attributes = []
-        if cluster == '0006':
-            attributes.append({'attribute': '0000', 'name': 'onoff', 'type': '10', 'value': "0"})
         # TODO: get cluster name
         endpoint['client_clusters'].append({'cluster': cluster, 'name': cluster, 'manufacturer': manufacturer,
                                             'manufacturer_code': manufacturer_code, 'attributes': attributes})
