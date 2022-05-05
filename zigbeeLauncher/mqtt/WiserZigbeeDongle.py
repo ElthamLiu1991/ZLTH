@@ -96,7 +96,7 @@ def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
                 request=attribute_write_request_handle,
                 response=protocol.error,
                 timeout=protocol.timeout
-            ), timestamp, uuid, payload)
+            ), timestamp, uuid, data, report=True)
         elif command == "join":
             send_command(Command(
                 dongle=dongles_dict[device],
@@ -344,6 +344,7 @@ def init(MQTT_info_callback, MQTT_update_callback=None, MQTT_error_callback=None
     thread.start()
     commands_init()
     set_value("dongle", True)
+    set_value('pending', {})
 
 
 def mqtt_info_callback(name, msg):

@@ -163,8 +163,9 @@ def simulator_device_update(client, ip, payload, device):
             if data['data']:
                 DBDevice(mac=device).update(data["data"])
         else:
+            logger.warn("device %s not in database", device)
             # 不存在，获取dongle信息
-            request_dongle_info(client, ip, device)
+            # request_dongle_info(client, ip, device)
     except Exception as e:
         logger.error("update failed:%s", e)
 

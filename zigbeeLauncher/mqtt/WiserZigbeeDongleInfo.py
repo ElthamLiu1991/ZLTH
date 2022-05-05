@@ -4,6 +4,7 @@ from zigbeeLauncher.serial_protocol.SerialProtocol02 import endpoint_list_reques
     endpoint_descriptor_request_handle
 from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
 from zigbeeLauncher.serial_protocol.SerialProtocol01 import *
+from . import set_value, get_value
 from .WiserZigbeeDongleCommands import Command, send_command
 from zigbeeLauncher.logging import dongleLogger as logger
 
@@ -13,9 +14,18 @@ class Info:
         self.dongle = dongle
         self.callback = callback
         self.info = {"name": dongle.port, "mac": dongle.name}
-        self.get_info()
         self.retry = 0
         self.counter = 0
+        self.start()
+
+    def start(self):
+        pending = get_value('pending')
+        if self.dongle.name not in pending:
+            logger.info("add %s to info queue", self.dongle.name)
+            pending[self.dongle.name] = self
+            set_value('pending', pending)
+        if len(pending) == 1:
+            self.get_info()
 
     def timeout(self, device, timestamp, uuid):
         if self.dongle.state != 2 and self.dongle.state != 3:
@@ -37,6 +47,13 @@ class Info:
                         "state": self.dongle.state,
                         "configured": 0
                     })
+                pending = get_value('pending')
+                del pending[self.dongle.name]
+                set_value('pending', pending)
+                for info in pending:
+                    pending[info].get_info()
+                    return
+
         else:
             if self.callback:
                 self.callback(self.dongle.name, {
@@ -49,6 +66,12 @@ class Info:
                     "state": self.dongle.state,
                     "configured": 0
                 })
+            pending = get_value('pending')
+            del pending[self.dongle.name]
+            set_value('pending', pending)
+            for info in pending:
+                pending[info].get_info()
+                return
 
     def response(self, device, userdata):
         if 'descriptor' not in userdata:
@@ -64,6 +87,12 @@ class Info:
     def call_callback(self):
         if self.callback:
             self.callback(self.dongle.name, self.info)
+        pending = get_value('pending')
+        del pending[self.dongle.name]
+        set_value('pending', pending)
+        for info in pending:
+            pending[info].get_info()
+            return
 
     def get_info(self):
         """

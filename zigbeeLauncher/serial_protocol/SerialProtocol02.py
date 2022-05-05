@@ -144,19 +144,19 @@ def attribute_response_handle(data):
     """
     index = 0
     rsp = {}
-    attribute = {'endpoint': int(data.payload[index:index+2], 16)}
+    attribute = {'endpoint': int(data.payload[index:index + 2], 16)}
     index = index + 2
-    attribute['cluster'] = big_small_end_convert(data.payload[index:index+4])
+    attribute['cluster'] = big_small_end_convert(data.payload[index:index + 4])
     index = index + 4
-    attribute['server'] = bool(int(data.payload[index:index+2], 16))
+    attribute['server'] = bool(int(data.payload[index:index + 2], 16))
     index = index + 2
-    attribute['attribute'] = big_small_end_convert(data.payload[index:index+4])
+    attribute['attribute'] = big_small_end_convert(data.payload[index:index + 4])
     index = index + 4
-    manufacturer_code = big_small_end_convert(data.payload[index:index+4])
+    manufacturer_code = big_small_end_convert(data.payload[index:index + 4])
     index = index + 4
-    attribute_property = data.payload[index:index+2]
+    attribute_property = data.payload[index:index + 2]
     index = index + 2
-    type = data.payload[index:index+2]
+    type = data.payload[index:index + 2]
     index = index + 2
     if get_bytes(type) == 0:
         # string type
@@ -187,17 +187,22 @@ def attribute_write_request_handle(payload):
         }
         :return:
         """
+    attribute = payload['attribute']
     data = ""
-    data = data + to_hex(payload['endpoint'])
-    data = data + big_small_end_convert(payload['cluster'])
-    data = data + to_hex(int(payload['server']))
-    data = data + big_small_end_convert(payload['attribute'])
-    data = data + big_small_end_convert(payload['manufacturer_code'])
-    data = data + payload['type']
+    data = data + to_hex(attribute['endpoint'])
+    data = data + big_small_end_convert(attribute['cluster'])
+    data = data + to_hex(int(attribute['server']))
+    data = data + big_small_end_convert(attribute['attribute'])
+    data = data + big_small_end_convert(attribute['manufacturer_code'])
+    data = data + attribute['type']
 
-    length = get_bytes(payload['type'])
+    length = get_bytes(attribute['type'])
     if length == 0:
-        data = data + "".join(format(ord(c), "02X") for c in payload['value'])
+        data = data + "".join(format(ord(c), "02X") for c in attribute['value'])
     else:
-        data = data + big_small_end_convert(hex(int(payload['value']))[2:])
+        data = data + big_small_end_convert(hex(int(attribute['value']))[2:])
+    # 删除payload里面的manufacturer_code和type
+    del attribute['manufacturer_code']
+    del attribute['type']
+    print(payload)
     return encode(zigbee_config_command + attribute_write_request, data)

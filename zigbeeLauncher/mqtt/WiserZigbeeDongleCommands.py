@@ -2,6 +2,8 @@ import asyncio
 import time
 from threading import Thread
 
+from zigbeeLauncher.mqtt import get_value
+
 commands = {}
 loop = asyncio.new_event_loop()
 
@@ -18,9 +20,11 @@ class Command:
         self.done = done
         self.seq = 0
 
-    async def send_command(self, timestamp, uuid, payload):
+    async def send_command(self, timestamp, uuid, payload, report):
         self.timestamp = timestamp
         self.uuid = uuid
+        self.payload = payload
+        self.report = report
         self.seq, data = self.request(payload)
         commands[(self.seq, self.device)] = self
         self.dongle.data_write(data)
@@ -47,10 +51,13 @@ class Command:
                 user_data["timestamp"] = self.timestamp
                 user_data["uuid"] = self.uuid
             self.response(self.device, user_data)
+        else:
+            if self.report and get_value("dongle_update_callback"):
+                get_value("dongle_update_callback")(self.dongle.name, self.payload)
 
 
-def send_command(command, timestamp=None, uuid=None, payload=None):
-    asyncio.run_coroutine_threadsafe(command.send_command(timestamp, uuid, payload), loop)
+def send_command(command, timestamp=None, uuid=None, payload=None, report=False):
+    asyncio.run_coroutine_threadsafe(command.send_command(timestamp, uuid, payload, report), loop)
 
 
 def start_loop():

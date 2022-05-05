@@ -7,6 +7,7 @@ from . import set_value, get_value, mqtt_version, client_ip, router
 from . import WiserZigbeeLauncher
 from . import WiserZigbeeSimulator
 from .WiserZigbeeGlobal import pack_payload
+from ..database.interface import DBDevice, DBSimulator
 from ..logging import mqttLogger as logger
 from .WiserZigbeeDongle import init
 

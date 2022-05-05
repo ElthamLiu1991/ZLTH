@@ -296,3 +296,24 @@ class ZigbeeResource(Resource):
                 return pack_response(90000, error=str(e)), 500
         else:
             return pack_response(10000, device=mac), 404
+
+
+class ZigbeeAttributesResource(Resource):
+
+    def get(self, mac):
+        if not DBDevice(mac=mac).retrieve():
+            return pack_response(10000, device=mac), 404
+        if request.args:
+            try:
+                paras = {}
+                for key in request.args:
+                    paras[key] = request.args[key]
+                paras['mac'] = mac
+                data = DBZigbeeEndpointClusterAttribute(**paras).retrieve()
+                return pack_response(0, data)
+            except Exception as e:
+                logger.exception("request error")
+                return pack_response(90000, error="bad parameters:" + str(request.args)), 500
+        else:
+            data = DBZigbeeEndpointClusterAttribute(mac=mac).retrieve()
+            return pack_response(0, data)

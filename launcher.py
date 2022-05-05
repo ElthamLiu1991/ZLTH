@@ -17,7 +17,7 @@ if __name__ == "__main__":
     if ret == 0:
         from zigbeeLauncher.logging import flaskLogger as logger
         logger.fatal("5000 in used")
-        exit(-1)
+        sys.exit(-1)
 
     if not os.path.exists('./database'):
         os.mkdir('./database')

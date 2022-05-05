@@ -4,7 +4,7 @@ from .devices import DeviceResource, DevicesResource
 from .simulators import SimulatorResource, SimulatorsResource
 from .files import files, FileResource
 from .firmwares import firmwares, FirmwareResource
-from .zigbees import ZigbeesResource, ZigbeeResource
+from .zigbees import ZigbeesResource, ZigbeeResource, ZigbeeAttributesResource
 
 api = NestableBlueprint('api_2', __name__, url_prefix='/api/2')
 device_api = Api(api)
@@ -14,6 +14,7 @@ device_api.add_resource(DeviceResource, '/devices/<string:mac>')
 zigbee_api = Api(api)
 zigbee_api.add_resource(ZigbeesResource, '/zigbees/')
 zigbee_api.add_resource(ZigbeeResource, '/zigbees/<string:mac>')
+zigbee_api.add_resource(ZigbeeAttributesResource, '/zigbees/<string:mac>/attributes/')
 
 simulator_api = Api(api)
 simulator_api.add_resource(SimulatorsResource, '/simulators/')

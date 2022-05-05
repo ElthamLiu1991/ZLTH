@@ -2,7 +2,8 @@ import sys
 import threading
 import time
 from typing import cast
-
+from ..database.interface import DBDevice, DBSimulator, DBZigbee, DBZigbeeEndpoint, DBZigbeeEndpointCluster, \
+    DBZigbeeEndpointClusterAttribute
 from zeroconf import ServiceBrowser, Zeroconf, ServiceInfo, IPVersion
 
 from zigbeeLauncher.logging import mqttLogger as logger
@@ -12,11 +13,20 @@ from .WiserZigbeeGlobal import _init, get_value, set_value, Router, Response, ge
 mqtt_version = "v1.0"
 payload_validate = json.Validator('{"required":["timestamp", "uuid", "data"]}')
 client_mac = get_mac_address()
+try:
+    user_label = DBSimulator(mac=client_mac).retrieve()[0]['label']
+except Exception as e:
+    user_label = ""
+# 删除所有数据
+DBSimulator().delete()
+DBDevice().delete()
+DBZigbee().delete()
+DBZigbeeEndpoint().delete()
+DBZigbeeEndpointCluster().delete()
+DBZigbeeEndpointClusterAttribute().delete()
 router = Router()
 response = Response()
 _init()
-global client_ip
-client_ip = ""
 while True:
     client_ip = get_ip_address()
     if client_ip:
@@ -57,11 +67,11 @@ class MyListener:
             thread.start()
             """
             logger.info("Run MQTT client: simulator")
-            if addr == client_ip:
+            if addr == get_ip_address():
                 logger.info("connect to 127.0.0.1 broker")
-                thread = WiserMQTT('127.0.0.1', cast(int, info.port), client_ip, 'simulator')
+                thread = WiserMQTT('127.0.0.1', cast(int, info.port), get_ip_address(), 'simulator')
             else:
-                thread = WiserMQTT(addr, cast(int, info.port), client_ip, 'simulator')
+                thread = WiserMQTT(addr, cast(int, info.port), get_ip_address(), 'simulator')
             thread.start()
 
     def update_service(self, zeroconf, type, name):
@@ -77,7 +87,7 @@ class MyListener:
             thread.start()
             """
             logger.info("Run %s MQTT client: simulator")
-            thread = WiserMQTT(addr, cast(int, info.port), client_ip, 'simulator')
+            thread = WiserMQTT(addr, cast(int, info.port), get_ip_address(), 'simulator')
             thread.start()
 
 
@@ -86,16 +96,17 @@ ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", MyListener())
 
 def init():
     if sys.platform.startswith('darwin'):
-        thread = WiserMQTT('127.0.0.1', 1883, client_ip, 'simulator')
+        thread = WiserMQTT('127.0.0.1', 1883, get_ip_address(), 'simulator')
         thread.start()
     logger.info("register launcher service")
     info = ServiceInfo(
         "_launcher._tcp.local.",
         str(get_mac_address()) + "._launcher._tcp.local.",
-        addresses=[client_ip],
+        addresses=[get_ip_address()],
         port=1883,
         properties={'timestamp': round(int(time.time() * 1000 * 1000))},
         server=str(get_mac_address()) + '.local.',
     )
     zeroconf = Zeroconf(ip_version=IPVersion.All)
     zeroconf.register_service(info)
+

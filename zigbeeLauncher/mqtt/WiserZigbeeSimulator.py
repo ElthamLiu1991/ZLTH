@@ -5,7 +5,7 @@ import uuid
 
 import rapidjson
 
-from . import router, mqtt_version, client_ip, client_mac, payload_validate
+from . import router, mqtt_version, client_ip, client_mac, payload_validate, user_label
 from .WiserZigbeeGlobal import pack_payload, get_value, except_handle, get_ip_address
 from .WiserZigbeeDongle import upload_port_info, dongle_command_handle, pack_port_info
 from zigbeeLauncher.logging import simulatorLogger as logger
@@ -149,16 +149,12 @@ def pack_simulator_info():
     version = '1.0'
     with open('./version/version.txt', 'r') as f:
         version = f.read()
-    result = DBSimulator(mac=client_mac).retrieve()
-    label = ''
-    if result:
-        label = result[0]['label']
     data = {
         "ip": get_ip_address(),
         "mac": client_mac,
         "name": "simulator-" + client_ip,
         "connected": 1,
-        "label": label,
+        "label": user_label,
         "version": version,
         "devices": pack_port_info()
     }
