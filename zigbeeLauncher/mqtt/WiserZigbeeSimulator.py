@@ -9,7 +9,8 @@ from . import router, mqtt_version, client_ip, client_mac, payload_validate, use
 from .WiserZigbeeGlobal import pack_payload, get_value, except_handle, get_ip_address
 from .WiserZigbeeDongle import upload_port_info, dongle_command_handle, pack_port_info
 from zigbeeLauncher.logging import simulatorLogger as logger
-from ..database.interface import DBDevice, DBSimulator
+from ..database.interface import DBDevice, DBSimulator, DBZigbee, DBZigbeeEndpointCluster, DBZigbeeEndpoint, \
+    DBZigbeeEndpointClusterAttribute
 
 
 def simulator_error_callback(device, msg):
@@ -155,11 +156,46 @@ def pack_simulator_info():
         "name": "simulator-" + client_ip,
         "connected": 1,
         "label": user_label,
-        "version": version,
-        "devices": pack_port_info()
+        "version": version
     }
     # 打包dongles信息
+    devices = DBDevice(ip=get_ip_address()).retrieve()
+    for device in devices:
+        zigbee = DBZigbee(mac=device['mac']).retrieve()[0]
+        device['zigbee'] = zigbee
+        endpoints = DBZigbeeEndpoint(mac=device['mac']).retrieve()
+        zigbee['endpoints'] = endpoints
+        for endpoint in endpoints:
+            server_clusters = DBZigbeeEndpointCluster(
+                mac=device['mac'],
+                endpoint=endpoint['endpoint'],
+                server=True
+            ).retrieve()
+            endpoint['server_clusters'] = server_clusters
+            for cluster in server_clusters:
+                attributes = DBZigbeeEndpointClusterAttribute(
+                    mac=device['mac'],
+                    endpoint=endpoint['endpoint'],
+                    cluster=cluster['cluster'],
+                    server=cluster['server']
+                ).retrieve()
+                cluster['attributes'] = attributes
 
+            client_clusters = DBZigbeeEndpointCluster(
+                mac=device['mac'],
+                endpoint=endpoint['endpoint'],
+                server=False
+            ).retrieve()
+            endpoint['client_clusters'] = client_clusters
+            for cluster in client_clusters:
+                attributes = DBZigbeeEndpointClusterAttribute(
+                    mac=device['mac'],
+                    endpoint=endpoint['endpoint'],
+                    cluster=cluster['cluster'],
+                    server=cluster['server']
+                ).retrieve()
+                cluster['attributes'] = attributes
+    data['devices'] = devices
     return data
 
 

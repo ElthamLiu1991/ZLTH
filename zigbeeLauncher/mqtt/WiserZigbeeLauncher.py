@@ -129,7 +129,7 @@ def simulator_update(client, ip, payload):
         # update database
         data = json.loads(payload)
         DBDevice(ip=ip).update(data["data"])
-        DBSimulator(mac=ip).update(data["data"])
+        DBSimulator(ip=ip).update(data["data"])
     except Exception as e:
         logger.error('Falied to update simulator:%s', e)
 
