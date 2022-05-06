@@ -1,5 +1,6 @@
 taskkill /f /im launcher.exe
-cmd /c "cd /d emqx-4.4.1-otp23.0-windows-amd64_\emqx&&bin\emqx start"
+cmd /c "cd /d emqx-4.4.3-otp24.2.1-windows-amd64\emqx&&bin\emqx stop"
+cmd /c "cd /d emqx-4.4.3-otp24.2.1-windows-amd64\emqx&&bin\emqx start"
 start launcher.exe
 @echo off
 timeout /T 2
