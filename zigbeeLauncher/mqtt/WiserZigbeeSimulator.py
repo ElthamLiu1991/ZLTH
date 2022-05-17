@@ -127,7 +127,7 @@ def simulator_command(client, ip, payload):
             DBSimulator(ip=ip).update({'label':data['data']['label']['data']})
             # update
             data = pack_payload({'label': label})
-            topic = mqtt_version + "/" + client_ip + "/simulator/" + ip + "/update"
+            topic = mqtt_version + "/" + client_ip + "/simulator/update"
             logger.info("Publish: topic:%s, payload:%s", topic, rapidjson.dumps(data, indent=2))
             brokers = get_value('brokers')
             if brokers:

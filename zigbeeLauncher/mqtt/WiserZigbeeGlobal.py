@@ -29,6 +29,7 @@ def get_value(name, defValue=None):
 
 # 获取IP地址
 def get_ip_address():
+    ip = None
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(('8.8.8.8', 80))

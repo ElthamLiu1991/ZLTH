@@ -33,7 +33,17 @@ class Info:
                 logger.warn('%s, %s:Get info timeout, retry:%d', self.dongle.port, self.dongle.name, self.retry)
                 time.sleep(1)
                 self.retry = self.retry + 1
-                self.get_info()
+                # retry next time
+                # self.get_info()
+                pending = get_value('pending')
+                for info in pending:
+                    if pending[info].retry < self.retry:
+                        # go with this device
+                        return
+                # start next loop
+                for info in pending:
+                    pending[info].get_info()
+                    break
             else:
                 logger.error('Get info failed')
                 if self.callback:
@@ -84,7 +94,7 @@ class Info:
         # self.info.update(userdata)
         logger.info(self.info)
 
-    def call_callback(self):
+    def finish(self):
         if self.callback:
             self.callback(self.dongle.name, self.info)
         pending = get_value('pending')
@@ -152,4 +162,4 @@ class Info:
         if self.counter == len(self.info['endpoint']):
             print("descriptor finish")
             del self.info['endpoint']
-            self.call_callback()
+            self.finish()
