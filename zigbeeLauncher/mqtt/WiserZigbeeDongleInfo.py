@@ -39,6 +39,7 @@ class Info:
                 for info in pending:
                     if pending[info].retry < self.retry:
                         # go with this device
+                        pending[info].get_info()
                         return
                 # start next loop
                 for info in pending:
@@ -91,8 +92,6 @@ class Info:
                 self.info['zigbee']['endpoints'] = [userdata['descriptor']]
             else:
                 self.info['zigbee']['endpoints'].append(userdata['descriptor'])
-        # self.info.update(userdata)
-        logger.info(self.info)
 
     def finish(self):
         if self.callback:

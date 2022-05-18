@@ -2,6 +2,7 @@ import sys
 import threading
 import time
 from typing import cast
+
 from ..database.interface import DBDevice, DBSimulator, DBZigbee, DBZigbeeEndpoint, DBZigbeeEndpointCluster, \
     DBZigbeeEndpointClusterAttribute
 from zeroconf import ServiceBrowser, Zeroconf, ServiceInfo, IPVersion
@@ -33,15 +34,8 @@ while True:
         break
     logger.warning("get ip address failed, waiting")
     time.sleep(1)
-
-from zigbeeLauncher.database.interface import DBDevice, DBSimulator
-# 将所有数据设置为offline
-DBSimulator().update({"connected": False})
-DBDevice().update({"connected": False})
-# 删除本地数据
-DBDevice(ip=client_mac).delete()
-# DBSimulator(mac=client_mac).delete()
-
+from threading import RLock
+lock = RLock()
 from .WiserZigbeeLauncherMqtt import WiserMQTT
 
 
@@ -60,18 +54,15 @@ class MyListener:
         for addr in info.parsed_scoped_addresses():
             brokers = get_value('brokers')
             if brokers and addr in brokers:
+                logger.info('already connected to broker:%s', addr)
                 continue
             """
             logger.info("Run %s MQTT client: launcher")
             thread = WiserMQTT(addr, cast(int, info.port), get_mac_address(), 'launcher')
             thread.start()
             """
-            logger.info("Run MQTT client: simulator")
-            if addr == get_ip_address():
-                logger.info("connect to 127.0.0.1 broker")
-                thread = WiserMQTT('127.0.0.1', cast(int, info.port), get_ip_address(), 'simulator')
-            else:
-                thread = WiserMQTT(addr, cast(int, info.port), get_ip_address(), 'simulator')
+            logger.info("Run MQTT client: edge")
+            thread = WiserMQTT(addr, cast(int, info.port), get_ip_address(), 'edge')
             thread.start()
 
     def update_service(self, zeroconf, type, name):
@@ -80,21 +71,28 @@ class MyListener:
         for addr in info.parsed_scoped_addresses():
             brokers = get_value('brokers')
             if brokers and addr in brokers:
+                logger.info('already connected to broker:%s', addr)
+                # get /simulator/info
+                topic = mqtt_version + "/" + client_ip + "/synchronized"
+                logger.info("Publish: topic:%s", topic)
+                brokers[addr].publish(topic, payload=None, qos=2)
                 continue
             """
             logger.info("Run %s MQTT client: launcher")
             thread = WiserMQTT(addr, cast(int, info.port), get_mac_address(), 'launcher')
             thread.start()
             """
-            logger.info("Run %s MQTT client: simulator")
-            thread = WiserMQTT(addr, cast(int, info.port), get_ip_address(), 'simulator')
+            logger.info("Run MQTT client: edge")
+            thread = WiserMQTT(addr, cast(int, info.port), get_ip_address(), 'edge')
             thread.start()
 
 
-ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", MyListener())
-
-
 def init():
+    # start simulator client
+    logger.info("Run MQTT client: simulator")
+    thread = WiserMQTT('127.0.0.1', 1883, '127.0.0.1', 'simulator')
+    thread.start()
+    ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", MyListener())
     if sys.platform.startswith('darwin'):
         thread = WiserMQTT('127.0.0.1', 1883, get_ip_address(), 'simulator')
         thread.start()

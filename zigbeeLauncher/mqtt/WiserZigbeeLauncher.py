@@ -6,7 +6,7 @@ import rapidjson as json
 import zigbeeLauncher.logging
 from ..database import db
 from ..database.device import Device
-from . import router, mqtt_version, client_ip, payload_validate
+from . import router, mqtt_version, client_ip, payload_validate, lock
 from .WiserZigbeeGlobal import get_value, set_value, pack_payload
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee, DBZigbeeEndpoint, \
     DBZigbeeEndpointCluster, DBZigbeeEndpointClusterAttribute
@@ -15,6 +15,7 @@ from zigbeeLauncher.logging import launcherLogger as logger
 
 def insert_device(device):
     try:
+
         mac = device['mac']
         DBDevice(mac=mac).add(device)
         if 'zigbee' in device:
@@ -75,19 +76,21 @@ def insert_device(device):
         logger.exception("insert device failed: %s", e)
 
 
+
 @router.route('/simulator/info')
 def simulator_info(client, ip, payload):
     try:
+        lock.acquire()
         payload_validate(payload)
         # 加入数据库
         data = json.loads(payload)
         data_obj = data["data"]
+        DBSimulator(mac=data_obj["mac"]).add(data_obj)
         if 'devices' in data_obj:
             devices = data_obj["devices"]
             for device in devices:
-                device['ip'] = ip
+                device['ip'] = data_obj['ip']
                 insert_device(device)
-        DBSimulator(mac=data_obj["mac"]).add(data_obj)
         # 删除所有相关的devices
         #if ip != client_ip:
             #DBDevice(ip=data_obj['mac']).delete()
@@ -98,20 +101,24 @@ def simulator_info(client, ip, payload):
     except Exception as e:
         logger.exception("payload validation failed: %s", e)
     finally:
+        lock.release()
         pass
 
 
 @router.route('/simulator/devices/+/info')
 def simulator_device_info(client, ip, payload, device):
     try:
+        lock.acquire()
         payload_validate(payload)
         # 加入数据库
         data = json.loads(payload)
         data_obj = data["data"]
         insert_device(data_obj)
+        # print("insert device finish")
     except Exception as e:
         logger.error("payload validation failed:%s", e)
     finally:
+        lock.release()
         pass
 
 
@@ -180,8 +187,8 @@ def simulator_device_error(client, ip, payload, device):
     pass
 
 
-def request_synchronization(client):
-    topic = mqtt_version + "/synchronization"
+def request_synchronized(client, ip):
+    topic = mqtt_version + "/"+ip+"/synchronized"
     logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=None, qos=2)
 
@@ -200,17 +207,18 @@ def request_dongle_info(client, ip, dongle):
 
 def simulator_command(simulator, body):
     brokers = get_value('brokers')
-    if brokers:
-        for value in brokers.values():
-            payload = {}
-            if 'payload' in body:
-                payload = body['payload']
-            new_payload = {body['command']: payload}
-            data = pack_payload(new_payload)
+    if brokers and simulator in brokers:
+        if simulator == client_ip:
+            topic = mqtt_version + "/simulator/command"
+        else:
             topic = mqtt_version + "/" + simulator + "/simulator/command"
-            logger.info("Publish: topic:%s", topic)
-            value.publish(topic, data)
-            break
+        payload = {}
+        if 'payload' in body:
+            payload = body['payload']
+        new_payload = {body['command']: payload}
+        data = pack_payload(new_payload)
+        logger.info("Publish: topic:%s", topic)
+        brokers[simulator].publish(topic, data)
     else:
         logger.warn("Launcher MQTT client not ready")
 
@@ -218,43 +226,47 @@ def simulator_command(simulator, body):
 def dongle_command(simulator, name, body):
     print("this is dongle command", simulator, name, body)
     brokers = get_value('brokers')
-    if brokers:
-        for value in brokers.values():
-            payload = {}
-            if 'payload' in body:
-                payload = body['payload']
-            new_payload = {body['command']: payload}
-            data = pack_payload(new_payload)
+    if brokers and simulator in brokers:
+        if simulator == client_ip:
+            topic = mqtt_version + "/simulator/devices/" + name + "/command"
+        else:
             topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
-            logger.info("Publish: topic:%s", topic)
-            value.publish(topic, data)
-            break
+
+        payload = {}
+        if 'payload' in body:
+            payload = body['payload']
+        new_payload = {body['command']: payload}
+        data = pack_payload(new_payload)
+        logger.info("Publish: topic:%s", topic)
+        brokers[simulator].publish(topic, data)
     else:
         logger.warn("Launcher MQTT client not ready")
 
 
 def simulator_command_2(simulator, body):
     brokers = get_value('brokers')
-    if brokers:
-        for value in brokers.values():
-            data = pack_payload(body)
+    if brokers and simulator in brokers:
+        if simulator == client_ip:
+            topic = mqtt_version + "/simulator/command"
+        else:
             topic = mqtt_version + "/" + simulator + "/simulator/command"
-            logger.info("Publish: topic:%s", topic)
-            value.publish(topic, data)
-            break
+        data = pack_payload(body)
+        logger.info("Publish: topic:%s", topic)
+        brokers[simulator].publish(topic, data)
     else:
-        logger.warn("Launcher MQTT client not ready")
+        logger.error("Launcher MQTT client not ready")
 
 
 def dongle_command_2(simulator, name, body):
     print("this is dongle command", simulator, name, body)
     brokers = get_value('brokers')
-    if brokers:
-        for value in brokers.values():
-            data = pack_payload(body)
+    if brokers and simulator in brokers:
+        if simulator == client_ip:
+            topic = mqtt_version + "/simulator/devices/" + name + "/command"
+        else:
             topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
-            logger.info("Publish: topic:%s", topic)
-            value.publish(topic, data)
-            break
+        data = pack_payload(body)
+        logger.info("Publish: topic:%s", topic)
+        brokers[simulator].publish(topic, data)
     else:
-        logger.warn("Launcher MQTT client not ready")
+        logger.error("Launcher MQTT client not ready")
