@@ -10,6 +10,8 @@ from ..response import pack_response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
+from ...zigbee.DataType import get_bytes
+
 
 def get_endpoints(mac):
     result = []
@@ -222,6 +224,9 @@ class ZigbeeResource(Resource):
         device = DBDevice(mac=mac).retrieve()
         if device:
             try:
+                state = device[0]['state']
+                if state == 2 or state == 3:
+                    return pack_response(10002, device=mac), 500
                 connected = device[0]['connected']
                 ip = device[0]['ip']
                 if connected:
@@ -267,6 +272,13 @@ class ZigbeeResource(Resource):
                                 if not attribute:
                                     return pack_response(30000, attribute=payload['attribute']), 500
                                 else:
+                                    # 检查value的合法性
+                                    if len(payload['value']) > get_bytes(attribute[0]['type'])*2:
+                                        return pack_response(90005, value=payload['value']), 500
+                                    try:
+                                        int(payload['value'], 16)
+                                    except ValueError:
+                                        return pack_response(90006, value=payload['value']), 500
                                     # 获取manufacturer_code
                                     cluster = DBZigbeeEndpointCluster(
                                         mac=mac,

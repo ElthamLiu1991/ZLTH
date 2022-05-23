@@ -115,6 +115,9 @@ class DeviceResource(Resource):
         device = DBDevice(mac=mac).retrieve()
         if device:
             try:
+                state = device[0]['state']
+                if state == 2 or state == 3:
+                    return pack_response(10002, device=mac), 500
                 connected = device[0]['connected']
                 ip = device[0]['ip']
                 if connected:

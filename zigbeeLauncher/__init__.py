@@ -33,7 +33,6 @@ def fallback(fallback):       # Vue Router 的 mode 为 'hash' 时可移除该�
 
 
 def create_app():
-
     app.config.from_object(DevelopmentConfig)
 
     db.init_app(app)

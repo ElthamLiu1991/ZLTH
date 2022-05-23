@@ -2,6 +2,7 @@ codes = {
     0: "",
     10000: "device {device} not exist",
     10001: "device {device} is offline",
+    10002: "device {device} is in bootloader or upgrading mode",
     20000: "simulator {device} not exist",
     20001: "simulator {device} is offline",
     20002: "simulator {device} error: {error}",
@@ -14,9 +15,8 @@ codes = {
     90002: "unsupported command: {command}",
     90003: 'illegal schema:{error}',
     90004: 'json validation failed:{error}',
-    90005: 'out of range:{item}'
-
-
+    90005: 'out of range:{value}',
+    90006: 'invalid value:{value}'
 }
 
 

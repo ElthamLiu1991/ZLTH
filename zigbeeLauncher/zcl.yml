@@ -1,0 +1,181 @@
+clusters:
+  -
+    id: 0
+    name: Basic,
+    manufacturer: false
+    manufacturer_code: 0
+    attributes:
+      -
+       id: 0
+       name: ZCL Version
+       type: uint8
+       length: 1
+       writable: false
+       default: 8
+       mandatory: true
+       manufacturer: false
+       manufacturer_code: 0
+      -
+        id: 1
+        name: Application Version
+        type: uint8
+        length: 1
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: false
+        manufacturer_code: 0
+      -
+        id: 2
+        name: Stack Version
+        type: uint8
+        length: 1
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: false
+        manufacturer_code: 0
+      -
+        id: 3
+        name: HW Version
+        type: uint8
+        length: 1
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: false
+        manufacturer_code: 0
+      -
+        id: 4
+        name: Manufacturer Name
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: false
+        manufacturer_code: 0
+      -
+        id: 5
+        name: Model Identifier
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: false
+        manufacturer_code: 0
+      -
+        id: 6
+        name: Data Code
+        type: string
+        length: 16
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: false
+        manufacturer_code: 0
+      -
+        id: 7
+        name: Power Source
+        type: enum8
+        length: 1
+        values:
+          -
+            value: 0,
+            description: Unknown
+          -
+            value: 1
+            description: Mains(single phase)
+          -
+            value: 2
+            description: Mains(3 phase)
+          -
+            value: 3
+            description: Battery
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: true,
+        manufacturer_code: 1234
+    commands:
+      received:
+        -
+          id: 0
+          name: Reset to Factory Defaults
+          manatory: false
+          manufacturer: true,
+          manufacturer_code: 1234
+      generated: ~
+  -
+    id: 1
+    name: Power Configuration
+    manufacturer: false,
+    manufacturer_code: 0
+    attributes:
+      -
+       id: 0
+       name: Mains Voltage
+       type: uint16
+       length: 2
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false,
+       manufacturer_code: 0
+      -
+       id: 1
+       name: Mains Frequency
+       type: uint8
+       length: 1
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false,
+       manufacturer_code: 0
+    commands:
+      received: ~
+      generated: ~
+  -
+    id: 4
+    name: Groups
+    manufacturer: false,
+    manufacturer_code: 0
+    attributes:
+      -
+       id: 0
+       name: Name Support
+       type: map8
+       length: 1
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false,
+       manufacturer_code: 0
+    commands:
+      received:
+        -
+          id: 0
+          description: Add group
+          mandatory: true
+          manufacturer: false,
+          manufacturer_code: 0
+        -
+          id: 1
+          description: View group
+          mandatory: true
+          manufacturer: false,
+          manufacturer_code: 0
+      generated:
+        -
+          id: 0
+          description: Add group response
+          mandatory: true
+          manufacturer: false,
+          manufacturer_code: 0
+        -
+          id: 1
+          description: View group response
+          mandatory: true
+          manufacturer: false,
+          manufacturer_code: 0
