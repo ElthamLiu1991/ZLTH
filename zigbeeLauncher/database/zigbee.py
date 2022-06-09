@@ -2,8 +2,7 @@ from . import db, ma
 
 
 class Zigbee(db.Model):
-    id = db.Column('id', db.Integer(), primary_key=True)
-    mac = db.Column(db.String(30))
+    mac = db.Column(db.String(30), primary_key=True)
     device_type = db.Column(db.String(15))
     channel = db.Column(db.Integer())
     pan_id = db.Column(db.String())

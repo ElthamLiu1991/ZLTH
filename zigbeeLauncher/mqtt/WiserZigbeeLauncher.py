@@ -1,3 +1,5 @@
+import time
+import uuid
 from hashlib import md5
 
 import rapidjson
@@ -6,11 +8,12 @@ import rapidjson as json
 import zigbeeLauncher.logging
 from ..database import db
 from ..database.device import Device
-from . import router, mqtt_version, client_ip, payload_validate, lock
-from .WiserZigbeeGlobal import get_value, set_value, pack_payload
+from . import router, mqtt_version, client_ip
+from .WiserZigbeeGlobal import get_value, set_value, pack_payload, send_command, payload_validate
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee, DBZigbeeEndpoint, \
     DBZigbeeEndpointCluster, DBZigbeeEndpointClusterAttribute
 from zigbeeLauncher.logging import launcherLogger as logger
+from ..request_and_response import wait_response, add_response
 
 
 def insert_device(device):
@@ -21,66 +24,14 @@ def insert_device(device):
         if 'zigbee' in device:
             device['zigbee']['mac'] = mac
             DBZigbee(mac=mac).add(device["zigbee"])
-            # 删除endpoint数据
-            DBZigbeeEndpoint(mac=mac).delete()
-            # 删除endpointCluster数据
-            DBZigbeeEndpointCluster(mac=mac).delete()
-            # 删除endpointClusterAttribute数据
-            DBZigbeeEndpointClusterAttribute(mac=mac).delete()
-            endpoints = device['zigbee']['endpoints']
-            for endpoint in endpoints:
-                endpoint_id = endpoint['endpoint']
-                endpoint['mac'] = mac
-                DBZigbeeEndpoint(mac=mac, endpoint=endpoint_id).add(endpoint)
-                for cluster in endpoint['server_clusters']:
-                    cluster['mac'] = mac
-                    cluster['endpoint'] = endpoint_id
-                    cluster['server'] = True
-                    DBZigbeeEndpointCluster(
-                        mac=mac,
-                        endpoint=endpoint_id,
-                        cluster=cluster['cluster'],
-                        server=True).add(cluster)
-                    for attribute in cluster['attributes']:
-                        attribute['mac'] = mac
-                        attribute['endpoint'] = endpoint_id
-                        attribute['server'] = True
-                        attribute['cluster'] = cluster['cluster']
-                        DBZigbeeEndpointClusterAttribute(
-                            mac=mac,
-                            endpoint=endpoint_id,
-                            cluster=cluster['cluster'],
-                            server=True,
-                            attribute=attribute['attribute']).add(attribute)
-                for cluster in endpoint['client_clusters']:
-                    cluster['mac'] = mac
-                    cluster['endpoint'] = endpoint_id
-                    cluster['server'] = False
-                    DBZigbeeEndpointCluster(
-                        mac=mac,
-                        endpoint=endpoint_id,
-                        cluster=cluster['cluster'],
-                        server=False).add(cluster)
-                    for attribute in cluster['attributes']:
-                        attribute['mac'] = mac
-                        attribute['endpoint'] = endpoint_id
-                        attribute['server'] = False
-                        attribute['cluster'] = cluster['cluster']
-                        DBZigbeeEndpointClusterAttribute(
-                            mac=mac,
-                            endpoint=endpoint_id,
-                            cluster=cluster['cluster'],
-                            server=False,
-                            attribute=attribute['attribute']).add(attribute)
     except Exception as e:
         logger.exception("insert device failed: %s", e)
-
 
 
 @router.route('/simulator/info')
 def simulator_info(client, ip, payload):
     try:
-        lock.acquire()
+        #lock.acquire()
         payload_validate(payload)
         # 加入数据库
         data = json.loads(payload)
@@ -101,14 +52,14 @@ def simulator_info(client, ip, payload):
     except Exception as e:
         logger.exception("payload validation failed: %s", e)
     finally:
-        lock.release()
+        #lock.release()
         pass
 
 
 @router.route('/simulator/devices/+/info')
 def simulator_device_info(client, ip, payload, device):
     try:
-        lock.acquire()
+        #lock.acquire()
         payload_validate(payload)
         # 加入数据库
         data = json.loads(payload)
@@ -118,7 +69,7 @@ def simulator_device_info(client, ip, payload, device):
     except Exception as e:
         logger.error("payload validation failed:%s", e)
     finally:
-        lock.release()
+        #lock.release()
         pass
 
 
@@ -178,12 +129,14 @@ def simulator_device_update(client, ip, payload, device):
 
 
 @router.route('/simulator/error')
-def simulator_device_error(client, ip, payload):
+def simulator_error(client, ip, payload):
+    add_response(json.loads(payload))
     pass
 
 
 @router.route('/simulator/devices/+/error')
 def simulator_device_error(client, ip, payload, device):
+    add_response(json.loads(payload))
     pass
 
 
@@ -205,44 +158,6 @@ def request_dongle_info(client, ip, dongle):
     client.publish(topic, payload=None, qos=2)
 
 
-def simulator_command(simulator, body):
-    brokers = get_value('brokers')
-    if brokers and simulator in brokers:
-        if simulator == client_ip:
-            topic = mqtt_version + "/simulator/command"
-        else:
-            topic = mqtt_version + "/" + simulator + "/simulator/command"
-        payload = {}
-        if 'payload' in body:
-            payload = body['payload']
-        new_payload = {body['command']: payload}
-        data = pack_payload(new_payload)
-        logger.info("Publish: topic:%s", topic)
-        brokers[simulator].publish(topic, data)
-    else:
-        logger.warn("Launcher MQTT client not ready")
-
-
-def dongle_command(simulator, name, body):
-    print("this is dongle command", simulator, name, body)
-    brokers = get_value('brokers')
-    if brokers and simulator in brokers:
-        if simulator == client_ip:
-            topic = mqtt_version + "/simulator/devices/" + name + "/command"
-        else:
-            topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
-
-        payload = {}
-        if 'payload' in body:
-            payload = body['payload']
-        new_payload = {body['command']: payload}
-        data = pack_payload(new_payload)
-        logger.info("Publish: topic:%s", topic)
-        brokers[simulator].publish(topic, data)
-    else:
-        logger.warn("Launcher MQTT client not ready")
-
-
 def simulator_command_2(simulator, body):
     brokers = get_value('brokers')
     if brokers and simulator in brokers:
@@ -250,11 +165,14 @@ def simulator_command_2(simulator, body):
             topic = mqtt_version + "/simulator/command"
         else:
             topic = mqtt_version + "/" + simulator + "/simulator/command"
-        data = pack_payload(body)
-        logger.info("Publish: topic:%s", topic)
-        brokers[simulator].publish(topic, data)
+        return send_command(brokers[simulator], topic, body)
+
     else:
-        logger.error("Launcher MQTT client not ready")
+        logger.error("Launcher %s MQTT client not ready", simulator)
+        return {'code': 90007,
+                'message': 'simulator {} not connected'.format(simulator),
+                'timestamp': int(round(time.time() * 1000)),
+                'uuid': uuid.uuid1()}
 
 
 def dongle_command_2(simulator, name, body):
@@ -265,8 +183,11 @@ def dongle_command_2(simulator, name, body):
             topic = mqtt_version + "/simulator/devices/" + name + "/command"
         else:
             topic = mqtt_version + "/" + simulator + "/simulator/devices/" + name + "/command"
-        data = pack_payload(body)
-        logger.info("Publish: topic:%s", topic)
-        brokers[simulator].publish(topic, data)
+        return send_command(brokers[simulator], topic, body)
+
     else:
-        logger.error("Launcher MQTT client not ready")
+        logger.error("Launcher %s MQTT client not ready", simulator)
+        return {'code': 90007,
+                'message': 'simulator {} not connected'.format(simulator),
+                'timestamp': int(round(time.time() * 1000)),
+                'uuid': uuid.uuid1()}

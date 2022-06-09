@@ -2,7 +2,7 @@ from binascii import unhexlify
 
 from zigbeeLauncher.mqtt.WiserZigbeeDongleCommands import commands
 from zigbeeLauncher.serial_protocol.SerialProtocol import encode
-from zigbeeLauncher.mqtt import response
+from zigbeeLauncher.mqtt import response, get_value
 
 local_setting_command = "F0"
 reset_request = "00"
@@ -50,9 +50,13 @@ def info_response_handle(data):
     # 修改dongle属性
     data.dongle.swversion = rsp['swversion']
     data.dongle.hwversion = rsp['hwversion']
+    # need report this attribute if dongle ready
+    update = get_value("dongle_update_callback")
+    if update and data.dongle.ready:
+        update(data.dongle.name, rsp)
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)
-    pass
+
 
 
 def label_request_handle(payload=None):
@@ -66,9 +70,13 @@ def label_response_handle(data):
         "label": unhexlify(data.payload[:-2].encode('utf-8')).decode('utf-8')
     }
     data.dongle.label = rsp['label']
+    # need report this attribute if dongle ready
+    update = get_value("dongle_update_callback")
+    if update and data.dongle.ready:
+        update(data.dongle.name, rsp)
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)
-    pass
+
 
 
 def label_write_handle(data):
@@ -90,9 +98,13 @@ def state_request_handle(payload=None):
 @response.cmd(local_setting_command + state_response)
 def state_response_handle(data):
     rsp = {
-        "configured": bool(int(data.payload[2:], 16))
+        "configured": bool(int(data.payload[2:], 16)),
     }
     data.dongle.configured = rsp['configured']
+    # need report this attribute if dongle ready
+    update = get_value("dongle_update_callback")
+    if update and data.dongle.ready:
+        update(data.dongle.name, rsp)
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)
 
@@ -101,10 +113,9 @@ def state_response_handle(data):
 def status_response_handle(data):
     rsp = {}
     status = int(data.payload, 16)
-    if status != 0:
-        rsp = {
-            "code": status,
-            "description": "please refer error code specification"
-        }
+    rsp = {
+        "code": status,
+        "message": "please refer error code specification",
+    }
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)

@@ -1,6 +1,6 @@
-config_dict = {
+{
   "version": 1,
-  "disable_existing_loggers": False,
+  "disable_existing_loggers": false,
   "formatters": {
     "simple": {
       "format": "%(name)s==>[%(asctime)s][%(levelname)s][%(module)s:%(funcName)s:%(lineno)d]:%(message)s"

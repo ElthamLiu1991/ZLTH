@@ -1,3 +1,4 @@
+import json
 import logging
 import threading
 import time
@@ -19,7 +20,7 @@ class WiserMQTT(threading.Thread):
         self.port = port
         self.clientId = clientId
         self.role = role
-        self.will_payload = pack_payload({"connected": False})
+        self.will_payload = pack_payload({'connected': False})
         self.will_topic = mqtt_version + "/" + self.clientId + "/simulator/update"
 
     def run(self):
@@ -80,6 +81,7 @@ class WiserMQTT(threading.Thread):
         else:
             # 订阅消息
             # local
+            client.subscribe(mqtt_version + "/simulator/error", qos=2)
             client.subscribe(mqtt_version + "/simulator/devices/+/error", qos=2)
             client.subscribe(mqtt_version + "/simulator/info", qos=2)
             client.subscribe(mqtt_version + "/simulator/devices/+/info", qos=2)

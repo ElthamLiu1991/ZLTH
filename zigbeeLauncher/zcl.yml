@@ -1,181 +1,5012 @@
 clusters:
   -
-    id: 0
-    name: Basic,
+    id: 0x0000
+    name: Basic
     manufacturer: false
-    manufacturer_code: 0
+    
     attributes:
       -
-       id: 0
-       name: ZCL Version
+       id: 0x0000
+       name: ZCLVersion
        type: uint8
-       length: 1
        writable: false
        default: 8
        mandatory: true
        manufacturer: false
-       manufacturer_code: 0
+       server: true
       -
-        id: 1
-        name: Application Version
+        id: 0x0001
+        name: ApplicationVersion
         type: uint8
-        length: 1
+        
         writable: false
         default: 0
         mandatory: false
         manufacturer: false
-        manufacturer_code: 0
+        
+        server: true
       -
-        id: 2
-        name: Stack Version
+        id: 0x0002
+        name: StackVersion
         type: uint8
-        length: 1
+        
         writable: false
         default: 0
         mandatory: false
         manufacturer: false
-        manufacturer_code: 0
+        
+        server: true
       -
-        id: 3
-        name: HW Version
+        id: 0x0003
+        name: HWVersion
         type: uint8
-        length: 1
+        
         writable: false
         default: 0
         mandatory: false
         manufacturer: false
-        manufacturer_code: 0
+        
+        server: true
       -
-        id: 4
-        name: Manufacturer Name
+        id: 0x0004
+        name: ManufacturerName
         type: string
         length: 32
         writable: false
         default: ''
         mandatory: false
         manufacturer: false
-        manufacturer_code: 0
+        
+        server: true
       -
-        id: 5
-        name: Model Identifier
+        id: 0x0005
+        name: ModelIdentifier
         type: string
         length: 32
         writable: false
         default: ''
         mandatory: false
         manufacturer: false
-        manufacturer_code: 0
+        
+        server: true
       -
-        id: 6
-        name: Data Code
+        id: 0x0006
+        name: DataCode
         type: string
         length: 16
         writable: false
         default: ''
         mandatory: false
         manufacturer: false
-        manufacturer_code: 0
+        
+        server: true
       -
-        id: 7
-        name: Power Source
+        id: 0x0007
+        name: PowerSource
         type: enum8
-        length: 1
+        
         values:
           -
-            value: 0,
+            value: 0x00
             description: Unknown
           -
-            value: 1
+            value: 0x01
             description: Mains(single phase)
           -
-            value: 2
+            value: 0x02
             description: Mains(3 phase)
           -
-            value: 3
+            value: 0x03
             description: Battery
+          - value: 0x04
+            description: DC source
+          -
+            value: 0x05
+            description: Emergency mains constantly powered
+          -
+            value: 0x06
+            description: Emergency mains and transfer switch
+          -
+            value: 0x80
+            description: Unknown
+          - value: 0x81
+            description: Mains(single phase)
+          - value: 0x82
+            description: Mains(3 phase)
+          - value: 0x83
+            description: Battery
+          - value: 0x84
+            description: DC source
+          - value: 0x85
+            description: Emergency mains constantly powered
+          - value: 0x86
+            description: Emergency mains and transfer switch
+        writable: false
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: true
+      -
+        id: 0x0008
+        name: GenericDevice-Class
+        type: enum8
+        
+        values:
+          - value: 0x00
+            description: Lighting
+        writable: false
+        default: 0xFF
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0009
+        name: GenericDevice-Type
+        type: enum8
+        
+        values:
+          - value: 0x00
+            description: Incandescent
+          - value: 0x01
+            description: Spotlight Halogen
+          - value: 0x02
+            description: Halogen bulb
+          - value: 0x03
+            description: CFL
+          - value: 0x04
+            description: Linear Fluorescent
+          - value: 0x05
+            description: LED bulb
+          - value: 0x06
+            description: Spotlight LED
+          - value: 0x07
+            description: LED strip
+          - value: 0x08
+            description: LED tube
+          - value: 0x09
+            description: Generic indoor luminaaire/light fixture
+          - value: 0x0A
+            description: Generic outdoor luminaire/light fixture
+          - value: 0x0B
+            description: Pendant luminaire/light fixture
+          - value: 0x0C
+            description: Floor standing luminaire/light fixture
+          - value: 0xE0
+            description: Generic Controller(e.g. Remote controller)
+          - value: 0xE1
+            description: Wall Switch
+          - value: 0xE2
+            description: Portable remote controller
+          - value: 0xE3
+            description: Motion sensor / light sensor
+          - value: 0xE4
+            description: Reserved
+          - value: 0xF0
+            description: Generic actuator
+          - value: 0xF1
+            description: Wall socket
+          - value: 0xF2
+            description: Gateway/Bridge
+          - value: 0xF3
+            description: Plug-in unit
+          - value: 0xF4
+            description: Retrofit actuator
+          - value: 0xFF
+            description: Unspecified
+        writable: false
+        default: 0xFF
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x000A
+        name: ProductCode
+        type: octstr
+        length: 16
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x000B
+        name: ProductURL
+        type: string
+        length: 16
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x4000
+        name: SWBuildID
+        type: string
+        length: 16
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0xE001
+        name: SoftwareVersionString
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE002
+        name: HardwareVersionString
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE004
+        name: SerialNumber
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE007
+        name: ProductIdentifier
+        type: enum16
+        
         writable: false
         default: 0
         mandatory: false
-        manufacturer: true,
-        manufacturer_code: 1234
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE008
+        name: ProductRange
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE009
+        name: ProductModel
+        type: string
+        length: 32
+        writable: false
+        default: ''
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE00A
+        name: ProductFamily
+        type: string
+        length: 32
+        writable: false
+        default: 'Wiser Home'
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xE00B
+        name: VendorURL
+        type: string
+        length: 32
+        writable: false
+        default: 'http://www.schneider-electric.com'
+        mandatory: false
+        manufacturer: true
+        manufacturer_code: 0x105E
+        server: true
+      - id: 0xFFFD
+        name: ClusterRevision
+        type: uint16
+        
+        writable: false
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: true
+      - id: 0xFFFD
+        name: ClusterRevision
+        type: uint16
+        
+        writable: false
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: false
     commands:
-      received:
+      C->S:
         -
           id: 0
-          name: Reset to Factory Defaults
+          desciption: Reset to Factory Defaults
           manatory: false
-          manufacturer: true,
-          manufacturer_code: 1234
-      generated: ~
+          manufacturer: false
+          
+      S->C: []
   -
     id: 1
     name: Power Configuration
-    manufacturer: false,
-    manufacturer_code: 0
+    manufacturer: false
+    
     attributes:
       -
-       id: 0
-       name: Mains Voltage
+       id: 0x0000
+       name: MainsVoltage
        type: uint16
-       length: 2
+       
        writable: false
-       default: 0
+       default: 0x0000
        mandatory: false
-       manufacturer: false,
-       manufacturer_code: 0
+       manufacturer: false
+       
+       server: true
       -
-       id: 1
-       name: Mains Frequency
+       id: 0x0001
+       name: MainsFrequency
        type: uint8
-       length: 1
+       
        writable: false
-       default: 0
+       default: 0x00
        mandatory: false
-       manufacturer: false,
-       manufacturer_code: 0
+       manufacturer: false
+       
+       server: true
+      - id: 0x0010
+        name: MainsAlarmMask
+        type: map8
+        
+        writable: true
+        default: 0x00
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0011
+        name: MainsvoltageMinThreshold
+        type: uint16
+        
+        writable: true
+        default: 0x0000
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0012
+        name: MainsVoltageMaxThreshold
+        type: uint16
+        
+        writable: true
+        default: 0xFFFF
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0013
+        name: MainsVoltageDwellTripPoint
+        type: uint16
+        
+        writable: true
+        default: 0x0000
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0020
+        name: BatteryVoltage
+        type: uint8
+        
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0021
+        name: BatteryPercentageRemaining
+        type: uint8
+        
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0030
+        name: BatteryManufacturer
+        type: string
+        length: 16
+        writable: true
+        default: ''
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0031
+        name: BatterySize
+        type: enum8
+        
+        values:
+          - value: 0x00
+            description: No battery
+          - value: 0x01
+            description: Built in
+          - value: 0x02
+            description: Other
+          - value: 0x03
+            description: AA
+          - value: 0x04
+            description: AAA
+          - value: 0x05
+            description: C
+          - value: 0x06
+            description: D
+          - value: 0x07
+            description: 'CR2 (IEC: CR17355 / ANSI: 5046LC)'
+          - value: 0x08
+            description: 'CR123A (IEC: CR17345 / ANSI: 5018LC)'
+          - value: 0xFF
+            description: Unkonwn
+        writable: true
+        default: 0xFF
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0032
+        name: BatteryAHrRating
+        type: uint16
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0033
+        name: BatteryQuantity
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0034
+        name: BatteryRatedVoltage
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0035
+        name: BatteryAlarmMask
+        type: map8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0036
+        name: BatteryVoltageMinThreshold
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0037
+        name: BatteryVoltageThreshold1
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0038
+        name: BatteryVoltageThreshold2
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x0039
+        name: BatteryVoltageThreshold3
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x003A
+        name: BatteryPercentageMinThreshold
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x003B
+        name: BatteryPercentageThreshold1
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x003C
+        name: BatteryPercentageThreshold2
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x003D
+        name: BatteryPercentageThreshold3
+        type: uint8
+        
+        writable: true
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0x003E
+        name: BatteryAlarmState
+        type: map32
+        
+        writable: false
+        default: 0
+        mandatory: false
+        manufacturer: false
+        
+        server: true
+      - id: 0xFFFD
+        name: ClusterRevision
+        type: uint16
+        
+        writable: false
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: true
+      - id: 0xFFFD
+        name: ClusterRevision
+        type: uint16
+        
+        writable: false
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: false
     commands:
-      received: ~
-      generated: ~
+      C->S: []
+      S->C: []
+  - id: 0x0003
+    name: Identify
+    manufacturer: false
+    
+    attributes:
+      - id: 0x0000
+        name: IdentifyTime
+        type: uint16
+        
+        writable: true
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: true
+      - id: 0xFFFD
+        name: ClusterRevision
+        type: uint16
+        
+        writable: true
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: true
+      - id: 0xFFFD
+        name: ClusterRevision
+        type: uint16
+        
+        writable: true
+        default: 0
+        mandatory: true
+        manufacturer: false
+        
+        server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Identify
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Identify Query
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x40
+          description: Trigger effect
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        - id: 0x00
+          description: Identify Query Response
+          mandatory: true
+          manufacturer: false
+          
   -
     id: 4
     name: Groups
-    manufacturer: false,
-    manufacturer_code: 0
+    manufacturer: false
+    
     attributes:
-      -
-       id: 0
-       name: Name Support
+     - id: 0
+       name: NameSupport
        type: map8
-       length: 1
+       
        writable: false
        default: 0
        mandatory: true
-       manufacturer: false,
-       manufacturer_code: 0
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
     commands:
-      received:
+      C->S:
         -
           id: 0
           description: Add group
           mandatory: true
-          manufacturer: false,
-          manufacturer_code: 0
+          manufacturer: false
+          
         -
           id: 1
           description: View group
           mandatory: true
-          manufacturer: false,
-          manufacturer_code: 0
-      generated:
+          manufacturer: false
+          
+        - id: 0x02
+          description: Get group membership
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x03
+          description: Remove group
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x04
+          description: Remove all groups
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x05
+          description: Add group if identifying
+          mandatory: true
+          manufacturer: false
+          
+      S->C:
         -
           id: 0
           description: Add group response
           mandatory: true
-          manufacturer: false,
-          manufacturer_code: 0
+          manufacturer: false
+          
         -
           id: 1
           description: View group response
           mandatory: true
-          manufacturer: false,
-          manufacturer_code: 0
+          manufacturer: false
+          
+        - id: 2
+          description: Get group membership response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 3
+          description: Remove group response
+          mandatory: true
+          manufacturer: false
+          
+  -
+    id: 5
+    name: Scenes
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: SceneCount
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: CurrentScene
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: CurrentGroup
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: SceneValid
+       type: bool
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0004
+       name: NameSupport
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0005
+       name: LastConfiguredBy
+       type: EUI64
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        -
+          id: 0
+          description: Add Scene
+          mandatory: true
+          manufacturer: false
+          
+        -
+          id: 1
+          description: View Scene
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x02
+          description: Remove Scene
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x03
+          description: Remove All Scenes
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x04
+          description: Store Scene
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x05
+          description: Recall Scene
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x06
+          description: Get Scene Membership
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x40
+          description: Enhanced Add Scene
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x41
+          description: Enhanced View Scene
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x42
+          description: Copy Scene
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        -
+          id: 0
+          description: Add Scene Response
+          mandatory: true
+          manufacturer: false
+          
+        -
+          id: 1
+          description: View Scene Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 2
+          description: Remove Scene Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 3
+          description: Remove All Scenes Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 4
+          description: Store Scene Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 6
+          description: Get Scene Membership Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x40
+          description: Enhanced Add Scene Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x41
+          description: Enhanced View Scene Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x42
+          description:  Copy Scene Response
+          mandatory: false
+          manufacturer: false
+          
+  -
+    id: 6
+    name: On/Off
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: OnOff
+       type: bool
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x4000
+       name: GlobalSceneControl
+       type: bool
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x4001
+       name: OnTime
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x4002
+       name: OffWaitTime
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x4003
+       name: StartUpOnOff
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Set the OnOff attribute to 0
+         - value: 0x01
+           description: Set the OnOff attribute to 1
+         - value: 0x02
+           description: Set the OnOff attribute reverse
+         - value: 0x03
+           description: Reserved
+         - value: 0xFF
+           description: Set the OnOff attribute to its pervious value
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xE000
+       name: PreWarningTime
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE001
+       name: OnTimeReload
+       type: uint32
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE002
+       name: OnTimeReloadOptions
+       type: map8
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        -
+          id: 0
+          description: Off
+          mandatory: true
+          manufacturer: false
+          
+        -
+          id: 1
+          description: On
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x02
+          description: Toggle
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x40
+          description: Off with effect
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x41
+          description: On with recall global scene
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x42
+          description: On with timed off
+          mandatory: false
+          manufacturer: false
+          
+      S->C: []
+  -
+    id: 8
+    name: Level Control
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: CurrentLevel
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: RemainingTime
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: MinLevel
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: MaxLevel
+       type: uint8
+       
+       writable: false
+       default: 0xFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0004
+       name: CurrentFrequency
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0005
+       name: MinFrequency
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0006
+       name: MaxFrequency
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0010
+       name: OnOffTransitionTime
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0011
+       name: OnLevel
+       type: uint8
+       
+       writable: true
+       default: 0xFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0012
+       name: OnTransitionTime
+       type: uint16
+       
+       writable: true
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0013
+       name: OffTransitionTime
+       type: uint16
+       
+       writable: true
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0014
+       name: DefaultMoveRate
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x000F
+       name: Options
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x4000
+       name: StartUpCurrentLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        -
+          id: 0
+          description: Move to Level
+          mandatory: true
+          manufacturer: false
+          
+        -
+          id: 1
+          description: Move
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x02
+          description: Step
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x03
+          description: Stop
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x04
+          description: Move to Level (with On/Off)
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x05
+          description: Move (with On/Off)
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x06
+          description: Step (with On/Off)
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x07
+          description: Stop (with On/Off)
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x08
+          description: Move to Closest Frequency
+          mandatory: false
+          manufacturer: false
+          
+      S->C: []
+  -
+    id: 9
+    name: Alarms
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: AlarmCount
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Reset Alarm
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Reset all alarms
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x02
+          description: Get Alarm
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x03
+          description: Reset alarm log
+          mandatory: false
+          manufacturer: false
+          
+      S->C: []
+  -
+    id: 0x000F
+    name: Binary Inpurt (Basic)
+    manufacturer: false
+    
+    attributes:
+     - id: 0x0004
+       name: ActiveText
+       type: string
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x001C
+       name: Description
+       type: string
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x002E
+       name: InactiveText
+       type: string
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0051
+       name: OutOfService
+       type: bool
+       
+       writable: true
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0054
+       name: Polarity
+       type: enum8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0055
+       name: PresentValue
+       type: bool
+       
+       writable: true
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0067
+       name: Reliability
+       type: enum8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x006F
+       name: StatusFlags
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0100
+       name: ApplicationType
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0019
+    name: Over-The-Air Upgrade
+    manufacturer: false
+    
+    attributes:
+     - id: 0x0000
+       name: UpgradeServerID
+       type: EUI64
+       
+       writable: false
+       default: 0xFFFFFFFFFFFFFFFF
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+     - id: 0x0001
+       name: FileOffset
+       type: uint32
+       
+       writable: false
+       default: 0xFFFFFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0002
+       name: CurrentFileVersion
+       type: uint32
+       
+       writable: false
+       default: 0xFFFFFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0003
+       name: CurrentZigBeeStackVersion
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0004
+       name: DownloadedFileVersion
+       type: uint32
+       
+       writable: false
+       default: 0xFFFFFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0005
+       name: DownloadedZigBeeStackVersion
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0006
+       name: ImageUpgradeStatus
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Normal
+         - value: 0x01
+           description: Download in progress
+         - value: 0x02
+           description: Download complete
+         - value: 0x03
+           description: Waiting to upgrade
+         - value: 0x04
+           description: Count down
+         - value: 0x05
+           description: Wait for more
+         - value: 0x06
+           description: Waiting to Upgrade via External Event
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+     - id: 0x0007
+       name: ManufacturerID
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0008
+       name: ImageTypeID
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x0009
+       name: MinimumBlockPeriod
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x000A
+       name: ImageStamp
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x000B
+       name: UpgradeActivationPolicy
+       type: enum8
+       
+       values:
+         - value: 0x00
+           desciption: OTA Server Activation Allowed
+         - value: 0x01
+           description: Out-of-band Activation Only
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0x000C
+       name: UpgradeTimeoutPolicy
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Apply Upgrade After Timeout
+         - value: 0x01
+           description: Do not Apply Upgrade After Timeout
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: false
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x01
+          description: Query Next Image Request
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x03
+          description: Image Block Request
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x04
+          description: Image Page Request
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x06
+          description: Upgrade End Request
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x08
+          description: Query Device Specific File Request
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        - id: 0x00
+          description: Image Notify
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x02
+          description: Query Next Image Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x05
+          description: Image Block Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x07
+          description: Upgrade End Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x09
+          description: Query Device Specific File Response
+          mandatory: false
+          manufacturer: false
+          
+  -
+    id: 0x0020
+    name: Poll Control
+    manufacturer: false
+    
+    attributes:
+     - id: 0x0000
+       name: Check-inInterval
+       type: uint32
+       
+       writable: true
+       default: 0x3840
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: LongPollInterval
+       type: uint32
+       
+       writable: false
+       default: 0x14
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: ShortPollInterval
+       type: uint16
+       
+       writable: false
+       default: 0x02
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: FastPollTimeout
+       type: uint16
+       
+       writable: true
+       default: 0x28
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0004
+       name: Check-inIntervalMin
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0005
+       name: LongPollIntervalMin
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0006
+       name: FastPollTimeoutMax
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Check-in Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Fast Poll Stop
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x02
+          description: Set Long Poll Interval
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x03
+          description: Set Short Poll Interval
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        - id: 0x00
+          description: Check-in
+          mandatory: true
+          manufacturer: false
+          
+  -
+    id: 0x0102
+    name: Window Covering
+    manufacturer: false
+    
+    attributes:
+     - id: 0x0000
+       name: WindowCoveringType
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Rollershade
+         - value: 0x01
+           description: Rollershade - 2 Motor
+         - value: 0x02
+           description: Rollershade - Exterior
+         - value: 0x03
+           description: Rollershade - Exterior - 2 Motor
+         - value: 0x04
+           description: Drapery
+         - value: 0x05
+           description: Awning
+         - value: 0x06
+           description: Shutter
+         - value: 0x07
+           description: Tilt Blind - Tilt Only
+         - value: 0x08
+           description: Tilt Blind - Lift and Tilt
+         - value: 0x09
+           description: Projector Screen
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: PyhsicalClosdLimited-Lift
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: PyhsicalClosedLimit-Tilt
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: CurrentPosition-Lift
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0004
+       name: CurrentPosition-Tilt
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0005
+       name: NumberofActuations-Lift
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0006
+       name: NumberofActuation-Tilt
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0007
+       name: Config/Status
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0008
+       name: CurrentPositionLiftPercentage
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0009
+       name: CurrentPositionTiltPercentage
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0010
+       name: InstalledOpenLimit-Lift
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0011
+       name: InstalledClosedLimit-Lift
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0012
+       name: InstalledOpenLimit-Tilt
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0013
+       name: InstalledClosedLimit-Tilt
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0014
+       name: Velocity-Lift
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0015
+       name: AccelerationTime-Lift
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0016
+       name: DecelerationTime-Lift
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0017
+       name: Mode
+       type: map8
+       
+       writable: true
+       default: 0x04
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0018
+       name: IntermediateSetpoints-Lift
+       type: octstr
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0019
+       name: IntermediateSetpoints-Tilt
+       type: octstr
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xE000
+       name: DriveCloseDuration
+       type: uint16
+       
+       writable: true
+       default: 120
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE010
+       name: ProtectionStatus
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE012
+       name: SunProtectionIlluminanceThreshold
+       type: uint16
+       
+       writable: true
+       default: 32767
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE013
+       name: ProtectionSensor
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Up/Open
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Down/Close
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x02
+          description: Stop
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x04
+          description: Go To Lift Value
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x05
+          description: Go To Lift Percentage
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x07
+          description: Go To Tilt Value
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x08
+          description: Go To Tilt Percentage
+          mandatory: false
+          manufacturer: false
+          
+      S->C: []
+  -
+    id: 0x0301
+    name: Ballast Configuration
+    manufacturer: false
+    
+    attributes:
+     - id: 0x0000
+       name: PhysicalMinLevel
+       type: uint8
+       
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: PhysicalMaxLevel
+       type: uint8
+       
+       writable: false
+       default: 0xFE
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: BallastStatus
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0010
+       name: MinLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0011
+       name: MaxLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0012
+       name: PowerOnLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0013
+       name: PowerOnFadeTime
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0014
+       name: IntrinsicBallastFactor
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0015
+       name: BallastFactorAdjustment
+       type: uint8
+       
+       writable: true
+       default: 0xFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0020
+       name: LampQuantity
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0030
+       name: LampType
+       type: string
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0031
+       name: LampManufacturer
+       type: string
+       length: 16
+       writable: true
+       default: ''
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0032
+       name: LampRatedHours
+       type: uint24
+       writable: true
+       default: 0xFFFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0033
+       name: LampBurnHours
+       type: uint24
+       writable: true
+       default: 0xFFFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0034
+       name: LampAlarmMode
+       type: map8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0035
+       name: LampBurnHoursTripPoint
+       type: uint24
+       writable: true
+       default: 0xFFFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xE000
+       name: ControlMode
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Automatic
+         - value: 0x01
+           description: RC Mode
+         - value: 0x02
+           description: RL Mode
+         - value: 0x03
+           description: RL-LED
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0400
+    name: Illuminance Measurement
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: MeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: MinMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: MaxMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 2
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: Tolerance
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0004
+       name: LightSensorType
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Photodiode
+         - value: 0x01
+           description: CMOS
+         - value: 0x40
+           description: Reserved
+         - value: 0xFF
+           description: Unknown
+       writable: false
+       default: 0xFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0402
+    name: Temperature Measurement
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: MeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: MinMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: MaxMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 2
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: Tolerance
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0405
+    name: Relative Humidity
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: MeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: MinMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: MaxMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 2
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: Tolerance
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0406
+    name: Occupancy Sensing
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: Occupancy
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: OccupancySensorType
+       type: enum8
+       
+       values:
+         - value: 0x00
+           descrpiton: PIR
+         - value: 0x01
+           description: Ultrasonic
+         - value: 0x02
+           description: PIR and ultrasonic
+         - value: 0x03
+           description: Physical contact
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: OccupancySensorTypeBitmap
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0010
+       name: PIROccupiedToUnoccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0011
+       name: PIRUnoccupiedToOccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0012
+       name: PIRUnoccupiedToOccupiedThreshold
+       type: uint8
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0020
+       name: UltrasonicOccupiedToUnoccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0021
+       name: UltrasonicUnoccupiedToOccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0022
+       name: UltrasonicUnoccupiedToOccupiedThreshold
+       type: uint8
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0030
+       name: PhysicalContactOccupiedToUnoccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0031
+       name: PhysicalContactUnoccupiedToOccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0032
+       name: PhysicalContactUnoccupiedToOccupiedThreshold
+       type: uint8
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xE000
+       name: OccupancyDfltOperationMode
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Motion Sensor functionality is in manual mode
+         - value: 0x01
+           description: Motion sensor on with full auto functionality
+         - value: 0x02
+           description: Occ when motion, but no timeout
+         - value: 0x03
+           description: No motion sensing before the user manually switches on via local controll
+         - value: 0x04
+           description: Occupancy is disable
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE001
+       name: OccupancyOperationMode
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Motion Sensor functionality is in manual mode
+         - value: 0x01
+           description: Motion sensor on with full auto functionality
+         - value: 0x02
+           description: Occ when motion, but no timeout
+         - value: 0x03
+           description: No motion sensing before the user manually switches on via local controll
+         - value: 0x04
+           description: Occupancy is disable
+         - value: 0x05
+           description: Motion sensor test mode for range tests
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE002
+       name: ForceOffTimeout
+       type: uint16
+       
+       writable: true
+       default: 7
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE003
+       name: OccupancySensitivity
+       type: uint8
+       
+       writable: true
+       default: 100
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x042A
+    name: PM2.5 Measurement
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: MeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: MinMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: MaxMeasuredValue
+       type: uint16
+       
+       writable: false
+       default: 2
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0003
+       name: Tolerance
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0500
+    name: IAS Zone
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: ZoneState
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: Not enrolled
+         - value: 0x01
+           description: Enrolled
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: ZoneType
+       type: enum16
+       
+       values:
+         - value: 0x0000
+           descrpiton: Standard CIE
+         - value: 0x000D
+           description: Motion sensor
+         - value: 0x0015
+           description: Contact switch
+         - value: 0x0016
+           description: Door/Window handle
+         - value: 0x0028
+           description: Fire sensor
+         - value: 0x002A
+           description: Water sensor
+         - value: 0x002B
+           description: Carbon Monoxide (CO) sensor
+         - value: 0x002C
+           description: Personal emergency device
+         - value: 0x002D
+           description: Vibration/Movement sensor
+         - value: 0x010F
+           description: Remote Control
+         - value: 0x0115
+           description: Key fob
+         - value: 0x021D
+           description: Keypad
+         - value: 0x0225
+           description: Standard Warning Device
+         - value: 0x0226
+           description: Glass break sensor
+         - value: 0x0229
+           description: Security repeater
+         - value: 0xFFFF
+           description: Invalid Zone Type
+       writable: false
+       default: 1
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0002
+       name: ZoneStatus
+       type: map16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0010
+       name: IAS_CIE_Address
+       type: EUI64
+       
+       writable: true
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0011
+       name: ZoneID
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0012
+       name: NumberOfZoneSensitivityLevelsSupported
+       type: uint8
+       
+       writable: false
+       default: 2
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0013
+       name: CurrentZoneSensitivityLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xE000
+       name: SupervisionReportInterval
+       type: uint8
+       
+       writable: true
+       default: 0x78
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xE001
+       name: OccupiedToUnoccupiedDelay
+       type: uint16
+       
+       writable: true
+       default: 0x000F
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Zone Enroll Response
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Initiate Normal Operation Mode
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x02
+          description: Initial Test Mode
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        - id: 0x00
+          description: Zone Status Change Notification
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Zone Enroll Request
+          mandatory: true
+          manufacturer: false
+          
+  -
+    id: 0x0502
+    name: IAS WD
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: MaxDuration
+       type: uint16
+       
+       writable: true
+       default: 240
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Start warning
+          mandatory: true
+          manufacturer: false
+          
+        - id: 0x01
+          description: Squawk
+          mandatory: true
+          manufacturer: false
+          
+      S->C: []
+  -
+    id: 0x0B04
+    name: Electrical Measurement
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: MeasurementType
+       type: map32
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0100
+       name: DCVoltage
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0101
+       name: DCVoltageMin
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0102
+       name: DCVoltageMax
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0103
+       name: DCCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0104
+       name: DCCurrentMin
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0105
+       name: DCCurrentMax
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0106
+       name: DCPower
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0107
+       name: DCPowerMin
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0108
+       name: DCPowerMax
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0200
+       name: DCVoltageMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0201
+       name: DCVoltageDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0202
+       name: DCCurrentMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0203
+       name: DCCurrentDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0204
+       name: DCPowerMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0205
+       name: DCPowerDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0300
+       name: ACFrequency
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0301
+       name: ACFrequencyMin
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0302
+       name: ACFrequencyMax
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0303
+       name: NeutralCurrent
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0304
+       name: TotalActivePower
+       type: int32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0305
+       name: TotalReactivePower
+       type: int32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0306
+       name: TotalApparentPower
+       type: int32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0307
+       name: Measured1stHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0308
+       name: Measured3rdHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0309
+       name: Measured5thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x030a
+       name: Measured7thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x030b
+       name: Measured9thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x030c
+       name: Measured11thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x030d
+       name: MeasuredPhase1stHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x030e
+       name: MeasuredPhase3rdHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x030f
+       name: MeasuredPhase5thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0310
+       name: MeasuredPhase7thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0311
+       name: MeasuredPhase9thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0312
+       name: MeasuredPhase11thHarmonicCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0400
+       name: ACFrequencyMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0401
+       name: ACFrequencyDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0402
+       name: PowerMultiplier
+       type: uint32
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0403
+       name: PowerDivisor
+       type: uint32
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0404
+       name: HarmonicCurrentMultiplier
+       type: int8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0405
+       name: PhaseHarmonicCurrentMultiplier
+       type: int8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0501
+       name: LineCurrent
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0502
+       name: ActiveCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0503
+       name: ReactiveCurrent
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0505
+       name: RMSVoltage
+       type: iunt16
+       
+       writable: false
+       default: 0xffff
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0506
+       name: RMSVoltageMin
+       type: uint16
+       
+       writable: false
+       default: 0xffff
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0507
+       name: RMSVoltageMax
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0508
+       name: RMSCurrent
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0509
+       name: RMSCurrentMin
+       type: uint16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x050a
+       name: RMSCurrentMax
+       type: uint16
+       
+       writable: false
+       default: 0xffff
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x050b
+       name: ActivePower
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x050c
+       name: ActivePowerMin
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x050d
+       name: ActivePowerMax
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x050e
+       name: ReactivePower
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x050f
+       name: ApparentPower
+       type: int16
+       
+       writable: false
+       default: 0x8000
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0510
+       name: PowerFactor
+       type: int8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0600
+       name: ACVoltageMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0601
+       name: ACVoltageDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0602
+       name: ACCurrentMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0603
+       name: ACCurrentDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0604
+       name: ACPowerMultiplier
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0605
+       name: ACPowerDivisor
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0800
+       name: ACAlarmsMask
+       type: map16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0801
+       name: ACVoltageOverload
+       type: int16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0802
+       name: ACCurrentOverload
+       type: int16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0803
+       name: ACActivePowerOverload
+       type: int16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0804
+       name: ACReactivePowerOverload
+       type: int16
+       
+       writable: false
+       default: 0xFFFF
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0805
+       name: AverageRMSOverVoltage
+       type: int16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0806
+       name: AverageRMSUnderVoltage
+       type: int16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0807
+       name: RMSExtremeOverVoltage
+       type: int16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0808
+       name: RMSExtremeUnderVoltage
+       type: int16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0809
+       name: RMSVoltageSag
+       type: int16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x080A
+       name: RMSVoltageSwell
+       type: int16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0x0B05
+    name: Diagnostics
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: NumberOfResets
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: PersistentMemoryWrites
+       type: uint16
+       
+       writable: false
+       default: 1
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0100
+       name: MacRxBcast
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0101
+       name: MacTxBcast
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0102
+       name: MacRxUcast
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0103
+       name: MacTxUcast
+       type: uint32
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0104
+       name: MacTxUcastRetry
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0105
+       name: MacTxUcastFail
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0106
+       name: APSRxBcast
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0107
+       name: APSTxBcast
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0108
+       name: APSRxUcast
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0109
+       name: APSTxUcastSuccess
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x010A
+       name: APSTxUcastRetry
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x010B
+       name: APSTxUcastFail
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x010C
+       name: RouteDisInitiated
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x010D
+       name: NeighborAdded
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x010E
+       name: NeighborRemoved
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x010F
+       name: NeighborState
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0110
+       name: JoinIndication
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0111
+       name: ChildMoved
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0112
+       name: NWKFCFailure
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0113
+       name: APSFCFailure
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0114
+       name: APSUnauthorizedKey
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0115
+       name: NWKDecryptFailures
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0117
+       name: PacketBufferAllocateFailures
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0118
+       name: RelayedUcast
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0119
+       name: PhytoMACqueuelimitreached
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x011A
+       name: PackeValidatedropcount
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x011B
+       name: AverageMACRetryPerAPSMessageSent
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x011C
+       name: LastMessageLQI
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x011D
+       name: LastMessageRSSI
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Get Profile Info Command
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x01
+          description: Get Measurement Profile Command
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        - id: 0x00
+          description: Get Profile Info Response Command
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x01
+          description: Get Measurement Profile Response Command
+          mandatory: false
+          manufacturer: false
+          
+
+  -
+    id: 0x0702
+    name: Metering (Smart Energy)
+    manufacturer: false
+    
+    attributes:
+     - id: 0
+       name: CurrentSummationDelivered
+       type: uint48
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0001
+       name: CurrentSummationReceived
+       type: uint48
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0200
+       name: Status
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0300
+       name: UnitofMeasure
+       type: enum8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0301
+       name: Multiplier
+       type: uint24
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0302
+       name: Divisor
+       type: uint24
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0303
+       name: SummationFormatting
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0304
+       name: DemandFormatting
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0305
+       name: HistoricalConsumptionFormatting
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0x0306
+       name: MeteringDeviceType
+       type: map8
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0x0400
+       name: InstantaneousDemand
+       type: int24
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: false
+       default: 0
+       mandatory: true
+       manufacturer: false
+       
+       server: false
+    commands:
+      C->S:
+        - id: 0x00
+          description: Get Profile
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x01
+          description: Request Mirror Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x02
+          description: Mirror Removed
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x03
+          description: Request Fast Pool Mode
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x04
+          description: Schedule Snapshot
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x05
+          description: Take Snapshot
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x06
+          description: Get Snapshot
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x07
+          description: Start Sampling
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x08
+          description: Get Sampled Data
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x09
+          description: Mirror Report Attribute Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0A
+          description: Reset Load Limit Counter
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0B
+          description: Chang Supply
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0C
+          description: Local Change Supply
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0D
+          description: Set Supply Status
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0E
+          description: Set Uncontrolled Flow Threshold
+          mandatory: false
+          manufacturer: false
+          
+      S->C:
+        - id: 0x00
+          description: Get Profile Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x02
+          description: Remove Mirror
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x03
+          description: Request Fast Pool Mode Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x04
+          description: Schedule Snapshot Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x05
+          description: Take Snapshot Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x06
+          description: Publish Snapshot
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x07
+          description: Get Sampled Data Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x08
+          description: Configure Mirror
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x09
+          description: Configure Notification Scheme
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0A
+          description: Configure Notification Flag
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0B
+          description: Get Notified Message
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0C
+          description: Supply Status Response
+          mandatory: false
+          manufacturer: false
+          
+        - id: 0x0D
+          description: Start Sampling Response
+          mandatory: false
+          manufacturer: false
+          
+  -
+    id: 0xFC04
+    name: Visa Configuration
+    manufacturer: true
+    manufacturer_code: 0x105E
+    attributes:
+     - id: 0
+       name: IndicatorLuminanceLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0001
+       name: IndicatorColor
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0002
+       name: Indicator Mode
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0003
+       name: MotorTypeChannel1
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0004
+       name: MotorTypeChannel2
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0005
+       name: CurtainStatusChannel1
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0006
+       name: CurtainStatusChannel2
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0007
+       name: EntryCalibrationInCurtainChannel1
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0008
+       name: EntryCalibrationInCurtainChannel2
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0009
+       name: CalibrationCompletedInCurtainChannel1
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x000A
+       name: CalibrationCompletedInCurtainChannel2
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0010
+       name: Key1Configuration
+       type: uint8
+       
+       writable: true
+       default: 0x10
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0011
+       name: Key2Configuration
+       type: uint8
+       
+       writable: true
+       default: 0x10
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0012
+       name: Key3Configuration
+       type: uint8
+       
+       writable: true
+       default: 0x10
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0013
+       name: Key4Configuration
+       type: uint8
+       
+       writable: true
+       default: 0x10
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0020
+       name: Key1EventNoificiation
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0021
+       name: Key2EventNoificiation
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0022
+       name: Key3EventNoificiation
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0023
+       name: Key4EventNoificiation
+       type: uint8
+       
+       writable: false
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0030
+       name: Key1GroupID
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0031
+       name: Key2GroupID
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0032
+       name: Key3GroupID
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0033
+       name: Key4GroupID
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0040
+       name: Key1SceneID
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0041
+       name: Key2SceneID
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0042
+       name: Key3SceneID
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0043
+       name: Key4SceneID
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0xFF17
+    name: Schneider Switch Configuration
+    manufacturer: true
+    manufacturer_code: 0x105E
+    attributes:
+     - id: 0
+       name: SwitchIndication
+       type: enum8
+       
+       values:
+         - value: 0x0
+           description: Indicator is on when load is on
+         - value: 0x01
+           description: Indicator is always on
+         - value: 0x02
+           description: Indicator is on when load is off
+         - value: 0x03
+           description: Indicator is always off
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0001
+       name: SwitchAction
+       type: enum8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0010
+       name: UpSceneID
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0011
+       name: UpGroupID
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0020
+       name: DownSceneID
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0021
+       name: DownGroupID
+       type: uint16
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: false
+    commands:
+      C->S: []
+      S->C: []
+  -
+    id: 0xFF19
+    name: Occupancy Setting
+    manufacturer: true
+    manufacturer_code: 0x105E
+    attributes:
+     - id: 0
+       name: AmbienceLightThreshold
+       type: uint16
+       
+       writable: true
+       default: 30099
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0001
+       name: OccupancyActions
+       type: enum8
+       
+       values:
+         - value: 0x00
+           description: No commands are sent
+         - value: 0x01
+           description: Occupancy switch
+         - value: 0x02
+           description: Occupancy dimmer
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0002
+       name: UnoccupiedLevelDflt
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0x0003
+       name: UnoccupiedLevel
+       type: uint8
+       
+       writable: true
+       default: 0
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: true
+     - id: 0xFFFD
+       name: ClusterRevision
+       type: uint16
+       
+       writable: true
+       default: 1
+       mandatory: false
+       manufacturer: true
+       manufacturer_code: 0x105E
+       server: false
+    commands:
+      C->S: []
+      S->C: []

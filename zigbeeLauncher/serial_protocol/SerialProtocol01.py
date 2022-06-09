@@ -1,5 +1,6 @@
 from zigbeeLauncher.mqtt.WiserZigbeeDongleCommands import commands
-from zigbeeLauncher.serial_protocol.SerialProtocol import encode, big_small_end_convert, to_hex
+from zigbeeLauncher.serial_protocol.SerialProtocol import encode, big_small_end_convert, to_hex, \
+    big_small_end_convert_from_int
 from zigbeeLauncher.mqtt import response, get_value
 
 network_config_command = "01"
@@ -67,12 +68,12 @@ def network_status_response_handle(data):
     index = index + 16
     zigbee.update({"extended_pan_id": big_small_end_convert(extended_pan_id)})
     rsp['zigbee'] = zigbee
+    # need report this attribute if dongle ready
+    update = get_value("dongle_update_callback")
+    if update and data.dongle.ready:
+        update(data.dongle.name, rsp)
     if (data.seq, data.dongle.name) in commands:
         commands[(data.seq, data.dongle.name)].get_response(rsp)
-    else:
-        # update
-        if get_value("dongle_update_callback"):
-            get_value("dongle_update_callback")(data.dongle.name, rsp)
 
 
 def join_network_request_handle(payload):
@@ -80,18 +81,18 @@ def join_network_request_handle(payload):
 
     :param payload:
     {
-        "channel_mask": "7FFF800",
+        "channel_mask": 0x7FFF800,
         "auto_option": 3,
-        "pan_id": "12AB",
-        "extended_pan_id":"11223344AABBCCDD"
+        "pan_id": 0x12AB,
+        "extended_pan_id":0x11223344AABBCCDD
     }
     :return:
     """
     data = ""
-    data = data + big_small_end_convert(payload['channel_mask'])
+    data = data + big_small_end_convert_from_int(payload['channel_mask'], 4)
     data = data + to_hex(payload['auto_option'])
-    data = data + payload['pan_id']
-    data = data + payload['extended_pan_id']
+    data = data + big_small_end_convert_from_int(payload['pan_id'], 2)
+    data = data + big_small_end_convert_from_int(payload['extended_pan_id'], 8)
     return encode(network_config_command + join_network_request, data)
 
 

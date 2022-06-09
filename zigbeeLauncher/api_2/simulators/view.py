@@ -1,3 +1,5 @@
+import time
+
 import rapidjson
 from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
@@ -25,7 +27,7 @@ class SimulatorsResource(Resource):
                 items = DBSimulator(**paras).retrieve()
             except Exception as e:
                 logger.exception("request error")
-                return pack_response(90000, error="bad parameters:"+str(request.args)), 500
+                return pack_response({'code': 90000}, status=500, error="bad parameters:" + str(request.args))
         else:
             items = DBSimulator().retrieve()
         for simulator in items:
@@ -34,36 +36,30 @@ class SimulatorsResource(Resource):
             devices = DBDevice(ip=simulator['ip']).retrieve()
             for device in devices:
                 simulator['devices'].append(device['mac'])
-        return jsonify(pack_response(0, items))
+        return pack_response({'code': 0, 'response': items})
         # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
-label_schema = {
+class SimulatorResource(Resource):
+    commands = ['label']
+    schema = {
+        "type": "object",
+        "properties": {
+            "label": {
                 "type": "object",
                 "properties": {
-                  "label": {
-                    "type": "object",
-                    "properties": {
-                      "data": {
+                    "data": {
                         "type": "string",
-                        "description": "label data"
-                      }
-                    },
-                    "required": [
-                      "data"
-                    ],
-                    "description": "label command"
-                  }
+                        "description": "label"
+                    }
                 },
+                "description": "label modification request",
                 "required": [
-                  "label"
+                    "data"
                 ]
-              }
-
-
-class SimulatorResource(Resource):
-
-    commands = ['label']
+            }
+        }
+    }
 
     def get(self, mac):
         if DBSimulator(mac=mac).retrieve():
@@ -73,9 +69,9 @@ class SimulatorResource(Resource):
             devices = DBDevice(ip=simulator['ip']).retrieve()
             for device in devices:
                 simulator['devices'].append(device['mac'])
-            return pack_response(0, simulator), 200
+            return pack_response({'code': 0, 'response': simulator})
         else:
-            return pack_response(20000, device=mac), 404
+            return pack_response({'code': 20000}, status=404, device=mac)
 
     def put(self, mac):
         args = request.get_json()
@@ -87,23 +83,27 @@ class SimulatorResource(Resource):
                 if connected:
                     for key in args.keys():
                         if key not in self.commands:
-                            return pack_response(90002, command=key), 500
+                            return pack_response({'code': 90002}, 500, command=key)
                     for key in args.keys():
                         try:
-                            validate(instance=args, schema=eval(key + '_schema'),
+                            validate(instance=args, schema=self.schema,
                                      format_checker=draft7_format_checker)
                         except SchemaError as e:
                             logger.exception('illegal schema: %s', e.message)
-                            return pack_response(90003, error=e.message)
+                            return pack_response({'code': 90003}, status=500, error=e.message)
                         except ValidationError as e:
                             logger.exception('json validation failed:%s', e.message)
-                            return pack_response(90004, error=e.message)
+                            return pack_response({'code': 90004}, status=500, error=e.message)
                         else:
-                            simulator_command_2(ip, args)
-                    return pack_response(0), 200
+                            response = simulator_command_2(ip, args)
+                            code = response['code']
+                            if code != 0:
+                                return pack_response(response, status=500)
+                            else:
+                                return pack_response(response)
                 else:
-                    return pack_response(20001, device=mac), 500
+                    return pack_response({'code': 20001}, status=500, device=mac)
             except Exception as e:
-                return pack_response(90000, error=str(e)), 500
+                return pack_response({'code': 90000}, status=500, error=str(e))
         else:
-            return pack_response(20000, device=mac), 404
+            return pack_response({'code': 20000}, status=404, device=mac)

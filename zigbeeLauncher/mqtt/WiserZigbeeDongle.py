@@ -22,104 +22,7 @@ from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
 from zigbeeLauncher.serial_protocol.SerialProtocol01 import *
 from zigbeeLauncher.serial_protocol.SerialProtocol02 import *
 
-
-def dongle_error_callback(device, msg):
-    callback = get_value("dongle_error_callback")
-    if callback:
-        callback(device, msg)
-
-
-@except_handle(dongle_error_callback)
-def dongle_command_handle(device=None, timestamp=0, uuid="", data={}):
-    if device not in dongles_dict:
-        raise Exception("device not exist")
-    for key in data.keys():
-        command = key
-        payload = data[key]
-        if dongles_dict[device].state == 2 and command != "reset" and command != "firmware":
-            # cannot operate device when device in bootloader mode
-            raise Exception("device is in bootloader mode")
-        if command == "identify":
-            send_command(Command(
-                dongle=dongles_dict[device],
-                request=identify_request_handle,
-                response=protocol.error,
-                timeout=protocol.timeout), timestamp, uuid, None)
-        elif command == "reset":
-            if dongles_dict[device].state == 2:
-                # 在bootloader模式下reset需要先停止当前的transfer
-                send_command(Command(
-                    dongle=dongles_dict[device],
-                    request=bootloader_stop_transfer,
-                    timeout=protocol.timeout,
-                    done=lambda: send_command(Command(
-                        dongle=dongles_dict[device],
-                        request=bootloader_finish_transfer,
-                        timeout=protocol.timeout), timestamp, uuid, None)), timestamp, uuid, None)
-            else:
-                send_command(Command(
-                    dongle=dongles_dict[device],
-                    request=reset_request_handle,
-                    timeout=protocol.timeout), timestamp, uuid, None)
-
-        elif command == "firmware":
-            if "data" in payload:
-                if "filename" in payload:
-                    filename = payload["filename"]
-                else:
-                    filename = uuid.uuid1()
-                filename = './firmwares/' + filename
-                # save data to file
-                with open(filename, 'wb') as f:
-                    f.write(base64.b64decode(payload["data"]))
-                file = WiserFile(filename)
-                Upgrade(dongles_dict[device], file)
-            else:
-                filename = './firmwares/' + payload['filename']
-                file = WiserFile(filename)
-                Upgrade(dongles_dict[device], file)
-
-        elif command == "label":
-            send_command(Command(
-                dongle=dongles_dict[device],
-                request=label_write_handle,
-                response=protocol.error,
-                timeout=protocol.timeout,
-                done=lambda: send_command(Command(
-                        dongle=dongles_dict[device],
-                        request=label_request_handle,
-                        response=protocol.error,
-                        timeout=protocol.timeout))), timestamp, uuid, payload["data"])
-        elif command == "attribute":
-            send_command(Command(
-                dongle=dongles_dict[device],
-                request=attribute_write_request_handle,
-                response=protocol.error,
-                timeout=protocol.timeout
-            ), timestamp, uuid, data, report=True)
-        elif command == "join":
-            send_command(Command(
-                dongle=dongles_dict[device],
-                request=join_network_request_handle,
-                response=protocol.error,
-                timeout=protocol.timeout
-            ), timestamp, uuid, payload)
-        elif command == "leave":
-            send_command(Command(
-                dongle=dongles_dict[device],
-                request=leave_network_request_handle,
-                response=protocol.error,
-                timeout=protocol.timeout
-            ), timestamp, uuid, None)
-        elif command == "data_request":
-            send_command(Command(
-                dongle=dongles_dict[device],
-                request=data_request_handle,
-                response=protocol.error,
-                timeout=protocol.timeout
-            ), timestamp, uuid, None)
-        else:
-            raise Exception("unsupported command:"+command)
+dongles_dict = {}
 
 
 class Dongles(Protocol):
@@ -134,6 +37,7 @@ class Dongles(Protocol):
         self.hwversion = ""
         self.flag = None
         self.data = b''
+        self.ready = False
 
     def set_attributes(self, **kwargs):
         for key in kwargs.keys():
@@ -200,7 +104,6 @@ class Dongles(Protocol):
             self.flag = data
         else:
             if self.new_state != self.state:
-                # update to 1
                 self.new_state = self.state
                 if get_value("dongle_update_callback"):
                     get_value("dongle_update_callback")(self.name, {"state": self.state})
@@ -338,8 +241,6 @@ def init(MQTT_info_callback, MQTT_update_callback=None, MQTT_error_callback=None
     set_value("dongle_info_callback", MQTT_info_callback)
     set_value("dongle_update_callback", MQTT_update_callback)
     set_value("dongle_error_callback", MQTT_error_callback)
-    global dongles_dict
-    dongles_dict = {}
     thread = Thread(target=scan)
     thread.start()
     commands_init()

@@ -2,10 +2,9 @@ from . import db, ma
 
 
 class Device(db.Model):
-    id = db.Column('id', db.Integer, primary_key=True)
     ip = db.Column(db.String(20))
     name = db.Column(db.String(30))
-    mac = db.Column(db.String(30))
+    mac = db.Column(db.String(30), primary_key=True)
     label = db.Column(db.String(50))
     connected = db.Column(db.Boolean())
     configured = db.Column(db.Boolean())

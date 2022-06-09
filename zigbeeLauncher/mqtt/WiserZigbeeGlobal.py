@@ -1,4 +1,4 @@
-import json
+import rapidjson as json
 import socket
 import time
 import traceback
@@ -6,9 +6,12 @@ import uuid
 from datetime import datetime
 from functools import wraps
 
-import rapidjson
-
 from ..logging import mqttLogger as logger
+from ..request_and_response import wait_response
+
+
+def payload_validate(data):
+    json.Validator('{"required":["timestamp", "uuid", "data"]}')(data)
 
 
 def _init():
@@ -45,16 +48,38 @@ def get_mac_address():
     return ":".join([mac[e:e + 2] for e in range(0, 11, 2)])
 
 
-def pack_payload(data):
+def send_command(client, topic, body):
     timestamp = int(round(time.time() * 1000))
-    uid = uuid.uuid1()
+    uid = str(uuid.uuid1())
+    # 加入request等待队列
+    task = wait_response(timestamp, uid)
     payload = {
         "timestamp": timestamp,
-        "uuid": str(uid),
-        "data": data
+        "uuid": uid,
+        "data": body
     }
-    return json.dumps(payload)
+    client.publish(topic, json.dumps(payload))
+    result = task.result()
+    if result == {}:
+        result = {
+            'code': 91000,
+            'message': "no response",
+            'timestamp': timestamp,
+            'uuid': uid,
+            'response': {
+            }
+        }
+    return result
 
+
+def pack_payload(data):
+    timestamp = int(round(time.time() * 1000))
+    uid = str(uuid.uuid1())
+    return json.dumps({
+        "timestamp": timestamp,
+        "uuid": uid,
+        "data": data
+    })
 
 class Router(object):
 
@@ -121,69 +146,63 @@ def except_handle(error_handle):
     # msg用于自定义函数的提示信息
     def except_execute(func):
         @wraps(func)
-        def execept_print(*args, **kwargs):
+        def except_print(*args, **kwargs):
+            device = None
+            rsp = {}
             try:
-                if "device" in kwargs:
-                    device = kwargs["device"]
-                    timestamp = kwargs["timestamp"]
-                    uuid = kwargs["uuid"]
-                else:
-                    device = None
-                    payload = rapidjson.loads(args[2])
-                    timestamp = payload["timestamp"]
-                    uuid = payload["uuid"]
-
+                payload_validate(args[2])
+                payload = json.loads(args[2])
+                timestamp = payload["timestamp"]
+                uuid = payload["uuid"]
+                if len(args) == 4:
+                    # device command
+                    device = args[3]
+                rsp.update({
+                    'timestamp': timestamp,
+                    'uuid': uuid
+                })
                 return func(*args, **kwargs)
-            except rapidjson.JSONDecodeError as e:
-                error_handle(device,
-                             {
-                                 "code": 500,
-                                 "description": str(e)
-                             }
-                             )
-            except rapidjson.ValidationError as e:
-                error_handle(device,
-                             {
-                                 "code": 501,
-                                 "description": str(e)
-                             }
-                             )
+            except json.JSONDecodeError as e:
+                rsp.update({
+                    'code': 1000,
+                    'message': str(e)
+                })
+            except json.ValidationError as e:
+                rsp.update({
+                    'code': 1001,
+                    'message': str(e)
+                })
             except KeyError as e:
-                error_handle(device,
-                             {
-                                 "code": 502,
-                                 "description": "mandatory key missing: " + str(e)
-                             }
-                             )
+                rsp.update({
+                    'code': 1002,
+                    'message': str(e)
+                })
             except Exception as e:
                 if str(e) == "device not exist":
-                    error_handle(device,
-                                 {
-                                     "timestamp": timestamp,
-                                     "uuid": uuid,
-                                     "code": 400,
-                                     "description": str(e)
-                                 }
-                                 )
+                    rsp.update({
+                        'code': 1003,
+                        'message': str(e)
+                    })
                 elif str(e) == "device is in bootloader mode":
-                    error_handle(device,
-                                 {
-                                     "timestamp": timestamp,
-                                     "uuid": uuid,
-                                     "code": 401,
-                                     "description": str(e)
-                                 }
-                                 )
+                    rsp.update({
+                        'code': 1004,
+                        'message': str(e)
+                    })
                 elif "unsupported command" in str(e):
-                    error_handle(device,
-                                 {
-                                     "timestamp": timestamp,
-                                     "uuid": uuid,
-                                     "code": 300,
-                                     "description": str(e)
-                                 }
-                                 )
-
-        return execept_print
+                    rsp.update({
+                        'code': 1005,
+                        'message': str(e)
+                    })
+                else:
+                    rsp.update({
+                        'code': 1006,
+                        'message': str(e)
+                    })
+            if 'code' in rsp:
+                if device:
+                    error_handle(device, rsp)
+                else:
+                    error_handle(rsp)
+        return except_print
 
     return except_execute

@@ -10,64 +10,8 @@ from ..response import pack_response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
-from ...zigbee.DataType import get_bytes
-
-
-def get_endpoints(mac):
-    result = []
-    endpoints = DBZigbeeEndpoint(mac=mac).retrieve()
-    if endpoints:
-        for endpoint in endpoints:
-            del endpoint['id']
-            del endpoint['mac']
-            endpoint_id = endpoint['endpoint']
-            server_clusters = []
-            client_clusters = []
-            clusters = DBZigbeeEndpointCluster(mac=mac, endpoint=endpoint_id).retrieve()
-            if clusters:
-                for cluster in clusters:
-                    if cluster['server']:
-                        tmp = []
-                        attributes = DBZigbeeEndpointClusterAttribute(
-                            mac=mac, endpoint=endpoint_id, server=True, cluster=cluster['cluster']).retrieve()
-                        if attributes:
-                            for attribute in attributes:
-                                tmp.append({
-                                    'attribute': attribute['attribute'],
-                                    'name': attribute['name'],
-                                    "type": attribute['type'],
-                                    "value": attribute['value']
-                                })
-                        server_clusters.append({
-                            'cluster': cluster['cluster'],
-                            'name': cluster['name'],
-                            'manufacturer': cluster['manufacturer'],
-                            'manufacturer_code': cluster['manufacturer_code'],
-                            'attributes': tmp
-                        })
-                    else:
-                        tmp = []
-                        attributes = DBZigbeeEndpointClusterAttribute(
-                            mac=mac, endpoint=endpoint_id, server=False, cluster=cluster['cluster']).retrieve()
-                        if attributes:
-                            for attribute in attributes:
-                                tmp.append({
-                                    'attribute': attribute['attribute'],
-                                    'name': attribute['name'],
-                                    "type": attribute['type'],
-                                    "value": attribute['value']
-                                })
-                        client_clusters.append({
-                            'cluster': cluster['cluster'],
-                            'name': cluster['name'],
-                            'manufacturer': cluster['manufacturer'],
-                            'manufacturer_code': cluster['manufacturer_code'],
-                            'attributes': tmp
-                        })
-            endpoint['server_clusters'] = server_clusters
-            endpoint['client_clusters'] = client_clusters
-            result.append(endpoint)
-    return result
+from ..util import check_zigbee_exist, check_device_state, check_device_exist
+from ...zigbee.DataType import get_bytes, data_type_value_table, data_type_table
 
 
 class ZigbeesResource(Resource):
@@ -82,250 +26,272 @@ class ZigbeesResource(Resource):
                 for key in request.args:
                     paras[key] = request.args[key]
                 data = DBZigbee(**paras).retrieve()
-                if data:
-                    for zigbee in data:
-                        zigbee['endpoints'] = get_endpoints(zigbee['mac'])
-                return pack_response(0, data)
+                return pack_response({'code': 0, 'response': data})
             except Exception as e:
                 logger.exception("request error")
-                return pack_response(90000, error="bad parameters:" + str(request.args)), 500
+                return pack_response({'code': 90000}, status=500, error="bad parameters:" + str(request.args))
         else:
             data = DBZigbee().retrieve()
-            if data:
-                for zigbee in data:
-                    zigbee['endpoints'] = get_endpoints(zigbee['mac'])
-            return pack_response(0, data)
+            return pack_response({'code': 0, 'response': data})
         # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
-join_schema = {
+class ZigbeeResource(Resource):
+    commands = ['join', 'leave', 'attribute', 'data_request']
+    schema = {
+        "type": "object",
+        "properties": {
+            "join": {
                 "type": "object",
                 "properties": {
-                  "join": {
-                    "type": "object",
-                    "properties": {
-                      "channel_mask": {
-                        "type": "string",
-                        "description": "network channel mask, all channel: 7FFF800"
-                      },
-                      "auto_option": {
+                    "channel_mask": {
+                        "type": "integer",
+                        "description": "network channel mask, 4 bytes, all channel: 0x7FFF800, channel 11: 0x800, channel 12: 0x1000..."
+                    },
+                    "auto_option": {
                         "type": "integer",
                         "description": "auto option setting, this property value should be 0, 1, 2, 3"
-                      },
-                      "pan_id": {
-                        "type": "string",
-                        "description": "network PAN ID, set this property if 'auto_option' is 0 or 2"
-                      },
-                      "extended_pan_id": {
-                        "type": "string",
-                        "description": "network extended PAN ID, set this property if 'auto_option' is 0 or 1"
-                      }
                     },
-                    "required": [
-                      "channel_mask",
-                      "auto_option",
-                      "pan_id",
-                      "extended_pan_id"
-                    ],
-                    "description": "join command"
-                  }
+                    "pan_id": {
+                        "type": "integer",
+                        "description": "network PAN ID, 2 bytes, set this property if 'auto_option' is 0 or 2,"
+                    },
+                    "extended_pan_id": {
+                        "type": "integer",
+                        "description": "network extended PAN ID, 8 bytes, set this property if 'auto_option' is 0 or 1"
+                    }
                 },
                 "required": [
-                  "join"
-                ]
-              }
-
-leave_schema = {
-            "type": "object",
-            "properties": {
-              "leave": {
+                    "channel_mask",
+                    "auto_option"
+                ],
+                "description": "join command, trigger device joining to a specific zigbee network\n"
+            },
+            "leave": {
                 "type": "object",
                 "properties": {},
-                "description": "leave command"
-              }
+                "description": "leave command, trigger device leaving to current zigbee network"
             },
-            "required": [
-              "leave"
-            ]
-          }
-
-attribute_schema = {
-            "type": "object",
-            "properties": {
-              "attribute": {
+            "data_request": {
+                "type": "object",
+                "properties": {},
+                "description": "data request command, trigger sleepy end device send out data_request_command\n"
+            },
+            "attribute": {
                 "type": "object",
                 "properties": {
-                  "endpoint": {
-                    "type": "integer",
-                    "description": "endpoint ID"
-                  },
-                  "cluster": {
-                    "type": "string",
-                    "description": "cluster ID"
-                  },
-                  "server": {
-                    "type": "boolean",
-                    "description": "server or client "
-                  },
-                  "attribute": {
-                    "type": "string",
-                    "description": "attribute ID"
-                  },
-                  "value": {
-                    "type": "string",
-                    "description": "attribute value"
-                  }
+                    "endpoint": {
+                        "type": "integer",
+                        "description": "endpoint id, rang 1-240"
+                    },
+                    "cluster": {
+                        "type": "integer",
+                        "description": "cluster ID, range 0-65535"
+                    },
+                    "server": {
+                        "type": "boolean",
+                        "description": "server cluster mask"
+                    },
+                    "manufacturer": {
+                        "type": "boolean",
+                        "description": "manufacturer specific mask fro this cluster"
+                    },
+                    "manufacturer_code": {
+                        "type": "integer",
+                        "description": "manufacturer code for this cluster if manufacturer is true, range 0-65535"
+                    },
+                    "attribute": {
+                        "type": "integer",
+                        "description": "attribute ID, range 0-65535"
+                    },
+                    "type": {
+                        "type": "string",
+                        "description": "attribute type, provide this property when attribute_manufacturer is true"
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "description": "integer data"
+                            },
+                            {
+                                "type": "string",
+                                "description": "string data"
+                            }
+                        ],
+                        "description": "attribute value, could be integer or string"
+                    }
                 },
                 "required": [
-                  "endpoint",
-                  "cluster",
-                  "server",
-                  "attribute",
-                  "value"
-                ],
-                "description": "attribute command"
-              }
-            },
-            "required": [
-              "attribute"
-            ]
-          }
+                    "endpoint",
+                    "cluster",
+                    "server",
+                    "attribute",
+                    "manufacturer",
+                    "value",
+                    "type"
+                ]
+            }
+        }
+    }
 
-data_request_schema = {
-            "type": "object",
-            "properties": {
-              "data_request": {
-                "type": "object",
-                "properties": {},
-                "description": "data request command"
-              }
-            },
-            "required": [
-              "data_request"
-            ]
-          }
+    @check_zigbee_exist
+    def get(self, mac, zigbee):
+        return pack_response({'code': 0, 'response': zigbee})
 
-
-class ZigbeeResource(Resource):
-
-    commands = ['join', 'leave', 'attribute', 'data_request']
-
-    def get(self, mac):
-        zigbee = DBZigbee(mac=mac).retrieve()
-        if zigbee:
-            zigbee = zigbee[0]
-            zigbee['endpoints'] = get_endpoints(zigbee['mac'])
-            return pack_response(0, zigbee), 200
-        else:
-            return pack_response(10000, device=mac), 404
-
-    def put(self, mac):
+    @check_device_state
+    def put(self, mac, device):
         args = request.get_json()
-        device = DBDevice(mac=mac).retrieve()
-        if device:
-            try:
-                state = device[0]['state']
-                if state == 2 or state == 3:
-                    return pack_response(10002, device=mac), 500
-                connected = device[0]['connected']
-                ip = device[0]['ip']
-                if connected:
-                    for key in args.keys():
-                        if key not in self.commands:
-                            return pack_response(90002, command=key), 500
-                    for key in args.keys():
-                        command = key
-                        try:
-                            validate(instance=args, schema=eval(key+'_schema'),
-                                     format_checker=draft7_format_checker)
-                            if command == 'join':
-                                # 验证channel和auto_option的合法性
-                                channel = int(args[key]['channel_mask'], 16)
-                                if channel < 0x800 or channel > 0x7FFF800:
-                                    return pack_response(90005, item='channel_mask'), 500
-                                auto_option = args[key]['auto_option']
-                                if auto_option > 3:
-                                    return pack_response(90005, item='auto_option'), 500
-                                # 验证设备是否已经入网
-                                zigbee = DBZigbee(mac=mac).retrieve()
-                                if not zigbee:
-                                    return pack_response(10000, device=mac), 404
-                                if zigbee[0]['pan_id'] != "FFFF":
-                                    return pack_response(40001, device=mac), 500
-                            elif command == 'leave':
-                                # 验证设备是否已经入网
-                                zigbee = DBZigbee(mac=mac).retrieve()
-                                if not zigbee:
-                                    return pack_response(10000, device=mac), 404
-                                if zigbee[0]['pan_id'] == "FFFF":
-                                    return pack_response(40000, device=mac), 500
-                            elif command == 'attribute':
-                                payload = args[key]
-                                # 判断attribute是否存在
-                                attribute = DBZigbeeEndpointClusterAttribute(
-                                    mac=mac,
-                                    endpoint=payload['endpoint'],
-                                    cluster=payload['cluster'],
-                                    server=payload['server'],
-                                    attribute=payload['attribute']
-                                ).retrieve()
-                                if not attribute:
-                                    return pack_response(30000, attribute=payload['attribute']), 500
-                                else:
-                                    # 检查value的合法性
-                                    if len(payload['value']) > get_bytes(attribute[0]['type'])*2:
-                                        return pack_response(90005, value=payload['value']), 500
-                                    try:
-                                        int(payload['value'], 16)
-                                    except ValueError:
-                                        return pack_response(90006, value=payload['value']), 500
-                                    # 获取manufacturer_code
-                                    cluster = DBZigbeeEndpointCluster(
-                                        mac=mac,
-                                        endpoint=payload['endpoint'],
-                                        cluster=payload['cluster'],
-                                        server=payload['server']
-                                    ).retrieve()
-                                    if not cluster:
-                                        return pack_response(30000, attribute=payload['attribute']), 500
-                                    payload['manufacturer_code'] = cluster[0]['manufacturer_code']
-                                    payload['type'] = attribute[0]['type']
-                            elif command == 'data_request':
-                                pass
-                        except SchemaError as e:
-                            logger.exception('illegal schema: %s', e.message)
-                            return pack_response(90003, error=e.message)
-                        except ValidationError as e:
-                            logger.exception('json validation failed:%s', e.message)
-                            return pack_response(90004, error=e.message)
+        ip = device['ip']
+        try:
+            for key in args.keys():
+                if key not in self.commands:
+                    return pack_response({'code': 90002}, status=500, command=key)
+            for key in args.keys():
+                command = key
+                payload = args[key]
+                try:
+                    validate(instance=args, schema=self.schema,
+                             format_checker=draft7_format_checker)
+                    if command == 'join':
+                        # 验证channel和auto_option的合法性
+                        channel = payload['channel_mask']
+                        auto_option = payload['auto_option']
+                        if not auto_option & 0x1 and 'pan_id' not in payload:
+                            return pack_response({'code': 90001}, status=500, item='pan_id')
+                        if not auto_option & 0x2 and 'extended_pan_id' not in payload:
+                            return pack_response({'code': 90001}, status=500, item='extended_pan_id')
+                        # 校验数据大小
+                        if channel < 0x800 or channel > 0x7FFF800:
+                            return pack_response({'code': 90005}, status=500, value='channel_mask')
+                        if auto_option > 3 or auto_option < 0:
+                            return pack_response({'code': 90005}, status=500, value='auto_option')
+                        if 'pan_id' in payload:
+                            pan_id = payload['pan_id']
+                            if pan_id < 0 or pan_id > 0xFFFF:
+                                return pack_response({'code': 90005}, status=500, value='channel_mask')
+                        if 'extended_pan_id' in payload:
+                            extended_pan_id = payload['extended_pan_id']
+                            if extended_pan_id < 0 or extended_pan_id > 0xFFFFFFFFFFFFFFFF:
+                                return pack_response({'code': 90005}, status=500, value='channel_mask')
+                        # 验证设备是否已经入网
+                        zigbee = DBZigbee(mac=mac).retrieve()
+                        if not zigbee:
+                            return pack_response({'code': 10000}, status=404, device=mac)
+                        if zigbee[0]['pan_id'] != "FFFF":
+                            return pack_response({'code': 40001}, status=500, device=mac)
+                    elif command == 'leave':
+                        # 验证设备是否已经入网
+                        zigbee = DBZigbee(mac=mac).retrieve()
+                        if not zigbee:
+                            return pack_response({'code': 10000}, status=404, device=mac)
+                        if zigbee[0]['pan_id'] == "FFFF":
+                            return pack_response({'code': 40000}, status=500, device=mac)
+                    elif command == 'attribute':
+                        # 验证manufacturer
+                        manufacturer = payload['manufacturer']
+                        if manufacturer and 'manufacturer_code' not in payload:
+                            return pack_response({'code': 90001}, status=500, item='manufacturer_code')
+                        # 验证type是否可以找到
+                        type = payload['type']
+                        if type not in data_type_value_table:
+                            return pack_response({'code': 30001}, status=500, type=type)
                         else:
-                            dongle_command_2(ip, mac, args)
-                            return pack_response(0)
+                            type = data_type_value_table[type]
+                        # 验证整型数据合法性
+                        len = data_type_table[type]
+                        value = payload['value']
+                        if isinstance(value, int):
+                            if len == 0:
+                                # 数据类型错误
+                                return pack_response({'code': 30002}, status=500)
+                            else:
+                                # 验证整型数据是否超出范围
+                                if 0x28 <= type <= 0x2f:
+                                    maximum = (1 << 8 * len) / 2
+                                    if not (-maximum) <= value < maximum:
+                                        return pack_response({'code': 90005}, status=500, value='value')
+                                    # 将负数转换
+                                    value_wrap = abs(~abs(value)) + 1
+                                    payload['value'] = value_wrap
+                                else:
+                                    if not 0 <= value <= (1<<8*len):
+                                        return pack_response({'code': 90005}, status=500, value='value')
+                        else:
+                            if len != 0:
+                                # 数据类型错误
+                                return pack_response({'code': 30002}, status=500)
+                        # 验证整型数据范围
+                        endpoint = payload['endpoint']
+                        if not 0 < endpoint <= 240:
+                            return pack_response({'code': 90005}, status=500, value='endpoint')
+                        cluster = payload['cluster']
+                        if not 0 <= cluster <= 0xFFFF:
+                            return pack_response({'code': 90005}, status=500, value='cluster')
+                        attribute = payload['attribute']
+                        if not 0 <= attribute <= 0xFFFF:
+                            return pack_response({'code': 90005}, status=500, value='attribute')
+                        if 'manufacturer_code' in payload:
+                            code = payload['manufacturer_code']
+                            if not 0 <= code <= 0xFFFF:
+                                return pack_response({'code': 90005}, status=500, value='manufacturer_code')
+                    elif command == 'data_request':
+                        pass
+                except SchemaError as e:
+                    logger.exception('illegal schema: %s', e.message)
+                    return pack_response({'code': 90003}, status=500, error=e.message)
+                except ValidationError as e:
+                    logger.exception('json validation failed:%s', e.message)
+                    return pack_response({'code': 90004}, status=500, error=e.message)
                 else:
-                    return pack_response(10001, device=mac), 500
-            except Exception as e:
-                logger.exception("request error:")
-                return pack_response(90000, error=str(e)), 500
-        else:
-            return pack_response(10000, device=mac), 404
+                    response = dongle_command_2(ip, mac, args)
+                    code = response['code']
+                    if code != 0:
+                        return pack_response(response, status=500)
+                    else:
+                        return pack_response(response)
+        except Exception as e:
+            logger.exception("request error:")
+            return pack_response({'code': 90000}, status=500, error=str(e))
 
 
 class ZigbeeAttributesResource(Resource):
-
-    def get(self, mac):
-        if not DBDevice(mac=mac).retrieve():
-            return pack_response(10000, device=mac), 404
+    @check_device_exist
+    def get(self, mac, device):
+        """
+        通过endpoint, cluster, attribute获取属性列表
+        :param mac:
+        :param device:
+        :return:
+        """
+        ip = device['ip']
+        paras = {}
         if request.args:
             try:
-                paras = {}
                 for key in request.args:
-                    paras[key] = request.args[key]
+                    paras[key] = int(request.args[key])
                 paras['mac'] = mac
-                data = DBZigbeeEndpointClusterAttribute(**paras).retrieve()
-                return pack_response(0, data)
+                if 'endpoint' not in paras:
+                    return pack_response({'code': 90001}, status=500, item='endpoint')
+                if 'cluster' not in paras:
+                    return pack_response({'code': 90001}, status=500, item='cluster')
+                if 'server' not in paras:
+                    return pack_response({'code': 90001}, status=500, item='server')
+                if 'manufacturer' not in paras:
+                    return pack_response({'code': 90001}, status=500, item='manufacturer')
+                else:
+                    if bool(paras['manufacturer']) and 'manufacturer_code' not in paras:
+                        return pack_response({'code': 90001}, status=500, item='manufacturer_code')
+                if 'attribute' not in paras:
+                    return pack_response({'code': 90001}, status=500, item='attribute')
             except Exception as e:
                 logger.exception("request error")
-                return pack_response(90000, error="bad parameters:" + str(request.args)), 500
+                return pack_response({'code': 90000}, status=500, error="bad parameters:" + str(request.args))
+            response = dongle_command_2(ip, mac, {'attribute': paras})
+            code = response['code']
+            if code != 0:
+                return pack_response(response, status=500)
+            else:
+                return pack_response(response)
         else:
-            data = DBZigbeeEndpointClusterAttribute(mac=mac).retrieve()
-            return pack_response(0, data)
+            return pack_response({'code': 90001}, status=500, item='endpoint')

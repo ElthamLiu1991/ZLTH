@@ -12,7 +12,6 @@ import rapidjson as json
 from .WiserZigbeeGlobal import _init, get_value, set_value, Router, Response, get_ip_address, get_mac_address
 
 mqtt_version = "v1.0"
-payload_validate = json.Validator('{"required":["timestamp", "uuid", "data"]}')
 client_mac = get_mac_address()
 try:
     user_label = DBSimulator(mac=client_mac).retrieve()[0]['label']
@@ -34,8 +33,8 @@ while True:
         break
     logger.warning("get ip address failed, waiting")
     time.sleep(1)
-from threading import RLock
-lock = RLock()
+#from threading import RLock
+#lock = RLock()
 from .WiserZigbeeLauncherMqtt import WiserMQTT
 
 

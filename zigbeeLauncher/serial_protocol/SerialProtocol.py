@@ -104,3 +104,14 @@ def big_small_end_convert(data):
     if len(data) % 2 != 0:
         data = '0'+data
     return binascii.hexlify(binascii.unhexlify(data)[::-1]).upper().decode()
+
+
+def big_small_end_convert_from_int(data, bytes):
+    data = hex(data)[2:].zfill(bytes*2)
+    return binascii.hexlify(binascii.unhexlify(data)[::-1]).upper().decode()
+
+
+def big_small_end_convert_to_int(data):
+    if len(data) % 2 != 0:
+        data = '0'+data
+    return int(binascii.hexlify(binascii.unhexlify(data)[::-1]).upper().decode(), 16)
