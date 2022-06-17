@@ -4,13 +4,14 @@ from flask_restful import Api, Resource, reqparse
 from . import devices
 from zigbeeLauncher.database.interface import DBDevice, DBZigbee, DBZigbeeEndpoint, DBZigbeeEndpointCluster, \
     DBZigbeeEndpointClusterAttribute
-from zigbeeLauncher.mqtt.WiserZigbeeLauncher import dongle_command_2
+from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..response import pack_response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
 from ..util import check_zigbee_exist, check_device_state, check_device_exist
+from ...zigbee import type_exist, format_validation, value_validation
 from ...zigbee.DataType import get_bytes, data_type_value_table, data_type_table
 
 
@@ -194,33 +195,13 @@ class ZigbeeResource(Resource):
                             return pack_response({'code': 90001}, status=500, item='manufacturer_code')
                         # 验证type是否可以找到
                         type = payload['type']
-                        if type not in data_type_value_table:
-                            return pack_response({'code': 30001}, status=500, type=type)
-                        else:
-                            type = data_type_value_table[type]
-                        # 验证整型数据合法性
-                        len = data_type_table[type]
                         value = payload['value']
-                        if isinstance(value, int):
-                            if len == 0:
-                                # 数据类型错误
-                                return pack_response({'code': 30002}, status=500)
-                            else:
-                                # 验证整型数据是否超出范围
-                                if 0x28 <= type <= 0x2f:
-                                    maximum = (1 << 8 * len) / 2
-                                    if not (-maximum) <= value < maximum:
-                                        return pack_response({'code': 90005}, status=500, value='value')
-                                    # 将负数转换
-                                    value_wrap = abs(~abs(value)) + 1
-                                    payload['value'] = value_wrap
-                                else:
-                                    if not 0 <= value <= (1<<8*len):
-                                        return pack_response({'code': 90005}, status=500, value='value')
-                        else:
-                            if len != 0:
-                                # 数据类型错误
-                                return pack_response({'code': 30002}, status=500)
+                        if not type_exist(type):
+                            return pack_response({'code': 30001}, status=500, type=type)
+                        if not format_validation(type, value):
+                            return pack_response({'code': 30002}, status=500)
+                        if not value_validation(type, value):
+                            return pack_response({'code': 90005}, status=500, value=value)
                         # 验证整型数据范围
                         endpoint = payload['endpoint']
                         if not 0 < endpoint <= 240:

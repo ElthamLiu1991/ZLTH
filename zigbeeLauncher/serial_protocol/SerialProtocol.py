@@ -2,8 +2,7 @@ import binascii
 
 from crcmod import mkCrcFun
 from binascii import unhexlify, hexlify
-from zigbeeLauncher.mqtt import response
-from zigbeeLauncher.mqtt.WiserZigbeeGlobal import get_value
+from . import response
 from zigbeeLauncher.logging import dongleLogger as logger
 
 start_frame = "AA55"
@@ -12,33 +11,14 @@ global sequence
 sequence = -1
 
 
-def timeout(device, timestamp, uuid):
-    if get_value("dongle_error_callback"):
-        get_value("dongle_error_callback")(device, {
-            "timestamp": timestamp,
-            "uuid": uuid,
-            "code": 300,
-            "description": "request timeout"
-        })
-
-
-def error(device, data):
-    if "code" in data:
-        if get_value("dongle_error_callback"):
-            get_value("dongle_error_callback")(device, data)
-    else:
-        if get_value("dongle_update_callback"):
-            get_value("dongle_update_callback")(device, data)
-
-
 class WiserZigbeeDongleSerial:
     def __init__(self, dongle, seq, length, payload):
         self.dongle = dongle
         self.seq = int(seq, 16)
         self.length = int(length, 16)
         self.payload = payload
-        logger.info("Get serial data from %s, seq=%d, length=%d, payload:%s",
-                    self.dongle.name, self.seq, self.length, self.payload)
+        # logger.info("Get serial data from %s, seq=%d, length=%d, payload:%s",
+        #             self.dongle.name, self.seq, self.length, self.payload)
 
 
 def crc16Xmodem_verify(data):
@@ -66,16 +46,16 @@ def next_sequence():
     return sequence
 
 
-def encode(command, payload):
+def encode(seq, command, payload):
     data = command
-    data = data + "%02X" % next_sequence()
+    data = data + "%02X" % seq
     if payload:
         data = data + "".join(format(int(len(payload) / 2), "02X"))
         data = data + payload
     else:
         data = data + "00"
     data = data + crc16Xmodem_calculate(data)
-    return sequence, start_frame + data
+    return start_frame + data
 
 
 def decode(dongle, data):
@@ -85,10 +65,10 @@ def decode(dongle, data):
     payload_len = data[6:8]
     payload = data[8:-4]
     crc = data[-4:]
-    logger.info("decode:%s%s, %s, %s, %s, %s", pri_command, sec_command, seq_number, payload_len, payload, crc)
+    logger.info("%s, decode:%s%s, %s, %s, %s, %s", dongle.property.mac, pri_command, sec_command, seq_number, payload_len, payload, crc)
     try:
         response.call(pri_command + sec_command,
-                      WiserZigbeeDongleSerial(dongle, seq_number, payload_len, payload))
+                      int(seq_number, 16), dongle, payload)
     except ValueError as e:
         logger.exception("decode error:%ss", str(e))
 
@@ -97,7 +77,7 @@ def to_hex(data):
     result = hex(data)[2:]
     if len(result) % 2 != 0:
         result = '0'+result
-    return result
+    return result.upper()
 
 
 def big_small_end_convert(data):
@@ -106,7 +86,7 @@ def big_small_end_convert(data):
     return binascii.hexlify(binascii.unhexlify(data)[::-1]).upper().decode()
 
 
-def big_small_end_convert_from_int(data, bytes):
+def big_small_end_convert_from_int(data, bytes=2):
     data = hex(data)[2:].zfill(bytes*2)
     return binascii.hexlify(binascii.unhexlify(data)[::-1]).upper().decode()
 
@@ -115,3 +95,11 @@ def big_small_end_convert_to_int(data):
     if len(data) % 2 != 0:
         data = '0'+data
     return int(binascii.hexlify(binascii.unhexlify(data)[::-1]).upper().decode(), 16)
+
+
+def ack(command, seq):
+    data = command
+    data = data + "%02X" % seq
+    data = data + "00"
+    data = data + crc16Xmodem_calculate(data)
+    return start_frame + data

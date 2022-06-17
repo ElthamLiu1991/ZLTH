@@ -10,14 +10,14 @@ from werkzeug.utils import secure_filename
 
 from zigbeeLauncher.database.interface import DBDevice, DBZigbee, DBZigbeeEndpoint, DBZigbeeEndpointCluster, \
     DBZigbeeEndpointClusterAttribute
-from zigbeeLauncher.mqtt.WiserZigbeeLauncher import dongle_command_2, simulator_command_2
+from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2, simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..json_schemas import config_schema
 from ..response import pack_response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
-from ..util import handle_devices, check_device_exist, check_device_state
+from ..util import handle_devices, check_device_exist, check_device_state, config_validation
 from ... import base_dir
 from ...mqtt import get_mac_address, get_ip_address
 
@@ -35,6 +35,9 @@ class ConfigResource(Resource):
                 return pack_response({'code': 90001}, status=500)
             validate(instance=args, schema=config_schema,
                      format_checker=draft7_format_checker)
+            result, error = config_validation(args['config'])
+            if not result:
+                return pack_response({'code':90005}, status=500, value=error)
             # save to file
             filename = args['filename']
             with open(os.path.join(base_dir, './files') + '/' + filename, 'w+') as f:
@@ -97,8 +100,12 @@ class ConfigFilesResource(Resource):
             return pack_response({'code': 50001}, status=500, file=None)
         try:
             y = yaml.safe_load(content.read())
-            validate(instance={'config':y}, schema=config_schema,
+            validate(instance={'config': y}, schema=config_schema,
                      format_checker=draft7_format_checker)
+            # 验证文件每个字段的值是否符合要求
+            result, error = config_validation(args['config'])
+            if not result:
+                return pack_response({'code': 90005}, status=500, value=error)
             filename = secure_filename(content.filename)
             content.seek(0)
             content.save(os.path.join('./files', filename))
@@ -159,32 +166,47 @@ class ConfigFileResource(Resource):
 class ConfigDevicesResource(Resource):
     def put(self):
         """
-        批量更新设备配置
+        批量更新设备配置, 使用文件或直接配置
         """
         args = request.get_json()
-        if 'filename' not in args and 'devices' not in args:
-            return pack_response({'code':90001}, status=500)
-        else:
+        if 'devices' not in args:
+            return pack_response({'code': 90001}, status=500, item='devices')
+        if 'filename' in args:
             file = args['filename']
             path = os.path.join(base_dir, './files') + '/' + file
             if not os.path.isfile(path):
-                return pack_response({'code':50000}, status=500, file=file)
+                return pack_response({'code': 50000}, status=500, file=file)
             else:
-                # send this file to another simulator
-                result, code = handle_devices(args['devices'])
-                if code != 200:
-                    return result, code
-                else:
-                    with open(path, 'r') as f:
-                        data = yaml.safe_load(f.read())
-                        for ip in result.keys():
-                            response = simulator_command_2(ip, {
-                                'config': {
-                                    "data": data,
-                                    'devices': result[ip]
-                                }
-                            })
-                            code = response['code']
-                            if code != 0:
-                                return pack_response(response, status=500)
-                    return pack_response(response)
+                with open(path, 'r') as f:
+                    data = yaml.safe_load(f.read())
+        elif 'config' in args:
+            try:
+                validate(instance=args, schema=config_schema,
+                         format_checker=draft7_format_checker)
+                result, error = config_validation(args['config'])
+                if not result:
+                    return pack_response({'code': 90005}, status=500, value=error)
+                data = args['config']
+            except SchemaError as e:
+                logger.exception('illegal schema: %s', e.message)
+                return pack_response({'code': 90003}, status=500, error=e.message)
+            except ValidationError as e:
+                logger.exception('json validation failed:%s', e.message)
+                return pack_response({'code': 90004}, status=500, error=e.message)
+        else:
+            return pack_response({'code': 90001}, status=500, item='filename or config')
+
+        result, code = handle_devices(args['devices'])
+        if code != 200:
+            return result, code
+        payload = {}
+        payload.update(data)
+        for ip in result.keys():
+            payload['devices'] = result[ip]
+            response = simulator_command_2(ip, {
+                'config': payload
+            })
+            code = response['code']
+            if code != 0:
+                return pack_response(response, status=500)
+        return pack_response(response)

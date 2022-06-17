@@ -9,14 +9,14 @@ from werkzeug.utils import secure_filename
 
 from . import devices
 from zigbeeLauncher.database.interface import DBDevice
-from zigbeeLauncher.mqtt.WiserZigbeeLauncher import dongle_command_2
+from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..response import pack_response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 from ..json_schemas import config_schema
 
-from ..util import check_device_exist, check_device_state
+from ..util import check_device_exist, check_device_state, config_validation
 from ... import base_dir
 
 
@@ -132,20 +132,17 @@ class DeviceConfigResource(Resource):
                 with open(path, 'r') as f:
                     data = yaml.safe_load(f.read())
                     response = dongle_command_2(ip, mac, {
-                        "config": {
-                            'data': data
-                        }
+                        "config": data
                     })
         elif 'config' in args:
             # verify the config is meet JSON schema requirement
             try:
-                validate(instance=args['config'], schema=config_schema,
+                validate(instance=args, schema=config_schema,
                          format_checker=draft7_format_checker)
-                response = dongle_command_2(ip, mac, {
-                    "config": {
-                        args['config']
-                    }
-                })
+                result, error = config_validation(args['config'])
+                if not result:
+                    return pack_response({'code': 90005}, status=500, value=error)
+                response = dongle_command_2(ip, mac, args)
             except SchemaError as e:
                 logger.exception('illegal schema: %s', e.message)
                 return pack_response({'code':90003}, status=500, error=e.message)
@@ -153,7 +150,7 @@ class DeviceConfigResource(Resource):
                 logger.exception('json validation failed:%s', e.message)
                 return pack_response({'code':90004}, status=500, error=e.message)
         else:
-            return pack_response({'code':90001}, status=500)
+            return pack_response({'code':90001}, status=500, item='filename or config')
         code = response['code']
         if code != 0:
             return pack_response(response, status=500)
@@ -168,15 +165,15 @@ class DeviceConfigResource(Resource):
         parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
         args = parser.parse_args()
         content = args.get('file')
+        if not content:
+            return pack_response({'code': 50001}, status=500, file=None)
         try:
             y = yaml.safe_load(content.read())
-            validate(instance=y, schema=config_schema,
+            validate(instance={'config': y}, schema=config_schema,
                      format_checker=draft7_format_checker)
 
             response = dongle_command_2(ip, mac, {
-                "config": {
-                    y
-                }
+                "config": y
             })
             code = response['code']
             if code != 0:
@@ -190,7 +187,7 @@ class DeviceConfigResource(Resource):
             logger.exception('json validation failed:%s', e.message)
             return pack_response({'code':90004}, status=500, error=e.message)
         except Exception as e:
-            logger.exception('load YAML failed:%s', e.message)
-            return pack_response({'code':50001}, status=500, file=content.filename)
+            logger.exception('load YAML failed:%s', str(e))
+            return pack_response({'code':90000}, status=500, error=str(e))
         pass
 

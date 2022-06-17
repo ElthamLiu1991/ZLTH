@@ -6,6 +6,8 @@ codes = {
     10000: "device {device} not exist",
     10001: "device {device} is offline",
     10002: "device {device} is in bootloader or upgrading mode",
+    10003: "device {device} is in bootloader or upgrading mode",
+    10009: "device {device} is in bootloader or upgrading mode",
     20000: "simulator {device} not exist",
     20001: "simulator {device} is offline",
     20002: "simulator {device} error: {error}",

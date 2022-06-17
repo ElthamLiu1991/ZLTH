@@ -1,8 +1,8 @@
+import sys
 from binascii import unhexlify
-
-from zigbeeLauncher.mqtt.WiserZigbeeDongleCommands import commands
-from zigbeeLauncher.serial_protocol.SerialProtocol import encode
-from zigbeeLauncher.mqtt import response, get_value
+from zigbeeLauncher.logging import dongleLogger as logger
+from zigbeeLauncher.serial_protocol import response
+from zigbeeLauncher.serial_protocol.SerialProtocol import encode, to_hex, ack
 
 local_setting_command = "F0"
 reset_request = "00"
@@ -15,107 +15,151 @@ label_write = "06"
 identify_request = "07"
 state_request = "08"
 state_response = "09"
+configuration_state_change_request = '0A'
 status_response = "F0"
 
-
-def reset_request_handle(payload=None):
-    seq, data = encode(local_setting_command + reset_request, None)
-    seq = 0x80
-    return seq, data
-
-
-def reset_bootloader_request_handle(payload=None):
-    # return encode(local_setting_command + reset_bootloader_request, None)
-    seq, data = encode(local_setting_command + reset_bootloader_request, None)
-    seq = 1000
-    return seq, data
+bootloader_sequence = 1000
+upgrading_start_sequence = 1001
+upgrading_stop_sequence = 1002
+upgrading_finish_sequence = 0x80
 
 
-def reset_bootloader_request_response(device):
-    if (1000, device) in commands:
-        commands[(1000, device)].get_response(0)
+def reset_request_handle(seq, payload=None):
+    data = encode(seq, local_setting_command + reset_request, None)
+    return data
 
 
-def info_request_handle(payload=None):
-    return encode(local_setting_command + info_request, None)
+def reset_bootloader_request_handle(seq, payload=None):
+    data = encode(seq, local_setting_command + reset_bootloader_request, None)
+    return data
+
+
+def reset_bootloader_request_response(sequence, dongle, payload):
+    dongle.response(bootloader_sequence)
+
+
+def bootloader_upgrading_start_handle(seq, payload=None):
+    return "31"
+
+
+def bootloader_upgrading_start_response(sequence, dongle, payload):
+    dongle.response(upgrading_start_sequence)
+
+
+def bootloader_upgrading_stop_transfer(seq, payload=None):
+    return "32"
+
+
+def bootloader_upgrading_stop_response(sequence, dongle, payload):
+    dongle.response(upgrading_stop_sequence)
+
+
+def bootloader_upgrading_finish_transfer(seq, payload=None):
+    return "32"
+
+
+def info_request_handle(seq, payload=None):
+    return encode(seq, local_setting_command + info_request, None)
 
 
 @response.cmd(local_setting_command + info_response)
-def info_response_handle(data):
+def info_response_handle(sequence, dongle, payload):
     rsp = {
         "connected": True,
-        "swversion": data.payload[:6],
+        "swversion": payload[:6],
         "hwversion": "1.0.0"
     }
     # 修改dongle属性
-    data.dongle.swversion = rsp['swversion']
-    data.dongle.hwversion = rsp['hwversion']
-    # need report this attribute if dongle ready
-    update = get_value("dongle_update_callback")
-    if update and data.dongle.ready:
-        update(data.dongle.name, rsp)
-    if (data.seq, data.dongle.name) in commands:
-        commands[(data.seq, data.dongle.name)].get_response(rsp)
+    dongle.property.update(**rsp)
+    dongle.response(sequence, payload=rsp)
 
 
-
-def label_request_handle(payload=None):
+def label_request_handle(seq, payload=None):
     # get label
-    return encode(local_setting_command + label_request, None)
+    return encode(seq, local_setting_command + label_request, None)
 
 
 @response.cmd(local_setting_command + label_response)
-def label_response_handle(data):
+def label_response_handle(sequence, dongle, payload):
     rsp = {
-        "label": unhexlify(data.payload[:-2].encode('utf-8')).decode('utf-8')
+        "label": unhexlify(payload[:-2].encode('utf-8')).decode('utf-8')
     }
-    data.dongle.label = rsp['label']
-    # need report this attribute if dongle ready
-    update = get_value("dongle_update_callback")
-    if update and data.dongle.ready:
-        update(data.dongle.name, rsp)
-    if (data.seq, data.dongle.name) in commands:
-        commands[(data.seq, data.dongle.name)].get_response(rsp)
+    dongle.property.update(**rsp)
+    dongle.response(sequence, payload=rsp)
 
 
-
-def label_write_handle(data):
+def label_write_handle(seq, data):
     # write label
     data = data + "\0"
-    return encode(local_setting_command + label_write, "".join(format(ord(c), "02X") for c in data))
+    return encode(seq, local_setting_command + label_write, "".join(format(ord(c), "02X") for c in data))
 
 
-def identify_request_handle(payload=None):
+def identify_request_handle(seq, payload=None):
     # identify
-    return encode(local_setting_command + identify_request, None)
+    return encode(seq, local_setting_command + identify_request, None)
 
 
-def state_request_handle(payload=None):
+def state_request_handle(seq, payload=None):
     # request running state, config state
-    return encode(local_setting_command + state_request, None)
+    return encode(seq, local_setting_command + state_request, None)
 
 
 @response.cmd(local_setting_command + state_response)
-def state_response_handle(data):
+def state_response_handle(sequence, dongle, payload):
+    dongle.write(ack(local_setting_command + state_response, sequence))
+    configured = payload[2:]
+    if configured == '01':
+        configured = False
+    else:
+        configured = True
+
     rsp = {
-        "configured": bool(int(data.payload[2:], 16)),
+        "configured": configured
     }
-    data.dongle.configured = rsp['configured']
-    # need report this attribute if dongle ready
-    update = get_value("dongle_update_callback")
-    if update and data.dongle.ready:
-        update(data.dongle.name, rsp)
-    if (data.seq, data.dongle.name) in commands:
-        commands[(data.seq, data.dongle.name)].get_response(rsp)
+    dongle.property.boot = True
+    dongle.property.update(**rsp)
+    dongle.response(sequence, payload=rsp)
+
+
+def configuration_state_change_request_handle(seq, payload=None):
+    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, seq)
+    """
+    change device to
+    0x00: factory default
+    0x01: No configured
+    0x02: Fully configured
+    :param payload:
+    :return:
+    """
+    return encode(seq, local_setting_command + configuration_state_change_request, payload)
 
 
 @response.cmd(local_setting_command + status_response)
-def status_response_handle(data):
-    rsp = {}
-    status = int(data.payload, 16)
-    rsp = {
-        "code": status,
-        "message": "please refer error code specification",
-    }
-    if (data.seq, data.dongle.name) in commands:
-        commands[(data.seq, data.dongle.name)].get_response(rsp)
+def status_response_handle(sequence, dongle, payload):
+    status = int(payload, 16)
+    if status in codes:
+        message = codes[status]
+    else:
+        message = 'unknown failure'
+    dongle.response(sequence, code=status, message=message)
+
+
+codes = {
+    0: "",
+    1: 'invalid call',
+    2: 'invalid data',
+    3: 'unsupported',
+    4: 'endpoint not found',
+    5: 'cluster not found',
+    6: 'attribute not found',
+    7: 'invalid data type',
+    8: 'invalid length',
+    9: 'out of space',
+    0x0A: 'save data to flash failure',
+    0x0B: 'get data from flash failure',
+    0x0C: 'not found command in cluster',
+    0x0D: 'configuration state error',
+    0x0E: 'configuration data error',
+    0xFE: 'unknown serial command',
+    0xFF: 'unknown failure'
+}

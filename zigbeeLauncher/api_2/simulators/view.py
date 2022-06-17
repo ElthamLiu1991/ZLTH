@@ -5,7 +5,7 @@ from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
 from . import simulators
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
-from zigbeeLauncher.mqtt.WiserZigbeeLauncher import simulator_command_2
+from zigbeeLauncher.mqtt.Launcher_API import simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..response import pack_response
 from jsonschema import validate, draft7_format_checker

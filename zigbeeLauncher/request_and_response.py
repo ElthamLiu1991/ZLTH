@@ -12,11 +12,11 @@ async def _check_response(x, y):
             if result != {}:
                 del message_queue[x]
                 return result
-        if time.time() - y/1000.0 > 8:
+        if time.time() - y/1000.0 > 10:
             logger.warning("request timeout:%s", x)
             del message_queue[x]
             return {}
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.01)
 
 
 async def _insert_request(x, y):

@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 from ..response import pack_response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt import get_mac_address, get_ip_address
-from zigbeeLauncher.mqtt.WiserZigbeeLauncher import simulator_command_2
+from zigbeeLauncher.mqtt.Launcher_API import simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..util import handle_devices
 from ... import base_dir

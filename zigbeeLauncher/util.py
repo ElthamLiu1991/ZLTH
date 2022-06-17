@@ -1,13 +1,21 @@
+import os
+
 import rapidjson as json
 import socket
 import time
-import traceback
 import uuid
-from datetime import datetime
 from functools import wraps
 
-from ..logging import mqttLogger as logger
-from ..request_and_response import wait_response
+from zigbeeLauncher.logging import utilLogger as logger
+from zigbeeLauncher.request_and_response import wait_response
+
+mqtt_error_code = {
+    1000: "device {} not exist",
+    2000: 'unsupported command: {}',
+    3000: 'json validation failed: {}',
+    4000: 'missing key:{}',
+    9000: 'internal error: {}'
+}
 
 
 def payload_validate(data):
@@ -30,6 +38,15 @@ def get_value(name, defValue=None):
         return defValue
 
 
+def get_version():
+    try:
+        with open(os.path.join(os.path.abspath('./version'), 'version.txt')) as f:
+            version = f.read()
+        return version
+    except Exception as e:
+        return '0.0.0'
+
+
 # 获取IP地址
 def get_ip_address():
     ip = None
@@ -39,6 +56,9 @@ def get_ip_address():
         ip = s.getsockname()[0]
     finally:
         s.close()
+        if not ip:
+            ip = '127.0.0.1'
+        # print("simulator ip:", ip)
         return ip
 
 
@@ -148,7 +168,6 @@ def except_handle(error_handle):
         @wraps(func)
         def except_print(*args, **kwargs):
             device = None
-            rsp = {}
             try:
                 payload_validate(args[2])
                 payload = json.loads(args[2])
@@ -157,52 +176,41 @@ def except_handle(error_handle):
                 if len(args) == 4:
                     # device command
                     device = args[3]
-                rsp.update({
-                    'timestamp': timestamp,
-                    'uuid': uuid
-                })
                 return func(*args, **kwargs)
             except json.JSONDecodeError as e:
-                rsp.update({
-                    'code': 1000,
-                    'message': str(e)
-                })
+                code = 3000
+                message = mqtt_error_code.format(str(e))
             except json.ValidationError as e:
-                rsp.update({
-                    'code': 1001,
-                    'message': str(e)
-                })
+                code = 3000
+                message = mqtt_error_code.format(str(e))
             except KeyError as e:
-                rsp.update({
-                    'code': 1002,
-                    'message': str(e)
-                })
+                code = 4000
+                message = mqtt_error_code.format(str(e))
             except Exception as e:
+                message = str(e)
                 if str(e) == "device not exist":
-                    rsp.update({
-                        'code': 1003,
-                        'message': str(e)
-                    })
-                elif str(e) == "device is in bootloader mode":
-                    rsp.update({
-                        'code': 1004,
-                        'message': str(e)
-                    })
+                    code = 1000
+                    message = mqtt_error_code.format(str(e))
                 elif "unsupported command" in str(e):
-                    rsp.update({
-                        'code': 1005,
-                        'message': str(e)
-                    })
+                    code = 2000
+                    message = mqtt_error_code.format(str(e))
                 else:
-                    rsp.update({
-                        'code': 1006,
-                        'message': str(e)
-                    })
-            if 'code' in rsp:
+                    code = 900
+                    message = mqtt_error_code.format(str(e))
+            if code != 0:
                 if device:
-                    error_handle(device, rsp)
+                    error_handle(device=device,
+                                 code=code,
+                                 message=message,
+                                 payload={},
+                                 timestamp=timestamp,
+                                 uuid=uuid)
                 else:
-                    error_handle(rsp)
+                    error_handle(code=code,
+                                 message=message,
+                                 payload={},
+                                 timestamp=timestamp,
+                                 uuid=uuid)
         return except_print
 
     return except_execute
