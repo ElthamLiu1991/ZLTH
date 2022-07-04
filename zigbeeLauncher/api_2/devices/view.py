@@ -11,7 +11,7 @@ from . import devices
 from zigbeeLauncher.database.interface import DBDevice
 from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
-from ..response import pack_response
+from ..response import Response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 from ..json_schemas import config_schema
@@ -31,12 +31,11 @@ class DevicesResource(Resource):
                 paras = {}
                 for key in request.args:
                     paras[key] = request.args[key]
-                return pack_response({'code':0, 'response':DBDevice(**paras).retrieve()})
+                return Response(data=DBDevice(**paras).retrieve()).pack()
             except Exception as e:
                 logger.exception("request error")
-                return pack_response({'code':90000}, status=500, error="bad parameters:"+str(request.args))
-        return pack_response({'code':0, 'response':DBDevice().retrieve()})
-        # return render_template('show_all_devices.html', devices=Device.query.all())
+                return Response("bad parameters:"+str(request.args), code=90000)
+        return Response(data=DBDevice().retrieve()).pack()
 
 
 class DeviceResource(Resource):
@@ -73,53 +72,63 @@ class DeviceResource(Resource):
 
     @check_device_exist
     def get(self, mac, device):
-        return pack_response({'code':0, 'response':device})
+        return Response(data=device).pack()
 
     @check_device_state
     def put(self, mac, device):
         args = request.get_json()
         ip = device['ip']
+        state = device['state']
         try:
             for key in args.keys():
                 if key not in self.commands:
-                    return pack_response({'code': 90002}, status=500, command=key)
+                    return Response(key, code=90002).pack()
             for key in args.keys():
+                if key != 'reset':
+                    if state == 2:
+                        return Response(mac, code=10002).pack()
+                    if key == 'label':
+                        # label size should not more than 64 characters
+                        if len(args[key]['data']) > 63:
+                            return Response('data', code=90005).pack()
+                if state == 3:
+                    return Response(mac, code=10003).pack()
+                if state == 9:
+                    return Response(mac, code=10009).pack()
                 try:
                     validate(instance=args, schema=self.schema,
                              format_checker=draft7_format_checker)
                 except SchemaError as e:
                     logger.exception('illegal schema: %s', e.message)
-                    return pack_response({'code':90003}, status=500, error=e.message)
+                    return Response(e.message, code=90003).pack()
                 except ValidationError as e:
                     logger.exception('json validation failed:%s', e.message)
-                    return pack_response({'code':90004}, status=500, error=e.message)
+                    return Response(e.message, code=90004).pack()
                 else:
                     response = dongle_command_2(ip, mac, args)
-                    code = response['code']
-                    if code != 0:
-                        return pack_response(response, status=500)
-                    else:
-                        return pack_response(response)
+                    return Response(**response).pack()
         except Exception as e:
-            return pack_response({'code':90000}, status=500, error=str(e))
+            return Response(str(e), code=90000).pack()
 
 
 class DeviceConfigResource(Resource):
     @check_device_state
     def get(self, mac, device):
+        if not device['configured']:
+            return Response(mac, code=60000).pack()
+        if device['state'] == 9:
+            return Response(mac, code=60001).pack()
         ip = device['ip']
         response = dongle_command_2(ip, mac, {
             "config": {
             }
         })
-        code = response['code']
-        if code != 0:
-            return pack_response(response, status=500)
-        else:
-            return pack_response(response)
+        return Response(**response).pack()
 
     @check_device_state
     def put(self, mac, device):
+        if device['state'] == 9:
+            return Response(mac, code=60001).pack()
         args = request.get_json()
         ip = device['ip']
         if 'filename' in args:
@@ -127,7 +136,7 @@ class DeviceConfigResource(Resource):
             file = args['filename']
             path = os.path.join(base_dir, './files') + '/' + file
             if not os.path.isfile(path):
-                return pack_response({'code':50000}, status=500, file=file)
+                return Response(file, code=50000).pack()
             else:
                 with open(path, 'r') as f:
                     data = yaml.safe_load(f.read())
@@ -141,24 +150,22 @@ class DeviceConfigResource(Resource):
                          format_checker=draft7_format_checker)
                 result, error = config_validation(args['config'])
                 if not result:
-                    return pack_response({'code': 90005}, status=500, value=error)
+                    return Response(error, code=90005).pack()
                 response = dongle_command_2(ip, mac, args)
             except SchemaError as e:
                 logger.exception('illegal schema: %s', e.message)
-                return pack_response({'code':90003}, status=500, error=e.message)
+                return Response(e.message, code=90003).pack()
             except ValidationError as e:
                 logger.exception('json validation failed:%s', e.message)
-                return pack_response({'code':90004}, status=500, error=e.message)
+                return Response(e.message, code=90004).pack()
         else:
-            return pack_response({'code':90001}, status=500, item='filename or config')
-        code = response['code']
-        if code != 0:
-            return pack_response(response, status=500)
-        else:
-            return pack_response(response)
+            return Response('filename or config', code=90001).pack()
+        return Response(**response).pack()
 
     @check_device_state
     def post(self, mac, device):
+        if device['state'] == 9:
+            return Response(mac, code=60001).pack()
         ip = device['ip']
         # verify the file is meet JSON schema requirement or not
         parser = reqparse.RequestParser()
@@ -166,28 +173,28 @@ class DeviceConfigResource(Resource):
         args = parser.parse_args()
         content = args.get('file')
         if not content:
-            return pack_response({'code': 50001}, status=500, file=None)
+            return Response(None, code=50001).pack()
         try:
             y = yaml.safe_load(content.read())
             validate(instance={'config': y}, schema=config_schema,
                      format_checker=draft7_format_checker)
-
+            result, error = config_validation(y)
+            if not result:
+                return Response(error, code=90005).pack()
+            # single device configuration may take more than 10 seconds depends on number of endpoints,
+            # so set timeout to at least 30 seconds
             response = dongle_command_2(ip, mac, {
                 "config": y
-            })
-            code = response['code']
-            if code != 0:
-                return pack_response(response, status=500)
-            else:
-                return pack_response(response), 200
+            }, timeout=30)
+            return Response(**response).pack()
         except SchemaError as e:
             logger.exception('illegal schema: %s', e.message)
-            return pack_response({'code':90003}, status=500, error=e.message)
+            return Response(e.message, code=90003).pack()
         except ValidationError as e:
             logger.exception('json validation failed:%s', e.message)
-            return pack_response({'code':90004}, status=500, error=e.message)
+            return Response(e.message, code=90004).pack()
         except Exception as e:
             logger.exception('load YAML failed:%s', str(e))
-            return pack_response({'code':90000}, status=500, error=str(e))
+            return Response(str(e), code=90000).pack()
         pass
 

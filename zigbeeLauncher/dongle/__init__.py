@@ -1,4 +1,6 @@
+import asyncio
 import platform
+from multiprocessing import Pool
 from threading import Thread
 
 from zigbeeLauncher.logging import dongleLogger as logger
@@ -10,10 +12,9 @@ from zigbeeLauncher.dongle.Dongle import Dongles
 from zigbeeLauncher.dongle.Dongle import dongles, Dongles
 from zigbeeLauncher.dongle.Serial import Serial
 from zigbeeLauncher.dongle.Task import Tasks
-from zigbeeLauncher.mqtt import set_value
 
 
-def serial_management():
+async def serial_manager():
     while True:
         try:
             new_port_list = list(serial.tools.list_ports.comports())
@@ -28,34 +29,46 @@ def serial_management():
                         name = '/dev/' + port.name
                     else:
                         name = port.name
-                    # use coroutine
+                    # 判断端口重名的问题
+                    same_name = False
+                    for key, value in dongles.items():
+                        if name == value.property.port:
+                            # logger.warning("%s, A same name dongle %s, already initial, "
+                            #                "please check with your system manager", serial_number, name)
+                            same_name = True
+                            break
+                    if same_name:
+                        continue
+                        # use coroutine
+                    # tasks = Tasks()
+                    # task = serial_asyncio.create_serial_connection(tasks.loop,
+                    #                                                Serial,
+                    #                                                name,
+                    #                                                baudrate=460800)
+                    # future = tasks.add(task)
                     tasks = Tasks()
-                    task = serial_asyncio.create_serial_connection(tasks.loop,
-                                                                   Serial,
-                                                                   name,
-                                                                   baudrate=460800)
-                    future = tasks.add(task)
-                    # 保存name:serial_number, future元组到ports
                     try:
                         dongle = Dongles(serial_number, port.name)
-                        protocol = future.result()[1]
-                        dongle.ready(protocol)
                         dongles[serial_number] = dongle
+                        transport, protocol = await serial_asyncio.create_serial_connection(tasks.loop,
+                                                                                            Serial,
+                                                                                            name,
+                                                                                            baudrate=460800)
+                        dongle.ready(protocol)
                         dongle.activated()
-                    except serial.serialutil.SerialException as e:
-                        # logger.exception("Open serial {} failed".format(port.name))
-                        pass
-                    # use multi-threading
-                    # dongle = Dongles(serial_number, port.name)
-                    # if dongle.isReady(port.name):
-                    #     dongles[serial_number] = dongle
-                    #     dongle.activated()
+                    except serial.serialutil.SerialException:
+                        logger.exception("Open serial {} failed".format(port.name))
+                        if serial_number in dongles:
+                            del dongles[serial_number]
+            await asyncio.sleep(0.01)
         except Exception as e:
             logger.exception("Serial management error:%s", e)
+            if serial_number in dongles:
+                del dongles[serial_number]
+        await asyncio.sleep(0.1)
 
 
 def init():
-    thread = Thread(target=serial_management)
-    thread.start()
-    set_value('dongle', True)
+    tasks = Tasks()
+    tasks.add(serial_manager())
     return

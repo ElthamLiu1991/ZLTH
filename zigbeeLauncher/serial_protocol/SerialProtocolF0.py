@@ -1,8 +1,77 @@
 import sys
+import time
 from binascii import unhexlify
 from zigbeeLauncher.logging import dongleLogger as logger
 from zigbeeLauncher.serial_protocol import response
-from zigbeeLauncher.serial_protocol.SerialProtocol import encode, to_hex, ack
+from zigbeeLauncher.serial_protocol.SerialProtocol import encode, to_hex, ack, from_string, ZLTH_Serial
+
+serial_protocol_schema_F003 = {
+        'major_firmware_version':{
+            'type': 'integer',
+            'length': 1
+        },
+        'minor_firmware_version':{
+            'type': 'integer',
+            'length': 1
+        },
+        'build_firmware_version':{
+            'type': 'integer',
+            'length': 1
+        },
+        'application_information':{
+            'type': 'integer',
+            'length': 1
+        },
+        'EUI64':{
+            'type': 'integer',
+            'length': 8
+        },
+        'hardware_version':{
+            'type': 'integer',
+            'length': 1
+        },
+        'bootloader_type':{
+            'type': 'integer',
+            'length': 1
+        }
+    }
+serial_protocol_schema_F005 = {
+        'label_string':{
+            'type': 'string'
+        }
+    }
+serial_protocol_schema_F006 = {
+    'label':{
+        'type': 'string'
+    }
+}
+serial_protocol_schema_F009 = {
+        'running_state':{
+            'type': 'integer',
+            'length': 1,
+            "description":"0x00=Staring up"
+                          "0x01=Already running"
+        },
+        'configuration_state':{
+            'type': 'integer',
+            'length': 1,
+            "description":"0x00=Factory default"
+                          "0x01=No configure"
+                          "0x02=Fully configured"
+        }
+    }
+serial_protocol_schema_F00A = {
+    'state_change': {
+        'type': 'integer',
+        'length': 1
+    }
+}
+serial_protocol_schema_F0F0 = {
+        'status':{
+            'type': 'integer',
+            'length': 1
+        }
+    }
 
 local_setting_command = "F0"
 reset_request = "00"
@@ -22,6 +91,7 @@ bootloader_sequence = 1000
 upgrading_start_sequence = 1001
 upgrading_stop_sequence = 1002
 upgrading_finish_sequence = 0x80
+reset_sequence = 0x80
 
 
 def reset_request_handle(seq, payload=None):
@@ -62,12 +132,15 @@ def info_request_handle(seq, payload=None):
     return encode(seq, local_setting_command + info_request, None)
 
 
-@response.cmd(local_setting_command + info_response)
-def info_response_handle(sequence, dongle, payload):
+@response.cmd(local_setting_command + info_response, serial_protocol_schema_F003)
+def info_response_handle(sequence, dongle, protocol):
+    swversion = str(protocol.major_firmware_version).zfill(2)+\
+        str(protocol.minor_firmware_version).zfill(2)+\
+        str(protocol.build_firmware_version).zfill(2)
     rsp = {
         "connected": True,
-        "swversion": payload[:6],
-        "hwversion": "1.0.0"
+        "swversion": swversion,
+        "hwversion": str(protocol.hardware_version)
     }
     # 修改dongle属性
     dongle.property.update(**rsp)
@@ -79,19 +152,24 @@ def label_request_handle(seq, payload=None):
     return encode(seq, local_setting_command + label_request, None)
 
 
-@response.cmd(local_setting_command + label_response)
-def label_response_handle(sequence, dongle, payload):
+@response.cmd(local_setting_command + label_response, serial_protocol_schema_F005)
+def label_response_handle(sequence, dongle, protocol):
     rsp = {
-        "label": unhexlify(payload[:-2].encode('utf-8')).decode('utf-8')
+        "label": protocol.label_string
     }
     dongle.property.update(**rsp)
     dongle.response(sequence, payload=rsp)
 
 
+# @response.cmd(local_setting_command + label_write, serial_protocol_schema_F006)
+# def label_write_handle(seq, payload):
+#     # write label
+#     protocol = ZLTH_Serial()
+#     return protocol.encode(seq, local_setting_command + label_write, payload)
+
 def label_write_handle(seq, data):
     # write label
-    data = data + "\0"
-    return encode(seq, local_setting_command + label_write, "".join(format(ord(c), "02X") for c in data))
+    return encode(seq, local_setting_command + label_write, from_string(data, len(data)))
 
 
 def identify_request_handle(seq, payload=None):
@@ -104,11 +182,11 @@ def state_request_handle(seq, payload=None):
     return encode(seq, local_setting_command + state_request, None)
 
 
-@response.cmd(local_setting_command + state_response)
-def state_response_handle(sequence, dongle, payload):
+@response.cmd(local_setting_command + state_response, serial_protocol_schema_F009)
+def state_response_handle(sequence, dongle, protocol):
     dongle.write(ack(local_setting_command + state_response, sequence))
-    configured = payload[2:]
-    if configured == '01':
+    configured = protocol.configuration_state
+    if configured == 1:
         configured = False
     else:
         configured = True
@@ -134,9 +212,9 @@ def configuration_state_change_request_handle(seq, payload=None):
     return encode(seq, local_setting_command + configuration_state_change_request, payload)
 
 
-@response.cmd(local_setting_command + status_response)
-def status_response_handle(sequence, dongle, payload):
-    status = int(payload, 16)
+@response.cmd(local_setting_command + status_response, serial_protocol_schema_F0F0)
+def status_response_handle(sequence, dongle, protocol):
+    status = protocol.status
     if status in codes:
         message = codes[status]
     else:

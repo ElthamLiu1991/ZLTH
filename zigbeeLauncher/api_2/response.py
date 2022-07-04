@@ -1,60 +1,57 @@
 import time
 import uuid
 
-codes = {
-    0: "",
-    10000: "device {device} not exist",
-    10001: "device {device} is offline",
-    10002: "device {device} is in bootloader or upgrading mode",
-    10003: "device {device} is in bootloader or upgrading mode",
-    10009: "device {device} is in bootloader or upgrading mode",
-    20000: "simulator {device} not exist",
-    20001: "simulator {device} is offline",
-    20002: "simulator {device} error: {error}",
-    20003: "simulator {device} unreachable",
-    30000: "attribute {attribute} not exist",
-    30001: "type {type} not exist",
-    30002: "value type incorrect",
-    40000: "{device} not in any network",
-    40001: "{device} already in a network",
-    50000: "file {file} not exist",
-    50001: "{file} is not a YAML file",
-    90000: "internal error: {error}",
-    90001: "missing mandatory item {item}",
-    90002: "unsupported command: {command}",
-    90003: 'illegal schema:{error}',
-    90004: 'json validation failed:{error}',
-    90005: 'out of range:{value}',
-    90006: 'invalid value:{value}',
-    # 90007: 'simulator {simulator} not connected',
-    # 90008: 'device {device} no response'
-    90007: 'this is a manufacture attribute, please provide "manufacturer_code" and "type"'
-}
 
+class Response:
+    codes = {
+        0: "",
+        10000: "device {} not exist",
+        10001: "device {} is offline",
+        10002: "device {} is in bootloader mode",
+        10003: "device {} is in upgrading mode",
+        10009: "device {} is in configuring mode",
+        20000: "simulator {} not exist",
+        20001: "simulator {} is offline",
+        20002: "simulator {} error: {}",
+        20003: "simulator {} unreachable",
+        30000: "attribute {} not exist",
+        30001: "type {} not exist",
+        30002: "value type incorrect",
+        40000: "{} not in any network",
+        40001: "{} already in a network",
+        50000: "file {} not exist",
+        50001: "{} is not a YAML file",
+        60000: "device {} is not configured yet",
+        60001: 'device {} is configuring, please try later',
+        90000: "internal error: {}",
+        90001: "missing mandatory item {}",
+        90002: "unsupported command: {}",
+        90003: 'illegal schema:{}',
+        90004: 'json validation failed:{}',
+        90005: 'out of range:{}',
+        90006: 'invalid value:{}',
+        # 90007: 'simulator {simulator} not connected',
+        # 90008: 'device {device} no response'
+        90007: 'this is a manufacture attribute, please provide "manufacturer_code" and "type"'
+    }
 
-def pack_response(response, status=200, **kwargs):
-    code = response['code']
-    if code in codes.keys():
-        message = codes[code].format(**kwargs)
-    else:
-        if 'message' in response:
-            message = response['message']
-    if 'response' not in response:
-        response.update({
-            'data': {}
-        })
-    else:
-        response.update({
-            "data": response['response']
-        })
-        del response['response']
-    if 'timestamp' not in response and 'uuid' not in response:
-        response.update({
-            "timestamp": int(round(time.time() * 1000)),
-            "uuid": str(uuid.uuid1())
-        })
-    response.update({
-        'code': code,
-        'message': message
-    })
-    return response, status
+    def __init__(self, *args, code=0, message='', data={}, timestamp=int(round(time.time() * 1000)), uuid=str(uuid.uuid1())):
+        self.code = code
+        self.message = message
+        self.data = data
+        self.timestamp = timestamp
+        self.uuid = uuid
+        self.errors = args
+
+    def pack(self):
+        response = self.__dict__
+        if self.code == 0:
+            state = 200
+        elif self.code == 10000 or self.code == 20000 or self.code == 30000:
+            state = 404
+        else:
+            state = 500
+        if self.code in self.codes:
+            response['message'] = self.codes[self.code].format(*self.errors)
+        del response['errors']
+        return response, state

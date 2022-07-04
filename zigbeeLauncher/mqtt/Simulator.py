@@ -1,37 +1,51 @@
+import asyncio
 import threading
 import time
 
 from zeroconf import ServiceBrowser, ServiceInfo, Zeroconf, IPVersion
 
 from zigbeeLauncher.database.interface import DBSimulator, DBDevice
+from zigbeeLauncher.dongle import init
 from zigbeeLauncher.dongle.Dongle import dongles
 from zigbeeLauncher.mqtt.Service import ServicesListener
-from zigbeeLauncher.mqtt.Callbacks import simulator_update_callback
-from zigbeeLauncher.mqtt.Instance import WiserMQTT, brokers
-from zigbeeLauncher.util import get_ip_address, get_mac_address, set_value
+from zigbeeLauncher.mqtt.Callbacks import simulator_update_callback, simulator_info_callback
+from zigbeeLauncher.mqtt.Connection import WiserMQTT
+from zigbeeLauncher.util import get_ip_address, get_mac_address
 from zigbeeLauncher.logging import mqttLogger as logger
 
 
 class Simulator(threading.Thread):
-    def __init__(self, ip, mac, label='', version='0.0.0'):
-        threading.Thread.__init__(self)
-        self.ip = ip
-        self.name = 'simulator-' + self.ip
-        self.mac = mac
-        self.connected = True
-        self.label = label
-        self.version = version
 
-        self.zeroconf = None
-        self.info = None
-        self.client = None
-        self.register()
+    _instance = None
+    _flag = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance=super().__new__(cls)
+        return cls._instance
+
+    def __init__(self, ip='', mac='', label='', version='0.0.0'):
+        if not self._flag:
+            self._flag = True
+            threading.Thread.__init__(self)
+            self.ip = ip
+            self.name = 'simulator-' + self.ip
+            self.mac = mac
+            self.connected = True
+            self.label = label
+            self.version = version
+
+            self.zeroconf = None
+            self.info = None
+            self.client = None  # localhost mqtt client
+            self.service_browser = None
+            self.register()
+            init()
 
     def run(self):
         while True:
             ip_new = get_ip_address()
             if ip_new != self.ip:
-                set_value('client_ip', ip_new)
                 # update local simulator ip and name
                 DBSimulator(ip=self.ip).update({
                     'ip': ip_new,
@@ -44,18 +58,21 @@ class Simulator(threading.Thread):
                         DBSimulator(ip=item['ip']).update({'connected': False})
                         DBDevice(ip=item['ip']).update({'connected': False})
                 logger.warning("ip change from %s to %s", self.ip, ip_new)
-                del brokers[self.ip]
+                simulators = DBSimulator().retrieve()
+                for simulator in simulators:
+                    print(simulator)
+                self.update(ip=ip_new, _name='simulator-' + ip_new)
                 self.unregister()
                 self.register()
-                self.update(ip=ip_new, name='simulator-'+ip_new)
+
             else:
-                time.sleep(1)
+                time.sleep(0.5)
 
     def register(self):
         logger.info("Run MQTT client: simulator")
         thread = WiserMQTT('127.0.0.1', 1883, 'simulator', self.on_connected)
         thread.start()
-        ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", ServicesListener())
+        self.service_browser = ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", ServicesListener())
         self.info = ServiceInfo(
             "_launcher._tcp.local.",
             self.mac + "._launcher._tcp.local.",
@@ -69,17 +86,21 @@ class Simulator(threading.Thread):
 
     def unregister(self):
         self.client.disconnect()
+        self.service_browser.cancel()
         self.zeroconf.remove_all_service_listeners()
         self.zeroconf.unregister_service(self.info)
 
     def on_connected(self, client):
         self.client = client
+        simulator_info_callback(self.get())
 
     def update(self, **kwargs):
         payload = {}
-        for key in kwargs:
-            if key in self.__dict__ and kwargs[key] != self.__dict__[key]:
-                payload.update({key: kwargs[key]})
+        for key, value in kwargs.items():
+            if key in self.__dict__ and value != self.__dict__[key]:
+                if key == '_name':
+                    key = 'name'
+                payload.update({key: value})
         self.__dict__.update(kwargs)
         if payload != {}:
             simulator_update_callback(payload)

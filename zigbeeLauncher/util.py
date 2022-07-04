@@ -22,22 +22,6 @@ def payload_validate(data):
     json.Validator('{"required":["timestamp", "uuid", "data"]}')(data)
 
 
-def _init():
-    global _global_dict
-    _global_dict = {}
-
-
-def set_value(name, value):
-    _global_dict[name] = value
-
-
-def get_value(name, defValue=None):
-    try:
-        return _global_dict[name]
-    except KeyError:
-        return defValue
-
-
 def get_version():
     try:
         with open(os.path.join(os.path.abspath('./version'), 'version.txt')) as f:
@@ -68,11 +52,11 @@ def get_mac_address():
     return ":".join([mac[e:e + 2] for e in range(0, 11, 2)])
 
 
-def send_command(client, topic, body):
+def send_command(client, topic, body, timeout):
     timestamp = int(round(time.time() * 1000))
     uid = str(uuid.uuid1())
     # 加入request等待队列
-    task = wait_response(timestamp, uid)
+    task = wait_response(timestamp, uid, timeout)
     payload = {
         "timestamp": timestamp,
         "uuid": uid,
@@ -86,7 +70,7 @@ def send_command(client, topic, body):
             'message': "no response",
             'timestamp': timestamp,
             'uuid': uid,
-            'response': {
+            'data': {
             }
         }
     return result
@@ -100,6 +84,7 @@ def pack_payload(data):
         "uuid": uid,
         "data": data
     })
+
 
 class Router(object):
 
@@ -138,7 +123,8 @@ class Router(object):
             if not para:
                 raise ValueError('No url function: %s', url)
         if para:
-            args = args + (para,)
+            # args = args + (para,)
+            kwargs['device'] = para
         logger.info("call %s", func.__name__)
         return func(*args, **kwargs)
 
@@ -169,34 +155,35 @@ def except_handle(error_handle):
         def except_print(*args, **kwargs):
             device = None
             try:
-                payload_validate(args[2])
-                payload = json.loads(args[2])
+                timestamp = 0
+                uuid = ''
+                payload_validate(kwargs['payload'])
+                payload = json.loads(kwargs['payload'])
                 timestamp = payload["timestamp"]
                 uuid = payload["uuid"]
-                if len(args) == 4:
-                    # device command
-                    device = args[3]
+                if 'device' in kwargs:
+                    device = kwargs['device']
                 return func(*args, **kwargs)
             except json.JSONDecodeError as e:
                 code = 3000
-                message = mqtt_error_code.format(str(e))
+                message = mqtt_error_code[code].format(str(e))
             except json.ValidationError as e:
-                code = 3000
-                message = mqtt_error_code.format(str(e))
+                code = 3001
+                message = mqtt_error_code[code].format(str(e))
             except KeyError as e:
                 code = 4000
-                message = mqtt_error_code.format(str(e))
+                message = mqtt_error_code[code].format(str(e))
             except Exception as e:
                 message = str(e)
                 if str(e) == "device not exist":
                     code = 1000
-                    message = mqtt_error_code.format(str(e))
+                    message = mqtt_error_code[code].format(str(e))
                 elif "unsupported command" in str(e):
                     code = 2000
-                    message = mqtt_error_code.format(str(e))
+                    message = mqtt_error_code[code].format(str(e))
                 else:
-                    code = 900
-                    message = mqtt_error_code.format(str(e))
+                    code = 9000
+                    message = mqtt_error_code[code].format(str(e))
             if code != 0:
                 if device:
                     error_handle(device=device,

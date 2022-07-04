@@ -2,7 +2,7 @@ import asyncio
 import threading
 
 
-class Tasks():
+class Tasks(threading.Thread):
     _instance = None
     _flag = False
 
@@ -12,14 +12,16 @@ class Tasks():
         return cls._instance
 
     def __init__(self):
+        threading.Thread.__init__(self)
         if not self._flag:
             self._flag = True
             print("task loopp init")
             self.loop = asyncio.new_event_loop()  # 获取一个事件循环
-            threading.Thread(target=self.run).start()
+            self.start()
 
     def run(self) -> None:
         print("run task loop")
+        _run = True
         asyncio.set_event_loop(self.loop)
         self.loop.run_forever()
 

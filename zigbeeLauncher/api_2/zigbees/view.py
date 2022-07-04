@@ -6,7 +6,7 @@ from zigbeeLauncher.database.interface import DBDevice, DBZigbee, DBZigbeeEndpoi
     DBZigbeeEndpointClusterAttribute
 from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
-from ..response import pack_response
+from ..response import Response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
@@ -27,118 +27,145 @@ class ZigbeesResource(Resource):
                 for key in request.args:
                     paras[key] = request.args[key]
                 data = DBZigbee(**paras).retrieve()
-                return pack_response({'code': 0, 'response': data})
+                return Response(data=data).pack()
             except Exception as e:
                 logger.exception("request error")
-                return pack_response({'code': 90000}, status=500, error="bad parameters:" + str(request.args))
+                return Response("bad parameters:" + str(request.args), code=90000).pack()
         else:
             data = DBZigbee().retrieve()
-            return pack_response({'code': 0, 'response': data})
+            return Response(data=data).pack()
         # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
 class ZigbeeResource(Resource):
     commands = ['join', 'leave', 'attribute', 'data_request']
     schema = {
-        "type": "object",
-        "properties": {
-            "join": {
                 "type": "object",
                 "properties": {
-                    "channel_mask": {
-                        "type": "integer",
-                        "description": "network channel mask, 4 bytes, all channel: 0x7FFF800, channel 11: 0x800, channel 12: 0x1000..."
-                    },
-                    "auto_option": {
-                        "type": "integer",
-                        "description": "auto option setting, this property value should be 0, 1, 2, 3"
-                    },
-                    "pan_id": {
+                  "join": {
+                    "type": "object",
+                    "properties": {
+                      "channels": {
+                        "description": "network channels, 11,12,13, ..., 26",
+                        "type": "array",
+                        "items": {
+                          "type": "integer"
+                        }
+                      },
+                      "pan_id": {
                         "type": "integer",
                         "description": "network PAN ID, 2 bytes, set this property if 'auto_option' is 0 or 2,"
-                    },
-                    "extended_pan_id": {
+                      },
+                      "extended_pan_id": {
                         "type": "integer",
                         "description": "network extended PAN ID, 8 bytes, set this property if 'auto_option' is 0 or 1"
-                    }
-                },
-                "required": [
-                    "channel_mask",
-                    "auto_option"
-                ],
-                "description": "join command, trigger device joining to a specific zigbee network\n"
-            },
-            "leave": {
-                "type": "object",
-                "properties": {},
-                "description": "leave command, trigger device leaving to current zigbee network"
-            },
-            "data_request": {
-                "type": "object",
-                "properties": {},
-                "description": "data request command, trigger sleepy end device send out data_request_command\n"
-            },
-            "attribute": {
-                "type": "object",
-                "properties": {
-                    "endpoint": {
+                      }
+                    },
+                    "required": [
+                      "channels"
+                    ],
+                    "description": "join command, trigger device joining to a specific zigbee network\n",
+                    "x-apifox-orders": [
+                      "channels",
+                      "pan_id",
+                      "extended_pan_id"
+                    ],
+                    "x-apifox-ignore-properties": []
+                  },
+                  "leave": {
+                    "type": "object",
+                    "properties": {},
+                    "description": "leave command, trigger device leaving to current zigbee network",
+                    "x-apifox-orders": [],
+                    "x-apifox-ignore-properties": []
+                  },
+                  "data_request": {
+                    "type": "object",
+                    "properties": {},
+                    "description": "data request command, trigger sleepy end device send out data_request_command\n",
+                    "x-apifox-orders": [],
+                    "x-apifox-ignore-properties": []
+                  },
+                  "attribute": {
+                    "type": "object",
+                    "properties": {
+                      "endpoint": {
                         "type": "integer",
                         "description": "endpoint id, rang 1-240"
-                    },
-                    "cluster": {
+                      },
+                      "cluster": {
                         "type": "integer",
                         "description": "cluster ID, range 0-65535"
-                    },
-                    "server": {
+                      },
+                      "server": {
                         "type": "boolean",
                         "description": "server cluster mask"
-                    },
-                    "manufacturer": {
+                      },
+                      "manufacturer": {
                         "type": "boolean",
                         "description": "manufacturer specific mask fro this cluster"
-                    },
-                    "manufacturer_code": {
+                      },
+                      "manufacturer_code": {
                         "type": "integer",
-                        "description": "manufacturer code for this cluster if manufacturer is true, range 0-65535"
-                    },
-                    "attribute": {
+                        "description": "manufacturer code for this cluster if cluster_manufacturer is true, range 0-65535"
+                      },
+                      "attribute": {
                         "type": "integer",
                         "description": "attribute ID, range 0-65535"
-                    },
-                    "type": {
+                      },
+                      "type": {
                         "type": "string",
-                        "description": "attribute type, provide this property when attribute_manufacturer is true"
-                    },
-                    "value": {
+                        "description": "attribute type"
+                      },
+                      "value": {
                         "oneOf": [
-                            {
-                                "type": "integer",
-                                "description": "integer data"
-                            },
-                            {
-                                "type": "string",
-                                "description": "string data"
-                            }
+                          {
+                            "type": "integer",
+                            "description": "integer data"
+                          },
+                          {
+                            "type": "string",
+                            "description": "string data"
+                          }
                         ],
                         "description": "attribute value, could be integer or string"
-                    }
+                      }
+                    },
+                    "required": [
+                      "endpoint",
+                      "cluster",
+                      "server",
+                      "manufacturer",
+                      "attribute",
+                      "type",
+                      "value"
+                    ],
+                    "description": "change attribute value",
+                    "x-apifox-orders": [
+                      "endpoint",
+                      "cluster",
+                      "server",
+                      "manufacturer",
+                      "manufacturer_code",
+                      "attribute",
+                      "type",
+                      "value"
+                    ],
+                    "x-apifox-ignore-properties": []
+                  }
                 },
-                "required": [
-                    "endpoint",
-                    "cluster",
-                    "server",
-                    "attribute",
-                    "manufacturer",
-                    "value",
-                    "type"
-                ]
-            }
-        }
-    }
+                "x-apifox-orders": [
+                  "join",
+                  "leave",
+                  "data_request",
+                  "attribute"
+                ],
+                "x-apifox-ignore-properties": []
+              }
 
     @check_zigbee_exist
     def get(self, mac, zigbee):
-        return pack_response({'code': 0, 'response': zigbee})
+        return Response(data=zigbee).pack()
 
     @check_device_state
     def put(self, mac, device):
@@ -147,7 +174,7 @@ class ZigbeeResource(Resource):
         try:
             for key in args.keys():
                 if key not in self.commands:
-                    return pack_response({'code': 90002}, status=500, command=key)
+                    return Response(key, code=90002).pack()
             for key in args.keys():
                 command = key
                 payload = args[key]
@@ -156,84 +183,78 @@ class ZigbeeResource(Resource):
                              format_checker=draft7_format_checker)
                     if command == 'join':
                         # 验证channel和auto_option的合法性
-                        channel = payload['channel_mask']
-                        auto_option = payload['auto_option']
-                        if not auto_option & 0x1 and 'pan_id' not in payload:
-                            return pack_response({'code': 90001}, status=500, item='pan_id')
-                        if not auto_option & 0x2 and 'extended_pan_id' not in payload:
-                            return pack_response({'code': 90001}, status=500, item='extended_pan_id')
-                        # 校验数据大小
-                        if channel < 0x800 or channel > 0x7FFF800:
-                            return pack_response({'code': 90005}, status=500, value='channel_mask')
-                        if auto_option > 3 or auto_option < 0:
-                            return pack_response({'code': 90005}, status=500, value='auto_option')
+                        channel = payload['channels']
+                        channel_all = list(range(11, 27))
+                        if not set(channel) < set(channel_all):
+                            return Response(channel, code=90005).pack()
                         if 'pan_id' in payload:
                             pan_id = payload['pan_id']
                             if pan_id < 0 or pan_id > 0xFFFF:
-                                return pack_response({'code': 90005}, status=500, value='channel_mask')
+                                return Response('pan_id', code=90005).pack()
                         if 'extended_pan_id' in payload:
                             extended_pan_id = payload['extended_pan_id']
                             if extended_pan_id < 0 or extended_pan_id > 0xFFFFFFFFFFFFFFFF:
-                                return pack_response({'code': 90005}, status=500, value='channel_mask')
+                                return Response('extended_pan_id', code=90005).pack()
                         # 验证设备是否已经入网
                         zigbee = DBZigbee(mac=mac).retrieve()
                         if not zigbee:
-                            return pack_response({'code': 10000}, status=404, device=mac)
-                        if zigbee[0]['pan_id'] != "FFFF":
-                            return pack_response({'code': 40001}, status=500, device=mac)
+                            return Response(mac, code=10000).pack()
+                        if zigbee[0]['pan_id'] != 0xFFFF:
+                            return Response(mac, code=40001).pack()
                     elif command == 'leave':
                         # 验证设备是否已经入网
                         zigbee = DBZigbee(mac=mac).retrieve()
                         if not zigbee:
-                            return pack_response({'code': 10000}, status=404, device=mac)
-                        if zigbee[0]['pan_id'] == "FFFF":
-                            return pack_response({'code': 40000}, status=500, device=mac)
+                            return Response(mac, code=10000).pack()
+                        if zigbee[0]['pan_id'] == 0xFFFF:
+                            return Response(mac, code=40000).pack()
                     elif command == 'attribute':
                         # 验证manufacturer
                         manufacturer = payload['manufacturer']
                         if manufacturer and 'manufacturer_code' not in payload:
-                            return pack_response({'code': 90001}, status=500, item='manufacturer_code')
+                            return Response('manufacturer_code', code=90001).pack()
                         # 验证type是否可以找到
                         type = payload['type']
                         value = payload['value']
+                        if isinstance(value, str):
+                            if 'length' not in payload:
+                                return Response('length', code=90001).pack()
+                            if len(value) > payload['length']:
+                                return Response(value, code=90005).pack()
                         if not type_exist(type):
-                            return pack_response({'code': 30001}, status=500, type=type)
+                            return Response(type, code=30001).pack()
                         if not format_validation(type, value):
-                            return pack_response({'code': 30002}, status=500)
+                            return Response(code=30002).pack()
                         if not value_validation(type, value):
-                            return pack_response({'code': 90005}, status=500, value=value)
+                            return Response(value, code=90005).pack()
                         # 验证整型数据范围
                         endpoint = payload['endpoint']
                         if not 0 < endpoint <= 240:
-                            return pack_response({'code': 90005}, status=500, value='endpoint')
+                            return Response('endpoint', code=90005).pack()
                         cluster = payload['cluster']
                         if not 0 <= cluster <= 0xFFFF:
-                            return pack_response({'code': 90005}, status=500, value='cluster')
+                            return Response('cluster', code=90005).pack()
                         attribute = payload['attribute']
                         if not 0 <= attribute <= 0xFFFF:
-                            return pack_response({'code': 90005}, status=500, value='attribute')
+                            return Response('attribute', code=90005).pack()
                         if 'manufacturer_code' in payload:
                             code = payload['manufacturer_code']
                             if not 0 <= code <= 0xFFFF:
-                                return pack_response({'code': 90005}, status=500, value='manufacturer_code')
+                                return Response('manufacturer_code', code=90005).pack()
                     elif command == 'data_request':
                         pass
                 except SchemaError as e:
                     logger.exception('illegal schema: %s', e.message)
-                    return pack_response({'code': 90003}, status=500, error=e.message)
+                    return Response(e.message, code=90003).pack()
                 except ValidationError as e:
                     logger.exception('json validation failed:%s', e.message)
-                    return pack_response({'code': 90004}, status=500, error=e.message)
+                    return Response(e.message, code=90004).pack()
                 else:
                     response = dongle_command_2(ip, mac, args)
-                    code = response['code']
-                    if code != 0:
-                        return pack_response(response, status=500)
-                    else:
-                        return pack_response(response)
+                    return Response(**response).pack()
         except Exception as e:
             logger.exception("request error:")
-            return pack_response({'code': 90000}, status=500, error=str(e))
+            return Response(str(e), code=90000).pack()
 
 
 class ZigbeeAttributesResource(Resource):
@@ -253,26 +274,22 @@ class ZigbeeAttributesResource(Resource):
                     paras[key] = int(request.args[key])
                 paras['mac'] = mac
                 if 'endpoint' not in paras:
-                    return pack_response({'code': 90001}, status=500, item='endpoint')
+                    return Response('endpoint', code=90001).pack()
                 if 'cluster' not in paras:
-                    return pack_response({'code': 90001}, status=500, item='cluster')
+                    return Response('cluster', code=90001).pack()
                 if 'server' not in paras:
-                    return pack_response({'code': 90001}, status=500, item='server')
+                    return Response('server', code=90001).pack()
                 if 'manufacturer' not in paras:
-                    return pack_response({'code': 90001}, status=500, item='manufacturer')
+                    return Response('manufacturer', code=90001).pack()
                 else:
                     if bool(paras['manufacturer']) and 'manufacturer_code' not in paras:
-                        return pack_response({'code': 90001}, status=500, item='manufacturer_code')
+                        return Response('manufacturer_code', code=90001).pack()
                 if 'attribute' not in paras:
-                    return pack_response({'code': 90001}, status=500, item='attribute')
+                    return Response('attribute', code=90001).pack()
             except Exception as e:
                 logger.exception("request error")
-                return pack_response({'code': 90000}, status=500, error="bad parameters:" + str(request.args))
+                return Response("bad parameters:" + str(request.args), code=90000).pack()
             response = dongle_command_2(ip, mac, {'attribute': paras})
-            code = response['code']
-            if code != 0:
-                return pack_response(response, status=500)
-            else:
-                return pack_response(response)
+            return Response(**response).pack()
         else:
-            return pack_response({'code': 90001}, status=500, item='endpoint')
+            return Response('endpoint', code=90001).pack()

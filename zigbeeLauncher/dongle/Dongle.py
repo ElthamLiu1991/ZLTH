@@ -23,6 +23,7 @@ from zigbeeLauncher.serial_protocol.SerialProtocol import crc16Xmodem_verify, de
 from zigbeeLauncher.serial_protocol.SerialProtocol01 import *
 from zigbeeLauncher.serial_protocol.SerialProtocol02 import *
 from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
+from zigbeeLauncher.util import except_handle, mqtt_error_code
 
 dongles = {}
 
@@ -86,23 +87,23 @@ class Dongles:
 
     def activated(self):
         self.mqtt = self.Mqtt(self)
-        self.mqtt.start()
-        self.serial.start()
-        now = time.time()
-        # while not self.property.boot:
-        #     if time.time() - now > 1:
-        #         break
-        threading.Thread(target=Info, args=(self,)).start()
+        #self.mqtt.start()
+        # self.serial.start()
+
+        #threading.Thread(target=Info, args=(self,)).start()
 
     def _deactivated(self):
-        if self.serial:
-            self.serial.stop()
-        if self.mqtt:
-            self.mqtt.stop()
+        pass
+        # if self.serial:
+        #     self.serial.stop()
+        # if self.mqtt:
+        #     self.mqtt.stop()
 
     def _connected(self):
         logger.info("Dongle %s, %s connected", self.property.port, self.property.mac)
         self.property.update(connected=True)
+        # get info
+        info = Info(self)
 
     def _disconnected(self):
         logger.error("Dongle %s, %s disconnected", self.property.port, self.property.mac)
@@ -112,12 +113,14 @@ class Dongles:
         self.property.update(connected=False)
 
     def _received(self, data):
-        self._serial_handle(data)
+        tasks = Tasks()
+        tasks.add(self._serial_handle(data))
+        # self._serial_handle(data)
 
     def write(self, data):
-        return self.serial.write(data)
+        self.serial.write(data)
 
-    def _serial_handle(self, data):
+    async def _serial_handle(self, data):
         mac = self.property.mac
         port = self.property.port
         if "Serial upload aborted" in repr(data):
@@ -144,129 +147,149 @@ class Dongles:
             self.property.update(state=3)
             self.flag = data
         else:
-            self.data = self.data + data
-            while len(self.data) >= 2:
-                if self.data[0] == 0xaa and self.data[1] == 0x55:
-                    if len(self.data) >= 6 and len(self.data) >= (6 + self.data[5] + 2):
-                        record = hexlify(self.data[2:6 + self.data[5] + 2]).upper().decode()
+            self.data += data
+            while True:
+                index = self.data.find(b'\xaaU')
+                if index == -1:
+                    logger.warning("incomplete package %s", repr(data))
+                    break
+                else:
+                    data = self.data[index:]
+                    cmd_length = 6+data[5]+2
+                    if len(data) >= 6 and len(data) >= cmd_length:
+                        record = hexlify(data[2:6 + data[5] + 2]).upper().decode()
                         if not crc16Xmodem_verify(record):
                             logger.warning("CRC check failed for %s", record)
                         else:
                             decode(self, record)
-                        self.data = self.data[6 + self.data[5] + 2:]
+                            self.data = data[cmd_length:]
+                            if self.data == b'':
+                                break
+                        # data = data[6 + data[5] + 2:]
                     else:
-                        logger.warning("incomplete package %s", repr(self.data))
+                        logger.warning("incomplete package %s", repr(data))
                         break
-                else:
-                    logger.warning("incomplete package %s", repr(self.data))
-                    break
+            # self.data = self.data + data
+            # while len(self.data) >= 2:
+            #     if self.data[0] == 0xaa and self.data[1] == 0x55:
+            #         if len(self.data) >= 6 and len(self.data) >= (6 + self.data[5] + 2):
+            #             record = hexlify(self.data[2:6 + self.data[5] + 2]).upper().decode()
+            #             if not crc16Xmodem_verify(record):
+            #                 logger.warning("CRC check failed for %s", record)
+            #             else:
+            #                 decode(self, record)
+            #             self.data = self.data[6 + self.data[5] + 2:]
+            #         else:
+            #             logger.warning("incomplete package %s", repr(self.data))
+            #             break
+            #     else:
+            #         logger.warning("incomplete package %s", repr(self.data))
+            #         break
 
-    class Mqtt(threading.Thread):
+    class Mqtt:
         def __init__(self, dongle):
-            threading.Thread.__init__(self)
             self.dongle = dongle
             self.queue = Queue(0)
             self._exit = False
 
-        def stop(self):
-            self._exit = True
-
         def add(self, payload):
-            self.queue.put_nowait(payload)
+            tasks = Tasks()
+            tasks.add(self.handle(payload))
 
-        def run(self) -> None:
-            while not self._exit:
-                if self.queue.empty():
-                    continue
-                payload = self.queue.get()
-                self.handle(payload)
-
-            print("exit dongle MQTT")
-            """
-            thread to handle MQTT data
-            :return:
-            """
-            pass
-
-        def handle(self, payload):
+        async def handle(self, payload):
             timestamp = payload['timestamp']
             uuid = payload['uuid']
-            for key in payload['data']:
-                data = payload['data'][key]
-                logger.info('key:%s', key)
-                if key == 'config':
-                    if 'endpoints' in data:
-                        threading.Thread(target=SetConfig, args=(self.dongle, data, timestamp, uuid,)).start()
-                    else:
-                        threading.Thread(target=GetConfig, args=(self.dongle, timestamp, uuid)).start()
-                elif key == 'firmware':
-                    if 'data' in data:
-                        if "filename" in data:
-                            filename = data["filename"]
+            try:
+                for key in payload['data']:
+                    data = payload['data'][key]
+                    logger.info('key:%s', key)
+                    if key == 'config':
+                        if 'endpoints' in data:
+                            config = SetConfig(self.dongle, data, timestamp, uuid)
+                            #threading.Thread(target=SetConfig, args=(self.dongle, data, timestamp, uuid,)).start()
                         else:
-                            filename = uuid.uuid1()
-                        filename = './firmwares/' + filename
-                        # save data to file
-                        with open(filename, 'wb') as f:
-                            f.write(base64.b64decode(data["data"]))
+                            config = GetConfig(self.dongle, timestamp, uuid)
+                            #threading.Thread(target=GetConfig, args=(self.dongle, timestamp, uuid)).start()
+                    elif key == 'firmware':
+                        if 'data' in data:
+                            if "filename" in data:
+                                filename = data["filename"]
+                            else:
+                                filename = uuid.uuid1()
+                            filename = './firmwares/' + filename
+                            # save data to file
+                            with open(filename, 'wb') as f:
+                                f.write(base64.b64decode(data["data"]))
+                        else:
+                            # upgrade firmware by file
+                            filename = './firmwares/' + data['filename']
+                        file = WiserFile(filename)
+                        upgrade = Upgrade(self.dongle, file)
+                        #threading.Thread(target=Upgrade, args=(self.dongle, file,)).start()
                     else:
-                        # upgrade firmware by file
-                        filename = './firmwares/' + data['filename']
-                    file = WiserFile(filename)
-                    threading.Thread(target=Upgrade, args=(self.dongle, file, )).start()
-                else:
-                    logger.info(', payload:%s', data)
-                    command = self.dongle.request(
-                        response_cb=dongle_error_callback,
-                        timestamp=timestamp,
-                        uuid=uuid
-                    )
-                    if key == 'identify':
-                        command.request_cb = identify_request_handle
-                        command.send()
-                    elif key == 'reset':
-                        if self.dongle.property.state == 3:
-                            command.request_cb = bootloader_upgrading_stop_transfer
-                            if command.send().result():
+                        logger.info(', payload:%s', data)
+                        command = self.dongle.request(
+                            response_cb=dongle_error_callback,
+                            timestamp=timestamp,
+                            uuid=uuid
+                        )
+                        if key == 'identify':
+                            command.request_cb = identify_request_handle
+                            await command.send()
+                        elif key == 'reset':
+                            if self.dongle.property.state == 2:
                                 command = self.dongle.request(
+                                    request_cb=bootloader_upgrading_finish_transfer,
                                     response_cb=dongle_error_callback,
                                     timestamp=timestamp,
-                                    uuid=uuid
+                                    uuid=uuid,
+                                    sequence=upgrading_finish_sequence
                                 )
-                                command.request_cb = bootloader_upgrading_finish_transfer
-                                command.send()
-                        elif self.dongle.property.state == 2:
-                            command.request_cb = bootloader_upgrading_finish_transfer
-                            command.send()
-                        else:
-                            command.request_cb = reset_request_handle
-                            command.send()
-                    elif key == 'label':
-                        command.request_cb = label_write_handle
-                        label = data['data']
-                        if command.send(label).result():
-                            # update label
-                            self.dongle.property.update(label=label)
-                    elif key == 'join':
-                        command.request_cb = join_network_request_handle
-                        command.send()
-                    elif key == 'join':
-                        command.request_cb = join_network_request_handle
-                        command.send()
-                    elif key == 'leave':
-                        command.request_cb = leave_network_request_handle
-                        command.send()
-                    elif key == 'data_request':
-                        command.request_cb = data_request_handle
-                        command.send()
-                    elif key == 'attribute':
-                        if 'value' in data:
-                            # write attribute
-                            command.request_cb = attribute_write_request_handle
-                        else:
-                            # get attribute
-                            command.request_cb = attribute_request_handle
-                        command.send(data)
+                                await command.send()
+                            else:
+                                command = self.dongle.request(
+                                    request_cb=reset_request_handle,
+                                    response_cb=dongle_error_callback,
+                                    timestamp=timestamp,
+                                    uuid=uuid,
+                                    sequence=reset_sequence
+                                )
+                                command.request_cb = reset_request_handle
+                                await command.send()
+                        elif key == 'label':
+                            command.request_cb = label_write_handle
+                            label = data['data']
+                            result = await command.send(label)
+                            if result:
+                                # update label
+                                self.dongle.property.update(label=label)
+                        elif key == 'join':
+                            command.request_cb = join_network_request_handle
+                            await command.send(data)
+                        elif key == 'leave':
+                            command.request_cb = leave_network_request_handle
+                            await command.send()
+                        elif key == 'data_request':
+                            command.request_cb = data_request_handle
+                            await command.send()
+                        elif key == 'attribute':
+                            if 'value' in data:
+                                # write attribute
+                                command.request_cb = attribute_write_request_handle
+                            else:
+                                # get attribute
+                                command.request_cb = attribute_request_handle
+                            await command.send(data)
+                        elif key == 'online':
+                            # simulation for online/offline change
+                            self.dongle.property.update(connected=data[key])
+            except Exception as e:
+                dongle_error_callback(device=self.dongle.property.mac,
+                                      code=9000,
+                                      message=mqtt_error_code[9000].format(str(e)),
+                                      payload={},
+                                      timestamp=timestamp,
+                                      uuid=uuid)
 
     class Property:
         def __init__(self, mac, port):
@@ -309,6 +332,7 @@ class Dongles:
                 'state': self.state,
                 'connected': self.connected,
                 'configured': self.configured,
+
                 'label': self.label,
                 'swversion': self.swversion,
                 'hwversion': self.hwversion,
@@ -325,7 +349,7 @@ class Dongles:
                 dongle_update_callback(self.mac, payload)
 
     class Commands:
-        def __init__(self, mac, seq, write, done, request_cb=None, response_cb=None, timeout_cb=None, retry=None,
+        def __init__(self, mac, seq, write, done, request_cb=None, response_cb=None, timeout_cb=None, timeout=2, retry=None,
                      timestamp=0, uuid='', **kwargs):
             self.mac = mac
             self.sequence = seq
@@ -334,6 +358,7 @@ class Dongles:
             self.request_cb = request_cb
             self.response_cb = response_cb
             self.timeout_cb = timeout_cb
+            self.timeout = timeout
             self.retry = retry
             self.timestamp = timestamp
             self.uuid = uuid
@@ -342,10 +367,9 @@ class Dongles:
             self.retry_counter = 0
             self.retry_max = 5
 
-        def send(self, *args, **kwargs):
+        async def send(self, *args, **kwargs):
             self.done_flag = False
-            tasks = Tasks()
-            return tasks.add(self._send_request(*args, **kwargs))
+            return await self._send_request(*args, **kwargs)
 
         def response(self, code=0, message='', payload={}):
             if self.response_cb:
@@ -354,53 +378,82 @@ class Dongles:
                     logger.error("request failed:%d, timestamp:%d, uuid:%s", code, self.timestamp, self.uuid)
                 else:
                     self.failed = False
-                self.response_cb(device=self.mac,
-                                 code=code,
-                                 message=message,
-                                 payload=payload,
-                                 timestamp=self.timestamp,
-                                 uuid=self.uuid)
+                threading.Thread(target=self.response_cb, kwargs={
+                    'device': self.mac,
+                    'code': code,
+                    'message': message,
+                    'payload': payload,
+                    'timestamp': self.timestamp,
+                    'uuid': self.uuid
+                }).start()
 
         async def _send_request(self, *args, **kwargs):
             """
             async task for sending serial data and check timeout, if self.timeout_cb is None, use
             default timeout handle to resend serial data
+            可能存在的问题：
+            a. 由于异步效率，可能在超时时间内获取到response了但是依然抛出asyncio.TimeoutError的异常,
+            因为处理response时已经将done_flag设置为true, while退出，导致无法重试
+            解决a的办法：
+                1. 增大timeout时间
             :param args:
             :param kwargs:
             :return:
             """
-            while True:
-                data = self.request_cb(self.sequence, *args, **kwargs)
-                self.write(data)
-                try:
-                    await asyncio.wait_for(self._wait_response(), timeout=1)
-                except asyncio.TimeoutError:
-                    self.failed = True
-                    if self.timeout_cb:
-                        logger.error("request timeout, sequence: %d, timestamp:%d, uuid:%s", self.sequence, self.timestamp, self.uuid)
-                        self.timeout_cb(device=self.mac,
-                                        code=5000,
-                                        message='request timeout',
-                                        payload={},
-                                        timestamp=self.timestamp,
-                                        uuid=self.uuid,
-                                        callback=self.retry)
-                        break
-                    else:
-                        logger.error("request timeout, sequence: %d, retry:%d", self.sequence,
-                                     self.retry_counter)
-                        if self.retry_counter < self.retry_max:
-                            self.retry_counter = self.retry_counter + 1
-                            continue
+            try:
+                while not self.done_flag and self.retry_counter < self.retry_max:
+                    data = self.request_cb(self.sequence, *args, **kwargs)
+                    logger.info('write %s, to serial: mac:%s, sequence:%d, request:%s', data, self.mac, self.sequence, self.request_cb)
+                    self.write(data)
+                    try:
+                        await asyncio.wait_for(self._wait_response(), timeout=self.timeout)
+                    except asyncio.TimeoutError:
+                        self.failed = True
+                        if self.timeout_cb:
+                            logger.error("request %s, timeout, mac:%s, sequence: %d, timestamp:%d, uuid:%s", self.mac, self.request_cb, self.sequence,
+                                         self.timestamp, self.uuid)
+                            threading.Thread(target=self.timeout_cb, kwargs={
+                                'device': self.mac,
+                                'code': 50000,
+                                'message': 'request timeout',
+                                'payload': {},
+                                'timestamp': self.timestamp,
+                                'uuid': self.uuid,
+                                'callback': self.retry
+                            }).start()
+                            break
                         else:
-                            self.response(code=5000, message='request timeout')
+                            logger.error("request timeout, mac:%s, sequence: %d, retry:%d", self.mac, self.sequence,
+                                         self.retry_counter)
+                            self.retry_counter += 1
+                            if self.retry_counter < self.retry_max:
+                                continue
+                            else:
+                                threading.Thread(target=self.response, kwargs={
+                                    'code': 50000,
+                                    'message': 'request timeout',
+                                }).start()
+                                break
+                    break
                 self.done(self.sequence)
                 if self.failed:
                     return False
                 return True
+            except Exception as e:
+                logger.error("request error, sequence: %d, timestamp:%d, uuid:%s", self.sequence, self.timestamp,
+                             self.uuid)
+                self.done(self.sequence)
+                if self.response_cb:
+                    threading.Thread(target=self.response_cb, kwargs={
+                        'device': self.mac,
+                        'code': 9000,
+                        'message': 'internal error: {}'.format(str(e)),
+                        'payload': {},
+                        'timestamp': self.timestamp,
+                        'uuid': self.uuid
+                    }).start()
 
         async def _wait_response(self):
             while not self.done_flag:
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.001)
             return
-

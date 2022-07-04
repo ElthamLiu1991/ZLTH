@@ -3,10 +3,270 @@ from binascii import unhexlify
 
 from zigbeeLauncher.serial_protocol import response
 from zigbeeLauncher.serial_protocol.SerialProtocol import encode, big_small_end_convert, to_hex, \
-    big_small_end_convert_to_int, big_small_end_convert_from_int, ack
+    big_small_end_convert_to_int, big_small_end_convert_from_int, ack, signed_to_unsigned, unsigned_to_signed, \
+    from_string
 from zigbeeLauncher.logging import dongleLogger as logger
 from zigbeeLauncher.zigbee.DataType import get_bytes, data_type_value_table, data_type_name_table, data_type_table
 
+serial_protocol_schema_0200 = {
+    'device_type':{
+        'type': 'integer',
+        'length': 1,
+        'enumerate':{
+            'coordinator': 0x00,
+            'router': 0x01,
+            'end_device': 0x02,
+            'sleepy_end_device': 0x03,
+            'unknown': 0xFF
+        }
+    },
+    'radio_power':{
+        'type': 'integer',
+        'length': 1
+    },
+    'manufacturer_code':{
+        'type': 'integer',
+        'length': 2
+    }
+}
+serial_protocol_schema_0202 = {
+    'device_type': {
+        'type': 'integer',
+        'length': 1,
+        'enumerate': {
+            0x00: 'coordinator',
+            0x01: 'router',
+            0x02: 'end_device',
+            0x03: 'sleepy_end_device',
+            0xFF: 'unknown'
+        }
+    },
+    'radio_power': {
+        'type': 'integer',
+        'length': 1
+    },
+    'manufacturer_code': {
+        'type': 'integer',
+        'length': 2
+    }
+}
+serial_protocol_schema_0205 = {
+    'number_of_endpoints': {
+        'type': 'integer',
+        'length': 1
+    },
+    'endpoints': {
+        'type': 'array',
+        'length': 'number_of_endpoints',
+        'object': {
+            'id': {
+                'type': 'integer',
+                'length': 1
+            }
+        }
+    }
+}
+serial_protocol_schema_0207 = {
+    'id': {
+        'type': 'integer',
+        'length': 1
+    },
+    'profile_id': {
+        'type': 'integer',
+        'length': 2
+    },
+    'device_id': {
+        'type': 'integer',
+        'length': 2
+    },
+    'device_version': {
+        'type': 'integer',
+        'length': 1
+    },
+    'number_of_server_cluster': {
+        'type': 'integer',
+        'length': 1
+    },
+    'number_of_client_cluster': {
+        'type': 'integer',
+        'length': 1
+    },
+    'server_clusters': {
+        'type': 'array',
+        'length': "number_of_server_cluster",
+        'object': {
+            'id': {
+                'type': 'integer',
+                'length': 2
+            },
+            'manufacturer_code': {
+                'type': 'integer',
+                'length': 2
+            }
+        }
+    },
+    'client_clusters': {
+        'type': 'array',
+        'length': "number_of_client_cluster",
+        'object': {
+            'id': {
+                'type': 'integer',
+                'length': 2
+            },
+            'manufacturer_code': {
+                'type': 'integer',
+                'length': 2
+            }
+        }
+    }
+}
+serial_protocol_schema_020A = {
+    'endpoint_id': {
+        'type': 'integer',
+        'length': 1
+    },
+    'cluster_id': {
+        'type': 'integer',
+        'length': 2
+    },
+    'manufacturer_code': {
+        'type': 'integer',
+        'length': 2
+    },
+    'server': {
+        'type': 'integer',
+        'length': 1
+    },
+    'total_number_of_attributes': {
+        'type': 'integer',
+        'length': 1
+    },
+    'remain_number_of_attributes': {
+        'type': 'integer',
+        'length': 1
+    },
+    'number_of_attributes': {
+        'type': 'integer',
+        'length': 1
+    },
+    'attributes': {
+        'type': 'array',
+        'length': 'number_of_attributes',
+        'object': {
+            'id': {
+                'type': 'integer',
+                'length': 2
+            },
+            'manufacturer_code': {
+                'type': 'integer',
+                'length': 2
+            },
+            'type': {
+                'type': 'integer',
+                'length': 1,
+                'enumerate': data_type_name_table
+            },
+            'attribute_property_bitmask': {
+                'type': 'integer',
+                'length': 1
+            },
+            'attribute_value_max_length': {
+                'type': 'integer',
+                'length': 1
+            },
+            'default': {
+                'type': 'type',
+                'length': 'attribute_value_max_length'
+            }
+        }
+    }
+}
+serial_protocol_schema_020C = {
+    'endpoint':{
+        'type': 'integer',
+        'length': 1
+    },
+    'cluster':{
+        'type': 'integer',
+        'length':2
+    },
+    'server':{
+        'type': 'integer',
+        'length': 1
+    },
+    'attribute':{
+        'type': 'integer',
+        'length': 2
+    },
+    'manufacturer_code':{
+        'type': 'integer',
+        'length': 2
+    },
+    'attribute_property_bitmask':{
+        'type': 'integer',
+        'length': 1
+    },
+    'type': {
+        'type': 'integer',
+        'length': 1,
+        'enumerate': data_type_name_table
+    },
+    'value': {
+        'type': 'type'
+    }
+}
+serial_protocol_schema_0211 = {
+    'endpoint_id': {
+        'type': 'integer',
+        'length': 1
+    },
+    'cluster_id': {
+        'type': 'integer',
+        'length': 2
+    },
+    'manufacturer_code': {
+        'type': 'integer',
+        'length': 2
+    },
+    'server': {
+        'type': 'integer',
+        'length': 1
+    },
+    'total_number_of_commands': {
+        'type': 'integer',
+        'length': 1
+    },
+    'remains_number_of_commands': {
+        'type': 'integer',
+        'length': 1
+    },
+    'number_of_commands': {
+        'type': 'integer',
+        'length': 1
+    },
+    'commands': {
+        'type': 'array',
+        'length': 'number_of_commands',
+        'object': {
+            'id': {
+                'type': 'integer',
+                'length': 1
+            },
+            'mask': {
+                'type': 'integer',
+                'length': 1,
+                'enumerate': {
+                    0x00: 'C->S',
+                    0x01: 'S->C'
+                }
+            },
+            'manufacturer_code':{
+                'type': 'integer',
+                'length': 2
+            }
+        }
+    }
+}
 zigbee_config_command = '02'
 
 node_info_write = '00'
@@ -64,27 +324,9 @@ def node_info_request_handle(seq, payload=None):
     return encode(seq, zigbee_config_command + node_info_request, None)
 
 
-@response.cmd(zigbee_config_command + node_info_response)
-def node_info_response_handle(sequence, dongle, payload):
-    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, sequence)
-    """
-
-    :param data:
-        byte0: zigbee device type
-        byte1: radio power
-        byte2-3: manufacturer code
-    :return:
-    """
-    index = 0
-    node = {"device_type": 'unknown'}
-    for type in device_type:
-        if device_type[type] == payload[index: index+2]:
-            node["device_type"] = type
-    index = index + 2
-    node["radio_power"] = int(payload[index: index + 2], 16)
-    index = index + 2
-    node["manufacturer_code"] = big_small_end_convert_to_int(payload[index:index + 4])
-    rsp = {'node': node}
+@response.cmd(zigbee_config_command + node_info_response, serial_protocol_schema_0202)
+def node_info_response_handle(sequence, dongle, protocol):
+    rsp = {'node': protocol.__dict__}
     dongle.response(sequence, payload=rsp)
 
 
@@ -141,21 +383,12 @@ def endpoint_list_request_handle(seq, payload=None):
     return encode(seq, zigbee_config_command + endpoint_list_request, None)
 
 
-@response.cmd(zigbee_config_command + endpoint_list_response)
-def endpoint_list_response_handle(sequence, dongle, payload):
-    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, sequence)
-    """
-    byte0: number of endpoints
-    """
-    i = 0
-    index = 0
-    endpoints = {"endpoints": []}
-    count = int(payload[index:index+2], 16)
-    index = index + 2
-    while i < count:
-        endpoints['endpoints'].append({'id': int(payload[index+i*2:index+i*2+2], 16)})
-        i = i + 1
-    dongle.response(sequence, payload=endpoints)
+@response.cmd(zigbee_config_command + endpoint_list_response, serial_protocol_schema_0205)
+def endpoint_list_response_handle(sequence, dongle, protocol):
+    endpoints = []
+    for endpoint in protocol.endpoints:
+        endpoints.append({'id': endpoint.id})
+    dongle.response(sequence, payload={'endpoints': endpoints})
 
 
 def endpoint_descriptor_request_handle(seq, payload):
@@ -164,66 +397,35 @@ def endpoint_descriptor_request_handle(seq, payload):
     return encode(seq, zigbee_config_command + endpoint_descriptor_request, endpoint)
 
 
-@response.cmd(zigbee_config_command + endpoint_descriptor_response)
-def endpoint_descriptor_response_handle(sequence, dongle, payload):
-    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, sequence)
-    """
-    byte0: endpoint id
-    byte1,2: profile id
-    byte3,4: device id
-    byte5: device version
-    byte6: number of server clusters
-    byte7: number of client clusters
-    ...
-    """
-    index = 0
-    id = int(payload[index:index + 2], 16)
-    index = index + 2
-    endpoint = {'id': id}
-    endpoint["profile_id"] = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    endpoint["device_id"] = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    endpoint['device_version'] = int(payload[index: index + 2], 16)
-    index = index + 2
-    server_clusters = int(payload[index: index + 2], 16)
-    index = index + 2
-    client_clusters = int(payload[index: index + 2], 16)
-    index = index + 2
-    i = 0
-    endpoint['server_clusters'] = []
-    while i < server_clusters:
-        cluster = {}
-        i = i + 1
-        cluster['id'] = big_small_end_convert_to_int(payload[index:index + 4])
-        index = index + 4
-        manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-        index = index + 4
-        if manufacturer_code == 0:
-            cluster['manufacturer'] = False
+@response.cmd(zigbee_config_command + endpoint_descriptor_response, serial_protocol_schema_0207)
+def endpoint_descriptor_response_handle(sequence, dongle, protocol):
+    endpoint = protocol.__dict__
+    server_clusters = []
+    client_clusters = []
+    for cluster in protocol.server_clusters:
+        _cluster = cluster.__dict__
+        if cluster.manufacturer_code == 0:
+            _cluster['manufacturer'] = False
+            del _cluster['manufacturer_code']
         else:
-            cluster['manufacturer'] = True
-            cluster['manufacturer_code'] = manufacturer_code
-        cluster['attributes'] = []
-        cluster['commands'] = {'C->S':[], 'S->C': []}
-        endpoint['server_clusters'].append(cluster)
-    i = 0
-    endpoint['client_clusters'] = []
-    while i < client_clusters:
-        cluster = {}
-        i = i + 1
-        cluster['id'] = big_small_end_convert_to_int(payload[index:index + 4])
-        index = index + 4
-        manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-        index = index + 4
-        if manufacturer_code == 0:
-            cluster['manufacturer'] = False
+            _cluster['manufacturer'] = True
+        _cluster['attributes'] = []
+        _cluster['commands'] = {'C->S': [], 'S->C': []}
+        server_clusters.append(_cluster)
+    for cluster in protocol.client_clusters:
+        _cluster = cluster.__dict__
+        if cluster.manufacturer_code == 0:
+            _cluster['manufacturer'] = False
+            del _cluster['manufacturer_code']
         else:
-            cluster['manufacturer'] = True
-            cluster['manufacturer_code'] = manufacturer_code
-        cluster['attributes'] = []
-        cluster['commands'] = {'C->S':[], 'S->C': []}
-        endpoint['client_clusters'].append(cluster)
+            _cluster['manufacturer'] = True
+        _cluster['attributes'] = []
+        _cluster['commands'] = {'C->S': [], 'S->C': []}
+        client_clusters.append(_cluster)
+    endpoint['server_clusters'] = server_clusters
+    endpoint['client_clusters'] = client_clusters
+    del endpoint['number_of_server_cluster']
+    del endpoint['number_of_client_cluster']
     dongle.response(sequence, payload=endpoint)
 
 
@@ -283,18 +485,29 @@ def add_attributes_to_cluster_handle(seq, payload, config):
         if 'length' in attribute:
             length = attribute['length']
             tmp = tmp + to_hex(length)
-            tmp = tmp + "".join(format(ord(c), "02X") for c in attribute['default'])
-            if len(attribute['default']) < length:
-                for i in range(0, length-len(attribute['default'])):
+            value_length = len(attribute['default'])
+            tmp = tmp + from_string(attribute['default'], value_length)
+            # tmp = tmp + to_hex(length)
+            # tmp = tmp + "".join(format(ord(c), "02X") for c in attribute['default'])
+            if value_length < length:
+                for i in range(length - value_length - 1):
                     tmp = tmp + '00'
+            print(tmp)
         else:
             length = get_bytes(type)
             tmp = tmp + to_hex(length)
-            tmp = tmp + big_small_end_convert_from_int(attribute['default'], length)
+            default = attribute['default']
+            if default < 0:
+                # 将负数进行转换
+                default = signed_to_unsigned(default, length)
+            tmp = tmp + big_small_end_convert_from_int(default, length)
         if len(head) + 2 + len(data) + len(tmp) > 400:
             # 将该attribute放到下一个包
-            config.count = count+1
+            if count == 0:
+                count = 1
+            config.count = count
             data = head + to_hex(count) + data
+            print(data)
             return encode(seq, zigbee_config_command + add_attributes_to_cluster, data)
         data = data + tmp
         count = count + 1
@@ -317,6 +530,7 @@ def attribute_list_request_handle(seq, payload=None):
         }
     :return:
     """
+    print(payload)
     data = ""
     data = data + to_hex(payload['endpoint_id'])
     data = data + big_small_end_convert_from_int(payload['cluster_id'])
@@ -329,111 +543,49 @@ def attribute_list_request_handle(seq, payload=None):
     return encode(seq, zigbee_config_command + attribute_list_request, data)
 
 
-@response.cmd(zigbee_config_command + attribute_list_response)
-def attribute_list_response_handle(sequence, dongle, payload):
-    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, sequence)
+@response.cmd(zigbee_config_command + attribute_list_response, serial_protocol_schema_020A)
+def attribute_list_response_handle(sequence, dongle, protocol):
     # ACK
     dongle.write(ack(zigbee_config_command + attribute_list_response, sequence))
-    """
-
-    :param data:
-    byte0: endpoint id
-    byte1-2: cluster id
-    byte3-4: manufacturer code for cluster
-    byte5: server/client
-    byte6: total number of attributes
-    byte7: remain number of attributes
-    byte8: number of attributes
-    byte9-10: attribute id
-    byte11-12: manufacturer code
-    byte13: type
-    byte14: mask
-    byte15: max length
-    byte16-: value
-    :return:
-    """
-    index = 0
-    endpoint_id = int(payload[index:index + 2], 16)
-    index = index + 2
-    cluster_id = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    if manufacturer_code == 0:
-        manufacturer = False
-    else:
-        manufacturer = True
-    server = bool(int(payload[index:index+2], 16))
-    index = index + 2
-    total = int(payload[index:index+2], 16)
-    index = index + 2
-    remains = int(payload[index:index+2], 16)
-    index = index + 2
-    count = int(payload[index:index+2], 16)
-    index = index + 2
-    i = 0
     attributes = []
-    while i < count:
-        i = i + 1
-        attribute = {"id": big_small_end_convert_to_int(payload[index:index + 4])}
-        index = index + 4
-        manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-        index = index + 4
-        if manufacturer_code == 0:
-            attribute['manufacturer'] = False
+    for attribute in protocol.attributes:
+        _attribute = attribute.__dict__
+        if attribute.manufacturer_code == 0:
+            _attribute['manufacturer'] = False
+            if protocol.manufacturer_code != 0:
+                _attribute['manufacturer'] = True
+                _attribute['manufacturer_code'] = protocol.manufacturer_code
+            else:
+                del _attribute['manufacturer_code']
         else:
-            attribute['manufacturer'] = True
-            attribute['manufacturer_code'] = manufacturer_code
-        type = int(payload[index: index + 2], 16)
-        index = index + 2
-        if type in data_type_name_table:
-            attribute['type'] = data_type_name_table[type]
+            _attribute['manufacturer'] = True
+        if attribute.attribute_property_bitmask & 0x01:
+            _attribute['writable'] = True
         else:
-            attribute['type'] = 'unknown'
-        mask = int(payload[index: index+ 2], 16)
-        index = index + 2
-        attribute['writable'] = False
-        if mask & 0x01:
-            attribute['writable'] = True
-        length = int(payload[index: index + 2], 16)
-        index = index + 2
-        # 设置value
-        if 0x28 <= type <= 0x2F:
-            # 有符号数
-            # TODO: 将有符号数转换成对应的正数或者负数
-            pass
-        elif 0x41 <= type <= 0x51:
-            # 字符串类型
-            value = unhexlify(payload[index: index + length*2].encode('utf-8')).decode('utf-8')
-            value = value[:value.find('\u0000')]
-            attribute['length'] = length
-            pass
-        else:
-            # 无符号数
-            value = big_small_end_convert_to_int(payload[index: index+length*2])
-        index = index + length * 2
-        attribute['default'] = value
-        attributes.append(attribute)
+            _attribute['writable'] = False
+        if isinstance(attribute.default, str):
+            _attribute['length'] = attribute.attribute_value_max_length
+        del _attribute['attribute_property_bitmask']
+        del _attribute['attribute_value_max_length']
+        attributes.append(_attribute)
+
     if sequence == dongle.config.seq:
         return
-    if endpoint_id != dongle.config.endpoint_id:
+    if protocol.endpoint_id != dongle.config.endpoint_id:
         return
-    if cluster_id != dongle.config.cluster_id:
+    if protocol.cluster_id != dongle.config.cluster_id:
         return
-    if server != dongle.config.server:
+    if protocol.server != dongle.config.server:
         return
-    if manufacturer != dongle.config.manufacturer:
+    if protocol.manufacturer_code == 0 and dongle.config.manufacturer:
         return
-    if manufacturer and manufacturer_code != dongle.config.manufacturer_code:
+    if protocol.manufacturer_code != 0 and not dongle.config.manufacturer:
         return
     dongle.config.seq = sequence
 
     dongle.config.cluster['attributes'].extend(attributes)
-    if remains == 0:
+    if protocol.remain_number_of_attributes == 0:
         dongle.config.next = True
-    # rsp = {'response': endpoint}
-    # if (seq, dongle.name) in commands:
-    #     commands[(seq, dongle.name)].get_response(rsp)
 
 
 def attribute_request_handle(seq, payload):
@@ -462,9 +614,8 @@ def attribute_request_handle(seq, payload):
     return encode(seq, zigbee_config_command + attribute_request, data)
 
 
-@response.cmd(zigbee_config_command + attribute_response)
-def attribute_response_handle(sequence, dongle, payload):
-    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, sequence)
+@response.cmd(zigbee_config_command + attribute_response, serial_protocol_schema_020C)
+def attribute_response_handle(sequence, dongle, protocol):
     dongle.write(ack(zigbee_config_command + attribute_response, sequence))
     """
     byte0: endpoint,
@@ -476,40 +627,19 @@ def attribute_response_handle(sequence, dongle, payload):
     byte9: attribute_type,
     byte10..n: value
     """
-    index = 0
-    attribute = {'endpoint': int(payload[index:index + 2], 16)}
-    index = index + 2
-    attribute['cluster'] = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    attribute['server'] = bool(int(payload[index:index + 2], 16))
-    index = index + 2
-    attribute['attribute'] = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    if manufacturer_code == 0:
+    attribute = protocol.__dict__
+    if protocol.manufacturer_code == 0:
         attribute['manufacturer'] = False
+        del attribute['manufacturer_code']
     else:
         attribute['manufacturer'] = True
-    attribute['manufacturer_code'] = manufacturer_code
-    attribute_property = payload[index:index + 2]
-    index = index + 2
-    type = int(payload[index:index + 2], 16)
-    index = index + 2
-    attribute['type'] = data_type_name_table[type]
-    if get_bytes(type) == 0:
-        # string type
-        attribute['value'] = unhexlify(payload[index:].encode('utf-8')).decode('utf-8')
+    if protocol.attribute_property_bitmask & 0x01:
+        attribute['writable'] = True
+    if protocol.server == 1:
+        attribute['server'] = True
     else:
-        attribute['value'] = big_small_end_convert_to_int(payload[index:])
-    # update = {'attribute': attribute}
-    rsp = {'response': attribute}
-    # if (seq, dongle.name) in commands:
-    #     commands[(seq, dongle.name)].get_response(rsp)
-    # # need report this attribute if dongle ready
-    # callback = get_value("dongle_update_callback")
-    # if callback and dongle.ready:
-    #     callback(dongle.name, update)
+        attribute['server'] = False
+    del attribute['attribute_property_bitmask']
     dongle.response(sequence, payload=attribute)
 
 
@@ -526,7 +656,8 @@ def attribute_write_request_handle(seq, payload):
             "manufacturer_code":1234, optional
             "type": 'bool'
             "value": 1,
-            "value": "this is a string"
+            "value": "this is a string",
+            "length": 16, optional
         }
         :return:
         """
@@ -543,14 +674,16 @@ def attribute_write_request_handle(seq, payload):
     data = data + to_hex(type)
 
     length = data_type_table[type]
-    if length == 0:
-        data = data + "".join(format(ord(c), "02X") for c in payload['value'])
+    value = payload['value']
+    if isinstance(value, str):
+        data = data + from_string(value, len(value))
+        print(data)
+        # data = data + to_hex(len(payload['value']))
+        # data = data + "".join(format(ord(c), "02X") for c in payload['value'])
     else:
-        value = payload['value']
         if value < 0:
-            # TODO: 将负数转换
-            value = abs(~abs(value)) + 1
-        data = data + big_small_end_convert_from_int(payload['value'], length)
+            value = signed_to_unsigned(value, length)
+        data = data + big_small_end_convert_from_int(value, length)
     return encode(seq, zigbee_config_command + attribute_write_request, data)
 
 
@@ -636,61 +769,21 @@ def supported_commands_list_request_handle(seq, payload=None):
     return encode(seq, zigbee_config_command + supported_commands_list_request, data)
 
 
-@response.cmd(zigbee_config_command + supported_commands_list_response)
-def supported_commands_list_response_handle(sequence, dongle, payload):
-    logger.info("function:%s, seq:%d", sys._getframe().f_code.co_name, sequence)
-    """
+@response.cmd(zigbee_config_command + supported_commands_list_response, serial_protocol_schema_0211)
+def supported_commands_list_response_handle(sequence, dongle, protocol):
 
-    :param data:
-    byte0: endpoint id
-    byte1-2: cluster id
-    byte3-4: manufacturer id
-    byte5: server/client
-    byte6: number of commands
-    byte7: command id
-    byte8: command mask
-    :return:
-    """
-    endpoint = {}
-    index = 0
-    id = int(payload[index:index + 2], 16)
-    index = index + 2
-    # TODO: 从config类中获取config并对比endpoint是否存在
-    id = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-    index = index + 4
-    server = bool(int(payload[index:index + 2], 16))
-    index = index + 2
-    # TODO: 判断config数据中cluster是否存在
-    total = int(payload[index:index + 2], 16)
-    index = index + 2
-    remains = int(payload[index:index + 2], 16)
-    index = index + 2
-    count = int(payload[index:index + 2], 16)
-    index = index + 2
-    i = 0
-    _commands = {'C->S': [], 'S->C': []}
-    while i < count:
-        command = {}
-        i = i + 1
-        id = int(payload[index:index + 2], 16)
-        index = index + 2
-        mask = int(payload[index:index + 2], 16)
-        index = index + 2
-        manufacturer_code = big_small_end_convert_to_int(payload[index:index + 4])
-        index = index + 4
-        command['id'] = id
-        if manufacturer_code == 0:
-            command['manufacturer'] = False
+    commands = {'C->S': [], 'S->C': []}
+    for command in protocol.commands:
+        _command = command.__dict__
+        if command.manufacturer_code == 0:
+            _command['manufacturer'] = False
+            del _command['manufacturer_code']
         else:
-            command['manufacturer'] = True
-            command['manufacturer_code'] = manufacturer_code
-        if mask & 0x01:
-            # server to client
-            _commands['S->C'].append(command)
+            _command['manufacturer'] = True
+        mask = command.mask
+        del _command['mask']
+        if mask == 'S->C':
+            commands['S->C'].append(_command)
         else:
-            # client to server
-            _commands['C->S'].append(command)
-
-    dongle.response(sequence, payload=_commands)
+            commands['C->S'].append(_command)
+    dongle.response(sequence, payload=commands)

@@ -7,7 +7,7 @@ from flask import request
 from flask_restful import Api, Resource, reqparse
 from werkzeug.utils import secure_filename
 
-from ..response import pack_response
+from ..response import Response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt import get_mac_address, get_ip_address
 from zigbeeLauncher.mqtt.Launcher_API import simulator_command_2
@@ -26,27 +26,35 @@ class FirmwareResource(Resource):
         data = []
         for root, dirs, files in os.walk('./firmwares'):
             data = data + files
-            return pack_response({'code': 0, 'response': data})
+            return Response(data=data).pack()
+
+    def delete(self):
+        args = request.get_json()
+        if 'filename' not in args:
+            return Response('filename', code=90001).pack()
+        file =args['filename']
+        path = os.path.join(base_dir, './firmwares') + '/' + file
+        if not os.path.isfile(path):
+            return Response(file, code=50000).pack()
+        else:
+            os.remove(os.path.join(path))
+            return Response().pack()
 
     def post(self):
         """
-        保存新的固件
+        保存新的固件, 可以接收多个文件
         :param mac:
         :return:
         """
-        parser = reqparse.RequestParser()
-        parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
-        args = parser.parse_args()
-        content = args.get('file')
+        files = request.files.getlist('file')
         try:
-            if not content:
-                return pack_response({'code': 90000}, status=500, error='file not found')
-            filename = secure_filename(content.filename)
-            content.save(os.path.join('./firmwares', filename))
-            return pack_response({'code': 0})
+            for file in files:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join('./firmwares', filename))
         except Exception as e:
             logger.exception("request error")
-            return pack_response({'code': 90000}, status=500, error=str(e))
+            return Response(str(e), code=90000).pack()
+        return Response().pack()
 
     def put(self):
         """
@@ -55,17 +63,17 @@ class FirmwareResource(Resource):
         """
         args = request.get_json()
         if 'devices' not in args and 'filename' not in args:
-            return pack_response({'code': 90001}, status=500)
+            return Response(code=90001).pack()
         else:
             file = args['filename']
             path = os.path.join(base_dir, './firmwares') + '/' + file
             if not os.path.isfile(path):
-                return pack_response({'code': 50000}, status=500, file=file)
+                return Response(file, code=50000).pack()
             else:
                 # send this file to another simulator
                 result, code = handle_devices(args['devices'])
                 if code != 200:
-                    return result, code
+                    return result, 500
                 else:
                     with open(path, 'rb') as f:
                         data = base64.b64encode(f.read()).decode()
@@ -87,6 +95,6 @@ class FirmwareResource(Resource):
                                 })
                             code = response['code']
                             if code != 0:
-                                return pack_response(response, status=500)
+                                return Response(**response).pack()
 
-                    return pack_response(response)
+                    return Response(**response).pack()

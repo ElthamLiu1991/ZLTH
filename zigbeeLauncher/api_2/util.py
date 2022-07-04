@@ -3,7 +3,7 @@ from functools import wraps
 
 import requests
 from zigbeeLauncher.logging import flaskLogger as logger
-from zigbeeLauncher.api_2.response import pack_response
+from zigbeeLauncher.api_2.response import Response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee
 from zigbeeLauncher.mqtt import get_mac_address
 from zigbeeLauncher.zigbee import type_exist, format_validation, value_validation
@@ -14,15 +14,13 @@ def handle_devices(devices):
     for mac in devices:
         device = DBDevice(mac=mac).retrieve()
         if not device:
-            return pack_response({
-                "code": 10000
-            }, status=500, device=mac)
+            return Response(mac, code=10000).pack()
         else:
             device = device[0]
             if not device["connected"]:
-                return pack_response({
-                    "code": 10001
-                }, status=500, device=mac)
+                return Response(mac, code=10001).pack()
+            elif device['state'] == 3:
+                return Response(mac, code=10003).pack()
             else:
                 ip = device['ip']
                 if ip not in devices_dict:
@@ -31,15 +29,11 @@ def handle_devices(devices):
     for ip in devices_dict:
         simulator = DBSimulator(ip=ip).retrieve()
         if not simulator:
-            return pack_response({
-                "code": 20000
-            }, status=500, device=ip)
+            return Response(ip, code=20000).pack()
         else:
             simulator = simulator[0]
             if not simulator['connected']:
-                return pack_response({
-                    "code": 20001
-                }, status=500, device=ip)
+                return Response(mac, code=20001).pack()
     return devices_dict, 200
 
 
@@ -49,7 +43,7 @@ def check_zigbee_exist(function):
         mac = kwargs['mac']
         zigbee = DBZigbee(mac=mac).retrieve()
         if not zigbee:
-            return pack_response({'code':10000}, status=404, device=mac)
+            return Response(mac, code=10000).pack()
         else:
             kwargs['zigbee'] = zigbee[0]
             return function(*args, **kwargs)
@@ -63,7 +57,7 @@ def check_device_exist(function):
         mac = kwargs['mac']
         device = DBDevice(mac=mac).retrieve()
         if not device:
-            return pack_response({'code':10000}, status=404, device=mac)
+            return Response(mac, code=10000).pack()
         else:
             kwargs['device'] = device[0]
             return function(*args, **kwargs)
@@ -77,23 +71,23 @@ def check_device_state(function):
         mac = kwargs['mac']
         device = DBDevice(mac=mac).retrieve()
         if not device:
-            return pack_response({'code': 10000}, status=404, device=mac)
+            return Response(mac, code=10000).pack()
         else:
             device = device[0]
             connected = device['connected']
             if not connected:
-                return pack_response({'code': 10001}, status=500, device=mac)
+                return Response(mac, code=10001).pack()
             else:
-                state = device['state']
-                if state == 2:
-                    return pack_response({'code': 10002}, status=500, device=mac)
-                elif state == 3:
-                    return pack_response({'code': 10003}, status=500, device=mac)
-                elif state == 9:
-                    return pack_response({'code': 10009}, status=500, device=mac)
-                else:
-                    kwargs['device'] = device
-                    return function(*args, **kwargs)
+                # state = device['state']
+                # if state == 2:
+                #     return Response(mac, code=10002).pack()
+                # elif state == 3:
+                #     return Response(mac, code=10003).pack()
+                # elif state == 9:
+                #     return Response(mac, code=10009).pack()
+                # else:
+                kwargs['device'] = device
+                return function(*args, **kwargs)
 
     return wrapper
 

@@ -5,24 +5,24 @@ from zigbeeLauncher.logging import flaskLogger as logger
 message_queue = {}
 
 
-async def _check_response(x, y):
+async def _check_response(x, y, timeout):
     while True:
         if x in message_queue:
             result = message_queue[x]
             if result != {}:
                 del message_queue[x]
                 return result
-        if time.time() - y/1000.0 > 10:
+        if time.time() - y/1000.0 > timeout:
             logger.warning("request timeout:%s", x)
             del message_queue[x]
             return {}
         await asyncio.sleep(0.01)
 
 
-async def _insert_request(x, y):
+async def _insert_request(x, y, timeout):
     if x not in message_queue:
         message_queue[x] = {}
-    result = await _check_response(x, y)
+    result = await _check_response(x, y, timeout)
     # 返回result
     return result
 
@@ -40,8 +40,8 @@ def init():
     run_loop_thread.start()  # 运行线程，同时协程事件循环也会运
 
 
-def wait_response(timestamp, uid):
-    return asyncio.run_coroutine_threadsafe(_insert_request(uid, timestamp), thread_loop)
+def wait_response(timestamp, uid, timeout):
+    return asyncio.run_coroutine_threadsafe(_insert_request(uid, timestamp, timeout), thread_loop)
 
 
 def add_response(response):

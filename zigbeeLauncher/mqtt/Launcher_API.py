@@ -4,11 +4,10 @@ import rapidjson as json
 
 
 from . import router
-from zigbeeLauncher.util import send_command, payload_validate, get_value, get_ip_address
+from zigbeeLauncher.util import send_command, payload_validate
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee
 from zigbeeLauncher.logging import launcherLogger as logger
 from zigbeeLauncher.request_and_response import add_response
-from zigbeeLauncher.mqtt.Instance import brokers
 
 
 def insert_device(device):
@@ -24,7 +23,7 @@ def insert_device(device):
 
 
 @router.route('/simulator/info')
-def simulator_info(client, ip, payload):
+def simulator_info(ip, payload):
     try:
         #lock.acquire()
         payload_validate(payload)
@@ -52,7 +51,7 @@ def simulator_info(client, ip, payload):
 
 
 @router.route('/simulator/devices/+/info')
-def simulator_device_info(client, ip, payload, device):
+def simulator_device_info(ip, payload, device):
     try:
         #lock.acquire()
         payload_validate(payload)
@@ -69,7 +68,7 @@ def simulator_device_info(client, ip, payload, device):
 
 
 @router.route('/simulator/update')
-def simulator_update(client, ip, payload):
+def simulator_update(ip, payload):
     """
     更新对于simulator的所有设备状态
     :param client:
@@ -89,7 +88,7 @@ def simulator_update(client, ip, payload):
 
 
 @router.route('/simulator/devices/+/update')
-def simulator_device_update(client, ip, payload, device):
+def simulator_device_update(ip, payload, device):
     try:
         payload_validate(payload)
         # update database
@@ -114,62 +113,71 @@ def simulator_device_update(client, ip, payload, device):
 
 
 @router.route('/simulator/error')
-def simulator_error(client, ip, payload):
+def simulator_error(ip, payload):
     add_response(json.loads(payload))
     pass
 
 
 @router.route('/simulator/devices/+/error')
-def simulator_device_error(client, ip, payload, device):
+def simulator_device_error(ip, payload, device):
     add_response(json.loads(payload))
     pass
 
 
-def request_synchronized(client, ip):
-    topic = get_value('mqtt_version') + "/"+ip+"/synchronized"
+def request_synchronized(client, body):
+    from zigbeeLauncher.mqtt import mqtt_version
+    topic = mqtt_version + "/simulator/synchronized"
     logger.info("Publish: topic:%s", topic)
-    client.publish(topic, payload=None, qos=2)
+    client.publish(topic, payload=body, qos=2)
 
 
 def request_simulator_info(client, ip):
-    topic = get_value('mqtt_version') + "/" + ip + "/simulator"
+    from zigbeeLauncher.mqtt import mqtt_version
+    topic = mqtt_version + "/" + ip + "/simulator"
     logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=None, qos=2)
 
 
 def request_dongle_info(client, ip, dongle):
-    topic = get_value('mqtt_version') + "/" + ip + "/simulator/devices/" + dongle
+    from zigbeeLauncher.mqtt import mqtt_version
+    topic = mqtt_version + "/" + ip + "/simulator/devices/" + dongle
     logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=None, qos=2)
 
 
-def simulator_command_2(simulator, body):
-    if brokers and simulator in brokers:
-        if simulator == get_value('client_ip'):
-            topic = get_value('mqtt_version') + "/simulator/command"
+def simulator_command_2(ip, body, timeout=10):
+    from zigbeeLauncher.mqtt.Simulator import Simulator
+    simulator = Simulator()
+    if simulator.client:
+        from zigbeeLauncher.mqtt import mqtt_version
+        if ip == simulator.ip:
+            topic = mqtt_version + "/simulator/command"
         else:
-            topic = get_value('mqtt_version') + "/" + simulator + "/simulator/command"
-        return send_command(brokers[simulator], topic, body)
+            topic = mqtt_version + "/" + ip + "/simulator/command"
+        return send_command(simulator.client, topic, body, timeout)
 
     else:
-        logger.error("Launcher %s MQTT client not ready", simulator)
+        logger.error("Launcher %s MQTT client not ready", ip)
         return {'code': 90007,
-                'message': 'simulator {} not connected'.format(simulator),
+                'message': 'simulator {} not connected'.format(ip),
                 'timestamp': int(round(time.time() * 1000)),
                 'uuid': str(uuid.uuid1())}
 
 
-def dongle_command_2(simulator, name, body):
-    if brokers and simulator in brokers:
-        if simulator == get_value('client_ip'):
-            topic = get_value('mqtt_version') + "/simulator/devices/" + name + "/command"
+def dongle_command_2(ip, name, body, timeout=10):
+    from zigbeeLauncher.mqtt.Simulator import Simulator
+    simulator = Simulator()
+    if simulator.client:
+        from zigbeeLauncher.mqtt import mqtt_version
+        if ip == simulator.ip:
+            topic = mqtt_version + "/simulator/devices/" + name + "/command"
         else:
-            topic = get_value('mqtt_version') + "/" + simulator + "/simulator/devices/" + name + "/command"
-        return send_command(brokers[simulator], topic, body)
+            topic = mqtt_version + "/" + ip + "/simulator/devices/" + name + "/command"
+        return send_command(simulator.client, topic, body, timeout)
 
     else:
-        logger.error("Launcher %s MQTT client not ready", simulator)
+        logger.error("Launcher %s MQTT client not ready", ip)
         return {'code': 90007,
-                'message': 'simulator {} not connected'.format(simulator),
+                'message': 'simulator {} not connected'.format(ip),
                 'timestamp': int(round(time.time() * 1000)),
                 'uuid': str(uuid.uuid1())}

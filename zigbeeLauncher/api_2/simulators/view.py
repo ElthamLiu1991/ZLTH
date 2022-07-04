@@ -7,7 +7,7 @@ from . import simulators
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
 from zigbeeLauncher.mqtt.Launcher_API import simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
-from ..response import pack_response
+from ..response import Response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
@@ -27,7 +27,7 @@ class SimulatorsResource(Resource):
                 items = DBSimulator(**paras).retrieve()
             except Exception as e:
                 logger.exception("request error")
-                return pack_response({'code': 90000}, status=500, error="bad parameters:" + str(request.args))
+                return Response("bad parameters:" + str(request.args), code=90000).pack()
         else:
             items = DBSimulator().retrieve()
         for simulator in items:
@@ -36,7 +36,7 @@ class SimulatorsResource(Resource):
             devices = DBDevice(ip=simulator['ip']).retrieve()
             for device in devices:
                 simulator['devices'].append(device['mac'])
-        return pack_response({'code': 0, 'response': items})
+        return Response(data=items).pack()
         # return render_template('show_all_devices.html', devices=Device.query.all())
 
 
@@ -69,9 +69,9 @@ class SimulatorResource(Resource):
             devices = DBDevice(ip=simulator['ip']).retrieve()
             for device in devices:
                 simulator['devices'].append(device['mac'])
-            return pack_response({'code': 0, 'response': simulator})
+            return Response(data=simulator).pack()
         else:
-            return pack_response({'code': 20000}, status=404, device=mac)
+            return Response(mac, code=20000).pack()
 
     def put(self, mac):
         args = request.get_json()
@@ -83,27 +83,27 @@ class SimulatorResource(Resource):
                 if connected:
                     for key in args.keys():
                         if key not in self.commands:
-                            return pack_response({'code': 90002}, 500, command=key)
+                            return Response(key, code=90002).pack()
                     for key in args.keys():
+                        if key == 'label':
+                            # label size should not more than 64 characters
+                            if len(args[key]['data']) > 63:
+                                return Response('data', code=90005).pack()
                         try:
                             validate(instance=args, schema=self.schema,
                                      format_checker=draft7_format_checker)
                         except SchemaError as e:
                             logger.exception('illegal schema: %s', e.message)
-                            return pack_response({'code': 90003}, status=500, error=e.message)
+                            return Response(e.message, code=90003).pack()
                         except ValidationError as e:
                             logger.exception('json validation failed:%s', e.message)
-                            return pack_response({'code': 90004}, status=500, error=e.message)
+                            return Response(e.message, code=90004).pack()
                         else:
                             response = simulator_command_2(ip, args)
-                            code = response['code']
-                            if code != 0:
-                                return pack_response(response, status=500)
-                            else:
-                                return pack_response(response)
+                            return Response(**response).pack()
                 else:
-                    return pack_response({'code': 20001}, status=500, device=mac)
+                    return Response(mac, code=20001).pack()
             except Exception as e:
-                return pack_response({'code': 90000}, status=500, error=str(e))
+                return Response(str(e), code=90000).pack()
         else:
-            return pack_response({'code': 20000}, status=404, device=mac)
+            return Response(mac, code=20000).pack()

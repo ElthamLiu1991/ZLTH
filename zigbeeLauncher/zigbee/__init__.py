@@ -26,7 +26,7 @@ def value_validation(_type, value):
             if not (-maximum) <= value < maximum:
                 return False
         else:
-            if not 0 <= value <= (1 << 8 * _len):
+            if not 0 <= value < (1 << 8 * _len):
                 return False
         return True
     else:

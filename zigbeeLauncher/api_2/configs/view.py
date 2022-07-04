@@ -13,7 +13,7 @@ from zigbeeLauncher.database.interface import DBDevice, DBZigbee, DBZigbeeEndpoi
 from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2, simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..json_schemas import config_schema
-from ..response import pack_response
+from ..response import Response
 from jsonschema import validate, draft7_format_checker
 from jsonschema.exceptions import SchemaError, ValidationError
 
@@ -31,24 +31,26 @@ class ConfigResource(Resource):
         """
         args = request.get_json()
         try:
-            if 'filename' not in args and 'config' not in args:
-                return pack_response({'code': 90001}, status=500)
+            if 'filename' not in args:
+                return Response('filename', code=90001).pack()
+            if 'config' not in args:
+                return Response('config', code=90001).pack()
             validate(instance=args, schema=config_schema,
                      format_checker=draft7_format_checker)
             result, error = config_validation(args['config'])
             if not result:
-                return pack_response({'code':90005}, status=500, value=error)
+                return Response(error, code=90005).pack()
             # save to file
             filename = args['filename']
             with open(os.path.join(base_dir, './files') + '/' + filename, 'w+') as f:
                 yaml.safe_dump(args['config'], f)
-            return pack_response({'code':0})
+            return Response().pack()
         except SchemaError as e:
             logger.exception('illegal schema: %s', e.message)
-            return pack_response({'code':90003}, status=500, error=e.message)
+            return Response(e.message, code=90003).pack()
         except ValidationError as e:
             logger.exception('json validation failed:%s', e.message)
-            return pack_response({'code':90004}, status=500, error=e.message)
+            return Response(e.message, code=90004).pack()
 
 
 class ConfigFilesResource(Resource):
@@ -85,7 +87,7 @@ class ConfigFilesResource(Resource):
                     except Exception as e:
                         logger.exception("load yaml failed")
                         continue
-            return pack_response({'code':0, 'response':data})
+            return Response(data=data).pack()
 
     def post(self):
         """
@@ -96,29 +98,29 @@ class ConfigFilesResource(Resource):
         parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
         args = parser.parse_args()
         content = args.get('file')
-        if not content:
-            return pack_response({'code': 50001}, status=500, file=None)
-        try:
-            y = yaml.safe_load(content.read())
-            validate(instance={'config': y}, schema=config_schema,
-                     format_checker=draft7_format_checker)
-            # 验证文件每个字段的值是否符合要求
-            result, error = config_validation(args['config'])
-            if not result:
-                return pack_response({'code': 90005}, status=500, value=error)
-            filename = secure_filename(content.filename)
-            content.seek(0)
-            content.save(os.path.join('./files', filename))
-            return pack_response({'code':0})
-        except SchemaError as e:
-            logger.exception('illegal schema: %s', e.message)
-            return pack_response({'code':90003}, status=500, error=e.message)
-        except ValidationError as e:
-            logger.exception('json validation failed:%s', e.message)
-            return pack_response({'code':90004}, status=500, error=e.message)
-        except Exception as e:
-            logger.exception('load YAML failed:%s', str(e))
-            return pack_response({'code':90000}, status=500, error=str(e))
+        files = request.files.getlist('file')
+        for file in files:
+            try:
+                y = yaml.safe_load(file.read())
+                validate(instance={'config': y}, schema=config_schema,
+                         format_checker=draft7_format_checker)
+                # 验证文件每个字段的值是否符合要求
+                result, error = config_validation(y)
+                if not result:
+                    return Response(error, code=90005).pack()
+                filename = secure_filename(file.filename)
+                file.seek(0)
+                file.save(os.path.join('./files', filename))
+            except SchemaError as e:
+                logger.exception('illegal schema: %s', e.message)
+                return Response(e.message, code=90003).pack()
+            except ValidationError as e:
+                logger.exception('json validation failed:%s', e.message)
+                return Response(e.message, code=90004).pack()
+            except Exception as e:
+                logger.exception('load YAML failed:%s', str(e))
+                return Response(str(e), code=90000).pack()
+        return Response().pack()
 
     def delete(self):
         """
@@ -129,7 +131,7 @@ class ConfigFilesResource(Resource):
             for file in files:
                 if os.path.isfile(root + '/' + file):
                     os.remove(root + '/' + file)
-        return pack_response({'code':0})
+        return Response().pack()
 
 
 class ConfigFileResource(Resource):
@@ -146,10 +148,10 @@ class ConfigFileResource(Resource):
                     data['config'] = y
                 except Exception as e:
                     logger.exception("load yaml failed")
-                    return pack_response({'code':50001}, status=500, file=file)
+                    return Response(file, code=50001).pack()
         except FileNotFoundError:
-            return pack_response({'code': 50000}, status=404, file=file)
-        return pack_response({'code':0, 'response': data})
+            return Response(file, code=50000).pack()
+        return Response(data=data).pack()
 
     def delete(self, file):
         """
@@ -158,9 +160,9 @@ class ConfigFileResource(Resource):
         """
         if os.path.isfile(os.path.join(base_dir, './files') + '/' + file):
             os.remove(os.path.join(base_dir, './files') + '/' + file)
-            return pack_response({'code':0})
+            return Response().pack()
         else:
-            return pack_response({'code':50000}, status=404, file=file)
+            return Response(file, code=50000).pack()
 
 
 class ConfigDevicesResource(Resource):
@@ -170,12 +172,12 @@ class ConfigDevicesResource(Resource):
         """
         args = request.get_json()
         if 'devices' not in args:
-            return pack_response({'code': 90001}, status=500, item='devices')
+            return Response('devices', code=90001).pack()
         if 'filename' in args:
             file = args['filename']
             path = os.path.join(base_dir, './files') + '/' + file
             if not os.path.isfile(path):
-                return pack_response({'code': 50000}, status=500, file=file)
+                return Response(file, code=50000).pack()
             else:
                 with open(path, 'r') as f:
                     data = yaml.safe_load(f.read())
@@ -185,20 +187,20 @@ class ConfigDevicesResource(Resource):
                          format_checker=draft7_format_checker)
                 result, error = config_validation(args['config'])
                 if not result:
-                    return pack_response({'code': 90005}, status=500, value=error)
+                    return Response(error, code=90005).pack()
                 data = args['config']
             except SchemaError as e:
                 logger.exception('illegal schema: %s', e.message)
-                return pack_response({'code': 90003}, status=500, error=e.message)
+                return Response(e.message, code=90003).pack()
             except ValidationError as e:
                 logger.exception('json validation failed:%s', e.message)
-                return pack_response({'code': 90004}, status=500, error=e.message)
+                return Response(e.message, code=90004).pack()
         else:
-            return pack_response({'code': 90001}, status=500, item='filename or config')
+            return Response('filename or config', code=90001).pack()
 
         result, code = handle_devices(args['devices'])
         if code != 200:
-            return result, code
+            return result, 500
         payload = {}
         payload.update(data)
         for ip in result.keys():
@@ -208,5 +210,5 @@ class ConfigDevicesResource(Resource):
             })
             code = response['code']
             if code != 0:
-                return pack_response(response, status=500)
-        return pack_response(response)
+                return Response(**response).pack()
+        return Response(**response).pack()
