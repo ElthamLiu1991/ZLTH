@@ -40,7 +40,7 @@ class DevicesResource(Resource):
 
 class DeviceResource(Resource):
 
-    commands = ['identify', 'reset', 'label']
+    commands = ['identify', 'reset', 'label', 'online']
     schema = {
         "type": "object",
         "properties": {

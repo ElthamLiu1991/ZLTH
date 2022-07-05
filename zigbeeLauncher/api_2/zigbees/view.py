@@ -185,7 +185,7 @@ class ZigbeeResource(Resource):
                         # 验证channel和auto_option的合法性
                         channel = payload['channels']
                         channel_all = list(range(11, 27))
-                        if not set(channel) < set(channel_all):
+                        if not set(channel) <= set(channel_all):
                             return Response(channel, code=90005).pack()
                         if 'pan_id' in payload:
                             pan_id = payload['pan_id']

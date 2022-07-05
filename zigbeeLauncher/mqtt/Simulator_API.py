@@ -98,19 +98,12 @@ def simulator_command(ip='', payload=''):
             label = command_payload['data']
             from zigbeeLauncher.mqtt.Simulator import Simulator
             simulator = Simulator()
-            simulator.update(label=data['data']['label']['data'])
+            simulator.update(label=label)
         elif command == 'config':
             for device in command_payload["devices"]:
                 if device in dongles:
                     dongle = dongles[device]
                     dongle.mqtt.add(data)
-        elif command == 'online':
-            # simulation for online/offline change
-            simulator = Simulator()
-            simulator.update(connected=data_obj[command])
-            for mac, dongle in dongles:
-                dongle.property.update(connected=data_obj[command])
-
         else:
             logger.warn("unsupported command:%s", command)
             raise Exception("unsupported command: " + command)

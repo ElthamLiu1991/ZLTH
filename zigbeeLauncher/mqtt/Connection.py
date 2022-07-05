@@ -4,6 +4,8 @@ import threading
 import time
 
 import paho.mqtt.client as mqtt
+import socket
+
 from . import router, mqtt_version
 from . import Launcher_API
 from zigbeeLauncher.util import pack_payload, get_ip_address
@@ -50,6 +52,7 @@ class WiserMQTT(threading.Thread):
                 client.subscribe(mqtt_version + "/simulator/info", qos=2)
                 client.subscribe(mqtt_version + "/simulator/devices/+/info", qos=2)
                 client.subscribe(mqtt_version + "/simulator/update", qos=2)
+                client.subscribe(mqtt_version + "/+/simulator/update", qos=2)   # subscribe from outside
                 client.subscribe(mqtt_version + "/simulator/devices/+/update", qos=2)
                 client.subscribe(mqtt_version + "/simulator/command", qos=2)
                 client.subscribe(mqtt_version + "/simulator/devices/+/command", qos=2)
@@ -96,19 +99,16 @@ class WiserMQTT(threading.Thread):
             logger.info("Try to connect MQTT broker: %s %d" % (self.broker, self.port))
             client = mqtt.Client("ZLTH-" + self.role + "-" + self.ip)
             if self.role == 'edge':
-                client.will_set(topic=self.will_topic, payload=self.will_payload)
+                client.will_set(self.will_topic, payload=self.will_payload, qos=2)
                 pass
             client.on_connect = on_connect
             client.on_message = on_message
             client.on_subscribe = on_subscribe
             client.on_disconnect = on_disconnect
-            client.connect(self.broker, self.port, 60)
+            client.connect(self.broker, self.port, 10)
             client.loop_forever()
-        except TimeoutError:
-            logger.warning("MQTT connect timeout, try again")
+        except Exception as e:
+            logger.exception("MQTT connect failed, try again")
             time.sleep(5)
             self.run()
-        except ConnectionRefusedError:
-            logger.warning("MQTT connect refused, try again")
-            time.sleep(5)
-            self.run()
+

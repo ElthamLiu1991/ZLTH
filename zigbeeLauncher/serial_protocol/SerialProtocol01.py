@@ -113,14 +113,16 @@ def join_network_request_handle(seq, payload):
     for item in payload['channels']:
         channel_mask = channel_mask + (1 << item)
     data = data + big_small_end_convert_from_int(channel_mask, 4)
-    auto_option = 0
+    auto_option = 3
     pan_id = 0
     extended_pan_id = 0
     if 'pan_id' in payload:
-        auto_option = auto_option + 1
+        auto_option &= 0x02
+        # auto_option = auto_option + 1
         pan_id = payload['pan_id']
     if 'extended_pan_id' in payload:
-        auto_option = auto_option + 2
+        # auto_option = auto_option + 2
+        auto_option &= 0x01
         extended_pan_id = payload['extended_pan_id']
     data = data + to_hex(auto_option)
     data = data + big_small_end_convert_from_int(pan_id, 2)

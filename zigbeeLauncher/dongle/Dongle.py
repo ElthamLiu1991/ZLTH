@@ -280,9 +280,6 @@ class Dongles:
                                 # get attribute
                                 command.request_cb = attribute_request_handle
                             await command.send(data)
-                        elif key == 'online':
-                            # simulation for online/offline change
-                            self.dongle.property.update(connected=data[key])
             except Exception as e:
                 dongle_error_callback(device=self.dongle.property.mac,
                                       code=9000,
