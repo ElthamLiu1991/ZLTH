@@ -2,7 +2,6 @@ import time
 import uuid
 import rapidjson as json
 
-
 from . import router
 from zigbeeLauncher.util import send_command, payload_validate
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee
@@ -25,7 +24,8 @@ def insert_device(device):
 @router.route('/simulator/info')
 def simulator_info(ip, payload):
     try:
-        #lock.acquire()
+        print(payload)
+        # lock.acquire()
         payload_validate(payload)
         # 加入数据库
         data = json.loads(payload)
@@ -37,23 +37,23 @@ def simulator_info(ip, payload):
                 device['ip'] = data_obj['ip']
                 insert_device(device)
         # 删除所有相关的devices
-        #if ip != client_ip:
-            #DBDevice(ip=data_obj['mac']).delete()
-            # 重新插入新设备
+        # if ip != client_ip:
+        # DBDevice(ip=data_obj['mac']).delete()
+        # 重新插入新设备
 
-            # 获取devices
-            # request_simulator_info(client, ip)
+        # 获取devices
+        # request_simulator_info(client, ip)
     except Exception as e:
         logger.exception("payload validation failed: %s", e)
     finally:
-        #lock.release()
+        # lock.release()
         pass
 
 
 @router.route('/simulator/devices/+/info')
 def simulator_device_info(ip, payload, device):
     try:
-        #lock.acquire()
+        # lock.acquire()
         payload_validate(payload)
         # 加入数据库
         data = json.loads(payload)
@@ -63,7 +63,7 @@ def simulator_device_info(ip, payload, device):
     except Exception as e:
         logger.error("payload validation failed:%s", e)
     finally:
-        #lock.release()
+        # lock.release()
         pass
 
 
@@ -124,9 +124,9 @@ def simulator_device_error(ip, payload, device):
     pass
 
 
-def request_synchronized(client, body):
+def request_synchronized(client, broker, body):
     from zigbeeLauncher.mqtt import mqtt_version
-    topic = mqtt_version + "/simulator/synchronized"
+    topic = mqtt_version + "/" + broker + "/simulator/synchronized"
     logger.info("Publish: topic:%s", topic)
     client.publish(topic, payload=body, qos=2)
 

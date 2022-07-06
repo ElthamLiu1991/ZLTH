@@ -46,7 +46,8 @@ class WiserMQTT(threading.Thread):
             else:
                 # 订阅消息
                 # local
-                client.subscribe(mqtt_version + "/simulator/synchronized", qos=2)
+                # client.subscribe(mqtt_version + "/simulator/synchronized", qos=2)
+                client.subscribe(mqtt_version + "/"+self.ip+"/simulator/synchronized", qos=2)
                 client.subscribe(mqtt_version + "/simulator/error", qos=2)
                 client.subscribe(mqtt_version + "/simulator/devices/+/error", qos=2)
                 client.subscribe(mqtt_version + "/simulator/info", qos=2)
@@ -59,8 +60,9 @@ class WiserMQTT(threading.Thread):
             if self.broker == '127.0.0.1' and self.connected_cb:
                 self.connected_cb(client)
             if role == 'edge':
-                logger.info("get dongle list from %s", self.broker)
-                Launcher_API.request_synchronized(client, pack_payload({'ip': self.ip}))
+                time.sleep(2)
+                logger.info("get dongle list from %s to %s", self.broker, self.ip)
+                Launcher_API.request_synchronized(client, self.broker, pack_payload({'ip': self.ip}))
 
         def on_message(client, userdata, msg):
             logger.info("Receive MQTT message, topic: %s", msg.topic)
