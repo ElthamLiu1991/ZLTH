@@ -24,7 +24,6 @@ def insert_device(device):
 @router.route('/simulator/info')
 def simulator_info(ip, payload):
     try:
-        print(payload)
         # lock.acquire()
         payload_validate(payload)
         # 加入数据库
@@ -128,7 +127,7 @@ def request_synchronized(client, broker, body):
     from zigbeeLauncher.mqtt import mqtt_version
     topic = mqtt_version + "/" + broker + "/simulator/synchronized"
     logger.info("Publish: topic:%s", topic)
-    client.publish(topic, payload=body, qos=2)
+    client.publish(topic, payload=body, qos=2, retain=True)
 
 
 def request_simulator_info(client, ip):

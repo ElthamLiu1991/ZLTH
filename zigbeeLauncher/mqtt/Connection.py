@@ -112,5 +112,5 @@ class WiserMQTT(threading.Thread):
         except Exception as e:
             logger.exception("MQTT connect failed, try again")
             time.sleep(5)
-            self.run()
+        self.run()
 
