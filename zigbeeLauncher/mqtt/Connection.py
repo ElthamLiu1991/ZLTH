@@ -74,10 +74,15 @@ class WiserMQTT(threading.Thread):
                 topic = msg.topic[msg.topic.find("/", 1):]
                 router.call(topic, ip=self.ip, payload=msg.payload.decode('utf-8'))
                 if 'info' in msg.topic or 'update' in msg.topic or 'error' in msg.topic:
+                    # special forward operation to make sure web client receive this message
+                    web_topic = mqtt_version+'/web/'+self.ip + topic
+                    client.publish(web_topic, msg.payload, qos=2)
+
                     # transfer to another edges also
                     topic = mqtt_version + '/' + self.ip + topic
                     logger.info("public to outside:%s", topic)
                     client.publish(topic, msg.payload, qos=2)
+
             else:
                 if 'update' in msg.topic or 'error' in msg.topic:
                     if ip == self.ip:
@@ -87,6 +92,12 @@ class WiserMQTT(threading.Thread):
                 topic = msg.topic[msg.topic.find("/", 10):]
                 # add to dongle mqtt queue
                 router.call(topic, ip=ip, payload=msg.payload.decode('utf-8'))
+
+                # special forward operation to make sure web client receive this message
+                web_topic = mqtt_version + '/web/' + self.ip + topic
+                from .Simulator import Simulator
+                simulator = Simulator()
+                simulator.client.publish(web_topic, msg.payload, qos=2)
 
         def on_subscribe(client, userdata, mid, granted_qos):
             pass

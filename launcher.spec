@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(['launcher.py'],
-             pathex=[],
+             pathex=['D:\\projects\\zigbee_launcher\\development\\venv\\Lib\\site-packages'],
              binaries=[],
              datas=[],
              hiddenimports=[],
