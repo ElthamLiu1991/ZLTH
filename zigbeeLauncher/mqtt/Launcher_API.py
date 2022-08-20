@@ -1,3 +1,5 @@
+import datetime
+import os
 import time
 import uuid
 import rapidjson as json
@@ -7,6 +9,8 @@ from zigbeeLauncher.util import send_command, payload_validate
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee
 from zigbeeLauncher.logging import launcherLogger as logger
 from zigbeeLauncher.request_and_response import add_response
+from .. import base_dir, socketio
+from ..auto_scripts import AutoTesting
 
 
 def insert_device(device):
@@ -98,6 +102,7 @@ def simulator_device_update(ip, payload, device):
         if 'zigbee' in data['data']:
             # zigbee table
             if DBZigbee(mac=device).retrieve():
+                data['data']['zigbee']['extended_pan_id'] = hex(data['data']['zigbee']['extended_pan_id'])[2:]
                 DBZigbee(mac=device).update(data['data']['zigbee'])
             del data['data']['zigbee']
         if DBDevice(mac=device).retrieve():

@@ -1,0 +1,52 @@
+{
+    "gateway_vid": "6c367244ee2ff6f38csuru",
+    "repeat": 0,
+    "features": [
+        {
+            "tuya_product_name": "按键开关",
+            "tuya_product_id": "x7zpydy5",
+            "state": [
+                {
+                    "status": {
+                        "code": "switch_1",
+                        "type": "Boolean"
+                    },
+                    "zlth": {
+                        "cluster": "On/Off",
+                        "name": "OnOff",
+                        "type": "attribute"
+                    },
+                    "request": {
+                        "value": true,
+                        "validation": 1
+                    },
+                    "report": {
+                        "value": 0,
+                        "validation": "false"
+                    }
+                }
+            ]
+        },
+        {
+            "tuya_product_name": "温湿度传感器",
+            "tuya_product_id": "fent9g4p",
+            "state": [
+                {
+                    "status": {
+                        "code": "va_temperature",
+                        "type": "Integer"
+                    },
+                    "zlth": {
+                        "cluster": "Temperature Measurement",
+                        "name": "MeasuredValue",
+                        "type": "attribute"
+                    },
+                    "report": {
+                        "value": 3000,
+                        "validation": "300"
+                    }
+                }
+            ]
+        }
+    ]
+}

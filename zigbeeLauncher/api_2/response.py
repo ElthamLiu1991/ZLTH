@@ -23,6 +23,8 @@ class Response:
         50001: "{} is not a YAML file",
         60000: "device {} is not configured yet",
         60001: 'device {} is configuring, please try later',
+        70000: 'script {} not exist',
+        70001: 'script {} is running',
         90000: "internal error: {}",
         90001: "missing mandatory item {}",
         90002: "unsupported command: {}",
@@ -47,7 +49,7 @@ class Response:
         response = self.__dict__
         if self.code == 0:
             state = 200
-        elif self.code == 10000 or self.code == 20000 or self.code == 30000:
+        elif self.code == 10000 or self.code == 20000 or self.code == 30000 or self.code == 70000:
             state = 404
         else:
             state = 500

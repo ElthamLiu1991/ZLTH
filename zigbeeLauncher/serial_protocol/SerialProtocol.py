@@ -244,23 +244,31 @@ class ZLTH_Serial:
                     _object.__dict__.update({item: []})
                     for i in range(length):
                         _sub_object = self.Sub_object()
-                        self._response_mapping(_sub_object, payload['object'])
-                        _object.__dict__[item].append(_sub_object)
+                        if self._response_mapping(_sub_object, payload['object']):
+                            _object.__dict__[item].append(_sub_object)
                 else:
                     # type为_object的一个属性
                     _payload = payload.copy()
                     _schema = {item: _payload}
                     _type = _object.__dict__[_payload['type']]
-                    if get_bytes(data_type_value_table[_type]) == 0:
-                        # string
-                        _payload['type'] = 'string'
+                    if _type not in data_type_value_table:
+                        # skip this attribute
+                        logger.warn("unsupported type:%s", _type)
+                        self.index = self.index + length * 2
+                        return False
                     else:
-                        # integer
-                        _payload['type'] = 'integer'
-                    if 'length' in _payload:
-                        length = _payload['length']
-                        if isinstance(length, str):
-                            _payload['length'] = _object.__dict__[length]
-                    self._response_mapping(_object, _schema)
+                        if get_bytes(data_type_value_table[_type]) == 0:
+                            # string
+                            _payload['type'] = 'string'
+                        else:
+                            # integer
+                            _payload['type'] = 'integer'
+                        if 'length' in _payload:
+                            length = _payload['length']
+                            if isinstance(length, str):
+                                _payload['length'] = _object.__dict__[length]
+                        self._response_mapping(_object, _schema)
         except Exception as e:
             logger.exception(str(e))
+            return False
+        return True

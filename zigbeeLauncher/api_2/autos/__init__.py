@@ -1,0 +1,5 @@
+scripts = [
+            'capacity',
+            'stability',
+            'functionality'
+        ]

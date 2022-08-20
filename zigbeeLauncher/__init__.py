@@ -4,6 +4,7 @@ from flask import Flask, render_template
 from .database import db, ma
 from .settings import DevelopmentConfig
 from flask_cors import CORS
+from flask_socketio import SocketIO, emit
 
 base_dir = os.path.abspath('./')
 
@@ -16,6 +17,8 @@ app.jinja_env.variable_start_string = '{['
 app.jinja_env.variable_end_string = ']}'
 
 CORS(app, supports_credentials=True)
+
+socketio = SocketIO(app)
 
 
 @app.route('/')
@@ -48,4 +51,5 @@ def create_app():
     init()
     from . import request_and_response
     request_and_response.init()
-    return app
+    #return app
+    return socketio, app

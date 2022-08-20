@@ -27,12 +27,16 @@ class ZigbeesResource(Resource):
                 for key in request.args:
                     paras[key] = request.args[key]
                 data = DBZigbee(**paras).retrieve()
+                for item in data:
+                    item['extended_pan_id'] = int(item['extended_pan_id'], 16)
                 return Response(data=data).pack()
             except Exception as e:
                 logger.exception("request error")
                 return Response("bad parameters:" + str(request.args), code=90000).pack()
         else:
             data = DBZigbee().retrieve()
+            for item in data:
+                item['extended_pan_id'] = int(item['extended_pan_id'], 16)
             return Response(data=data).pack()
         # return render_template('show_all_devices.html', devices=Device.query.all())
 
@@ -165,6 +169,7 @@ class ZigbeeResource(Resource):
 
     @check_zigbee_exist
     def get(self, mac, zigbee):
+        zigbee['extended_pan_id'] = int(zigbee['extended_pan_id'], 16)
         return Response(data=zigbee).pack()
 
     @check_device_state

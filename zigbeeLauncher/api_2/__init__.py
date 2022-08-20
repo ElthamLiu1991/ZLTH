@@ -1,5 +1,6 @@
 from flask_restful import Api
 from zigbeeLauncher.settings import NestableBlueprint
+from .autos.view import AutoResource, AutoConfigResource, AutoScriptResource
 from .configs.view import ConfigFilesResource, ConfigFileResource, ConfigDevicesResource, ConfigResource
 from .devices import DeviceResource, DevicesResource, DeviceConfigResource
 from .simulators import SimulatorResource, SimulatorsResource
@@ -29,5 +30,10 @@ configs_api.add_resource(ConfigResource, '/configs')
 configs_api.add_resource(ConfigFilesResource, '/configs/files')
 configs_api.add_resource(ConfigFileResource, '/configs/files/<string:file>')
 configs_api.add_resource(ConfigDevicesResource, '/configs/devices')
+
+auto_api = Api(api)
+auto_api.add_resource(AutoResource, '/autos')
+auto_api.add_resource(AutoScriptResource, '/autos/<string:script>')
+auto_api.add_resource(AutoConfigResource, '/autos/<string:script>/config')
 
 from . import *

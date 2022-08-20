@@ -147,7 +147,7 @@ class DBZigbee(DBInterface):
                             data['device_type'],
                             data['channel'],
                             data['pan_id'],
-                            data['extended_pan_id'],
+                            hex(data['extended_pan_id'])[2:],
                             data['node_id'])
             self._add(zigbee)
         except Exception as e:

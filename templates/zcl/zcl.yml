@@ -2763,7 +2763,7 @@ clusters:
          - value: 0x00
            description: Motion Sensor functionality is in manual mode
          - value: 0x01
-           description: Motion sensor on with full auto functionality
+           description: Motion sensor on with full autos functionality
          - value: 0x02
            description: Occ when motion, but no timeout
          - value: 0x03
@@ -2784,7 +2784,7 @@ clusters:
          - value: 0x00
            description: Motion Sensor functionality is in manual mode
          - value: 0x01
-           description: Motion sensor on with full auto functionality
+           description: Motion sensor on with full autos functionality
          - value: 0x02
            description: Occ when motion, but no timeout
          - value: 0x03
