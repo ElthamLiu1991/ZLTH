@@ -1,0 +1,1801 @@
+endpoints:
+- client_clusters:
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: UpgradeServerID
+      server: false
+      type: EUI64
+      writable: false
+    - default: 4294967295
+      id: 1
+      mandatory: false
+      manufacturer: false
+      name: FileOffset
+      server: false
+      type: uint32
+      writable: false
+    - default: 16778068
+      id: 2
+      mandatory: false
+      manufacturer: false
+      name: CurrentFileVersion
+      server: false
+      type: uint32
+      writable: false
+    - default: 65535
+      id: 3
+      mandatory: false
+      manufacturer: false
+      name: CurrentZigBeeStackVersion
+      server: false
+      type: uint16
+      writable: false
+    - default: 4294967295
+      id: 4
+      mandatory: false
+      manufacturer: false
+      name: DownloadedFileVersion
+      server: false
+      type: uint32
+      writable: false
+    - default: 65535
+      id: 5
+      mandatory: false
+      manufacturer: false
+      name: DownloadedZigBeeStackVersion
+      server: false
+      type: uint16
+      writable: false
+    - default: 0
+      id: 6
+      mandatory: true
+      manufacturer: false
+      name: ImageUpgradeStatus
+      server: false
+      type: enum8
+      values:
+      - description: Normal
+        value: 0
+      - description: Download in progress
+        value: 1
+      - description: Download complete
+        value: 2
+      - description: Waiting to upgrade
+        value: 3
+      - description: Count down
+        value: 4
+      - description: Wait for more
+        value: 5
+      - description: Waiting to Upgrade via External Event
+        value: 6
+      writable: false
+    - default: 4190
+      id: 7
+      mandatory: false
+      manufacturer: false
+      name: ManufacturerID
+      server: false
+      type: uint16
+      writable: false
+    - default: 65535
+      id: 8
+      mandatory: false
+      manufacturer: false
+      name: ImageTypeID
+      server: false
+      type: uint16
+      writable: false
+    - default: 0
+      id: 9
+      mandatory: false
+      manufacturer: false
+      name: MinimumBlockPeriod
+      server: false
+      type: uint16
+      writable: false
+    - default: 0
+      id: 10
+      mandatory: false
+      manufacturer: false
+      name: ImageStamp
+      server: false
+      type: uint32
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Query Next Image Request
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Image Block Request
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Upgrade End Request
+        id: 6
+        mandatory: true
+        manufacturer: false
+      S->C:
+      - description: Image Notify
+        id: 0
+        mandatory: false
+        manufacturer: false
+      - description: Query Next Image Response
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Image Block Response
+        id: 5
+        mandatory: true
+        manufacturer: false
+      - description: Upgrade End Response
+        id: 7
+        mandatory: true
+        manufacturer: false
+      - description: Query Device Specific File Response
+        id: 9
+        mandatory: false
+        manufacturer: false
+    id: 25
+    manufacturer: false
+    name: Over-The-Air Upgrade
+  device_id: 257
+  device_version: 1
+  id: 10
+  profile_id: 260
+  server_clusters:
+  - attributes:
+    - default: 2
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: ZCLVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 1
+      mandatory: false
+      manufacturer: false
+      name: ApplicationVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: 2
+      id: 2
+      mandatory: false
+      manufacturer: false
+      name: StackVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: 1
+      id: 3
+      mandatory: false
+      manufacturer: false
+      name: HWVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: Schneider Electric
+      id: 4
+      length: 32
+      mandatory: false
+      manufacturer: false
+      name: ManufacturerName
+      server: true
+      type: string
+      writable: false
+    - default: E8332DST350ZB
+      id: 5
+      length: 32
+      mandatory: false
+      manufacturer: false
+      name: ModelIdentifier
+      server: true
+      type: string
+      writable: false
+    - default: ''
+      id: 6
+      length: 16
+      mandatory: false
+      manufacturer: false
+      name: DataCode
+      server: true
+      type: string
+      writable: false
+    - default: 1
+      id: 7
+      mandatory: true
+      manufacturer: false
+      name: PowerSource
+      server: true
+      type: enum8
+      values:
+      - description: Unknown
+        value: 0
+      - description: Mains(single phase)
+        value: 1
+      - description: Mains(3 phase)
+        value: 2
+      - description: Battery
+        value: 3
+      - description: DC source
+        value: 4
+      - description: Emergency mains constantly powered
+        value: 5
+      - description: Emergency mains and transfer switch
+        value: 6
+      - description: Unknown
+        value: 128
+      - description: Mains(single phase)
+        value: 129
+      - description: Mains(3 phase)
+        value: 130
+      - description: Battery
+        value: 131
+      - description: DC source
+        value: 132
+      - description: Emergency mains constantly powered
+        value: 133
+      - description: Emergency mains and transfer switch
+        value: 134
+      writable: false
+    - default: ''
+      id: 10
+      length: 16
+      mandatory: false
+      manufacturer: false
+      name: ProductCode
+      server: true
+      type: octstr
+      writable: false
+    - default: ''
+      id: 16384
+      length: 16
+      mandatory: false
+      manufacturer: false
+      name: SWBuildID
+      server: true
+      type: string
+      writable: false
+    - default: 1.1.1
+      id: 57345
+      length: 20
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: SoftwareVersionString
+      server: true
+      type: string
+      writable: false
+    - default: 1.1.1
+      id: 57346
+      length: 20
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: HardwareVersionString
+      server: true
+      type: string
+      writable: false
+    - default: ''
+      id: 57348
+      length: 32
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: SerialNumber
+      server: true
+      type: string
+      writable: false
+    - default: 0
+      id: 57351
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductIdentifier
+      server: true
+      type: enum16
+      writable: false
+    - default: ''
+      id: 57352
+      length: 16
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductRange
+      server: true
+      type: string
+      writable: false
+    - default: ''
+      id: 57353
+      length: 16
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductModel
+      server: true
+      type: string
+      writable: false
+    - default: Wiser Home
+      id: 57354
+      length: 16
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductFamily
+      server: true
+      type: string
+      writable: false
+    - default: http://www.schneider-electric.com
+      id: 57355
+      length: 64
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: VendorURL
+      server: true
+      type: string
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Reset to Factory Defaults
+        id: 0
+        manatory: false
+        manufacturer: false
+      S->C: []
+    id: 0
+    manufacturer: false
+    name: Basic
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: IdentifyTime
+      server: true
+      type: uint16
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: true
+    commands:
+      C->S:
+      - description: Identify
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: Identify Query
+        id: 1
+        mandatory: true
+        manufacturer: false
+      S->C:
+      - description: Identify Query Response
+        id: 0
+        mandatory: true
+        manufacturer: false
+    id: 3
+    manufacturer: false
+    name: Identify
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: NameSupport
+      server: true
+      type: map8
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Add group
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: View group
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Get group membership
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Remove group
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Remove all groups
+        id: 4
+        mandatory: true
+        manufacturer: false
+      - description: Add group if identifying
+        id: 5
+        mandatory: true
+        manufacturer: false
+      S->C:
+      - description: Add group response
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: View group response
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Get group membership response
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Remove group response
+        id: 3
+        mandatory: true
+        manufacturer: false
+    id: 4
+    manufacturer: false
+    name: Groups
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: SceneCount
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 1
+      mandatory: true
+      manufacturer: false
+      name: CurrentScene
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 2
+      mandatory: true
+      manufacturer: false
+      name: CurrentGroup
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 3
+      mandatory: true
+      manufacturer: false
+      name: SceneValid
+      server: true
+      type: bool
+      writable: false
+    - default: 0
+      id: 4
+      mandatory: true
+      manufacturer: false
+      name: NameSupport
+      server: true
+      type: map8
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Add Scene
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: View Scene
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Remove Scene
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Remove All Scenes
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Store Scene
+        id: 4
+        mandatory: true
+        manufacturer: false
+      - description: Recall Scene
+        id: 5
+        mandatory: true
+        manufacturer: false
+      - description: Get Scene Membership
+        id: 6
+        mandatory: true
+        manufacturer: false
+      S->C: []
+    id: 5
+    manufacturer: false
+    name: Scenes
+  - attributes:
+    - default: 1
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: OnOff
+      server: true
+      type: bool
+      writable: false
+    - default: 1
+      id: 16384
+      mandatory: false
+      manufacturer: false
+      name: GlobalSceneControl
+      server: true
+      type: bool
+      writable: false
+    - default: 0
+      id: 16385
+      mandatory: false
+      manufacturer: false
+      name: OnTime
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 16386
+      mandatory: true
+      manufacturer: false
+      name: OffWaitTime
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 16387
+      mandatory: false
+      manufacturer: false
+      name: StartUpOnOff
+      server: true
+      type: enum8
+      values:
+      - description: Set the OnOff attribute to 0
+        value: 0
+      - description: Set the OnOff attribute to 1
+        value: 1
+      - description: Set the OnOff attribute reverse
+        value: 2
+      - description: Reserved
+        value: 3
+      - description: Set the OnOff attribute to its pervious value
+        value: 255
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: 'Off'
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: 'On'
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Toggle
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Off with effect
+        id: 64
+        mandatory: false
+        manufacturer: false
+      - description: On with recall global scene
+        id: 65
+        mandatory: false
+        manufacturer: false
+      - description: On with timed off
+        id: 66
+        mandatory: false
+        manufacturer: false
+      S->C: []
+    id: 6
+    manufacturer: false
+    name: On/Off
+  - attributes:
+    - default: 254
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: CurrentLevel
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 1
+      mandatory: false
+      manufacturer: false
+      name: RemainingTime
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 2
+      mandatory: false
+      manufacturer: false
+      name: MinLevel
+      server: true
+      type: uint8
+      writable: false
+    - default: 254
+      id: 3
+      mandatory: false
+      manufacturer: false
+      name: MaxLevel
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 16
+      mandatory: false
+      manufacturer: false
+      name: OnOffTransitionTime
+      server: true
+      type: uint16
+      writable: true
+    - default: 254
+      id: 17
+      mandatory: false
+      manufacturer: false
+      name: OnLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 15
+      mandatory: false
+      manufacturer: false
+      name: Options
+      server: true
+      type: map8
+      writable: true
+    - default: 254
+      id: 16384
+      mandatory: false
+      manufacturer: false
+      name: StartUpCurrentLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Move to Level
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: Move
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Step
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Stop
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Move to Level (with On/Off)
+        id: 4
+        mandatory: true
+        manufacturer: false
+      - description: Move (with On/Off)
+        id: 5
+        mandatory: true
+        manufacturer: false
+      - description: Step (with On/Off)
+        id: 6
+        mandatory: true
+        manufacturer: false
+      - description: Stop (with On/Off)
+        id: 7
+        mandatory: true
+        manufacturer: false
+      S->C: []
+    id: 8
+    manufacturer: false
+    name: Level Control
+  - attributes:
+    - default: 255
+      id: 284
+      mandatory: false
+      manufacturer: false
+      name: LastMessageLQI
+      server: true
+      type: uint8
+      writable: false
+    - default: 235
+      id: 285
+      mandatory: false
+      manufacturer: false
+      name: LastMessageRSSI
+      server: true
+      type: uint8
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S: []
+      S->C: []
+    id: 2821
+    manufacturer: false
+    name: Diagnostics
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: IndicatorLuminanceLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 1
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: IndicatorColor
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 2
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: Indicator Mode
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 65533
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: true
+    - default: 0
+      id: 65533
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: true
+    commands:
+      C->S: []
+      S->C: []
+    id: 64516
+    manufacturer: true
+    manufacturer_code: 4190
+    name: Visa Configuration
+- client_clusters:
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: UpgradeServerID
+      server: false
+      type: EUI64
+      writable: false
+    - default: 4294967295
+      id: 1
+      mandatory: false
+      manufacturer: false
+      name: FileOffset
+      server: false
+      type: uint32
+      writable: false
+    - default: 16778068
+      id: 2
+      mandatory: false
+      manufacturer: false
+      name: CurrentFileVersion
+      server: false
+      type: uint32
+      writable: false
+    - default: 65535
+      id: 3
+      mandatory: false
+      manufacturer: false
+      name: CurrentZigBeeStackVersion
+      server: false
+      type: uint16
+      writable: false
+    - default: 4294967295
+      id: 4
+      mandatory: false
+      manufacturer: false
+      name: DownloadedFileVersion
+      server: false
+      type: uint32
+      writable: false
+    - default: 65535
+      id: 5
+      mandatory: false
+      manufacturer: false
+      name: DownloadedZigBeeStackVersion
+      server: false
+      type: uint16
+      writable: false
+    - default: 0
+      id: 6
+      mandatory: true
+      manufacturer: false
+      name: ImageUpgradeStatus
+      server: false
+      type: enum8
+      values:
+      - description: Normal
+        value: 0
+      - description: Download in progress
+        value: 1
+      - description: Download complete
+        value: 2
+      - description: Waiting to upgrade
+        value: 3
+      - description: Count down
+        value: 4
+      - description: Wait for more
+        value: 5
+      - description: Waiting to Upgrade via External Event
+        value: 6
+      writable: false
+    - default: 4190
+      id: 7
+      mandatory: false
+      manufacturer: false
+      name: ManufacturerID
+      server: false
+      type: uint16
+      writable: false
+    - default: 65535
+      id: 8
+      mandatory: false
+      manufacturer: false
+      name: ImageTypeID
+      server: false
+      type: uint16
+      writable: false
+    - default: 0
+      id: 9
+      mandatory: false
+      manufacturer: false
+      name: MinimumBlockPeriod
+      server: false
+      type: uint16
+      writable: false
+    - default: 0
+      id: 10
+      mandatory: false
+      manufacturer: false
+      name: ImageStamp
+      server: false
+      type: uint32
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Query Next Image Request
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Image Block Request
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Upgrade End Request
+        id: 6
+        mandatory: true
+        manufacturer: false
+      S->C:
+      - description: Image Notify
+        id: 0
+        mandatory: false
+        manufacturer: false
+      - description: Query Next Image Response
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Image Block Response
+        id: 5
+        mandatory: true
+        manufacturer: false
+      - description: Upgrade End Response
+        id: 7
+        mandatory: true
+        manufacturer: false
+      - description: Query Device Specific File Response
+        id: 9
+        mandatory: false
+        manufacturer: false
+    id: 25
+    manufacturer: false
+    name: Over-The-Air Upgrade
+  device_id: 257
+  device_version: 1
+  id: 11
+  profile_id: 260
+  server_clusters:
+  - attributes:
+    - default: 2
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: ZCLVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 1
+      mandatory: false
+      manufacturer: false
+      name: ApplicationVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: 2
+      id: 2
+      mandatory: false
+      manufacturer: false
+      name: StackVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: 1
+      id: 3
+      mandatory: false
+      manufacturer: false
+      name: HWVersion
+      server: true
+      type: uint8
+      writable: false
+    - default: Schneider Electric
+      id: 4
+      length: 32
+      mandatory: false
+      manufacturer: false
+      name: ManufacturerName
+      server: true
+      type: string
+      writable: false
+    - default: E8332DST350ZB
+      id: 5
+      length: 32
+      mandatory: false
+      manufacturer: false
+      name: ModelIdentifier
+      server: true
+      type: string
+      writable: false
+    - default: ''
+      id: 6
+      length: 16
+      mandatory: false
+      manufacturer: false
+      name: DataCode
+      server: true
+      type: string
+      writable: false
+    - default: 1
+      id: 7
+      mandatory: true
+      manufacturer: false
+      name: PowerSource
+      server: true
+      type: enum8
+      values:
+      - description: Unknown
+        value: 0
+      - description: Mains(single phase)
+        value: 1
+      - description: Mains(3 phase)
+        value: 2
+      - description: Battery
+        value: 3
+      - description: DC source
+        value: 4
+      - description: Emergency mains constantly powered
+        value: 5
+      - description: Emergency mains and transfer switch
+        value: 6
+      - description: Unknown
+        value: 128
+      - description: Mains(single phase)
+        value: 129
+      - description: Mains(3 phase)
+        value: 130
+      - description: Battery
+        value: 131
+      - description: DC source
+        value: 132
+      - description: Emergency mains constantly powered
+        value: 133
+      - description: Emergency mains and transfer switch
+        value: 134
+      writable: false
+    - default: ''
+      id: 10
+      length: 16
+      mandatory: false
+      manufacturer: false
+      name: ProductCode
+      server: true
+      type: octstr
+      writable: false
+    - default: ''
+      id: 16384
+      length: 16
+      mandatory: false
+      manufacturer: false
+      name: SWBuildID
+      server: true
+      type: string
+      writable: false
+    - default: 1.1.1
+      id: 57345
+      length: 20
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: SoftwareVersionString
+      server: true
+      type: string
+      writable: false
+    - default: 1.1.1
+      id: 57346
+      length: 20
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: HardwareVersionString
+      server: true
+      type: string
+      writable: false
+    - default: ''
+      id: 57348
+      length: 32
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: SerialNumber
+      server: true
+      type: string
+      writable: false
+    - default: 0
+      id: 57351
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductIdentifier
+      server: true
+      type: enum16
+      writable: false
+    - default: ''
+      id: 57352
+      length: 16
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductRange
+      server: true
+      type: string
+      writable: false
+    - default: ''
+      id: 57353
+      length: 16
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductModel
+      server: true
+      type: string
+      writable: false
+    - default: Wiser Home
+      id: 57354
+      length: 16
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ProductFamily
+      server: true
+      type: string
+      writable: false
+    - default: http://www.schneider-electric.com
+      id: 57355
+      length: 64
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: VendorURL
+      server: true
+      type: string
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Reset to Factory Defaults
+        id: 0
+        manatory: false
+        manufacturer: false
+      S->C: []
+    id: 0
+    manufacturer: false
+    name: Basic
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: IdentifyTime
+      server: true
+      type: uint16
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: true
+    commands:
+      C->S:
+      - description: Identify
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: Identify Query
+        id: 1
+        mandatory: true
+        manufacturer: false
+      S->C:
+      - description: Identify Query Response
+        id: 0
+        mandatory: true
+        manufacturer: false
+    id: 3
+    manufacturer: false
+    name: Identify
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: NameSupport
+      server: true
+      type: map8
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Add group
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: View group
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Get group membership
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Remove group
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Remove all groups
+        id: 4
+        mandatory: true
+        manufacturer: false
+      - description: Add group if identifying
+        id: 5
+        mandatory: true
+        manufacturer: false
+      S->C:
+      - description: Add group response
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: View group response
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Get group membership response
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Remove group response
+        id: 3
+        mandatory: true
+        manufacturer: false
+    id: 4
+    manufacturer: false
+    name: Groups
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: SceneCount
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 1
+      mandatory: true
+      manufacturer: false
+      name: CurrentScene
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 2
+      mandatory: true
+      manufacturer: false
+      name: CurrentGroup
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 3
+      mandatory: true
+      manufacturer: false
+      name: SceneValid
+      server: true
+      type: bool
+      writable: false
+    - default: 0
+      id: 4
+      mandatory: true
+      manufacturer: false
+      name: NameSupport
+      server: true
+      type: map8
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Add Scene
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: View Scene
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Remove Scene
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Remove All Scenes
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Store Scene
+        id: 4
+        mandatory: true
+        manufacturer: false
+      - description: Recall Scene
+        id: 5
+        mandatory: true
+        manufacturer: false
+      - description: Get Scene Membership
+        id: 6
+        mandatory: true
+        manufacturer: false
+      S->C: []
+    id: 5
+    manufacturer: false
+    name: Scenes
+  - attributes:
+    - default: 1
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: OnOff
+      server: true
+      type: bool
+      writable: false
+    - default: 1
+      id: 16384
+      mandatory: false
+      manufacturer: false
+      name: GlobalSceneControl
+      server: true
+      type: bool
+      writable: false
+    - default: 0
+      id: 16385
+      mandatory: false
+      manufacturer: false
+      name: OnTime
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 16386
+      mandatory: true
+      manufacturer: false
+      name: OffWaitTime
+      server: true
+      type: uint16
+      writable: false
+    - default: 0
+      id: 16387
+      mandatory: false
+      manufacturer: false
+      name: StartUpOnOff
+      server: true
+      type: enum8
+      values:
+      - description: Set the OnOff attribute to 0
+        value: 0
+      - description: Set the OnOff attribute to 1
+        value: 1
+      - description: Set the OnOff attribute reverse
+        value: 2
+      - description: Reserved
+        value: 3
+      - description: Set the OnOff attribute to its pervious value
+        value: 255
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: 'Off'
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: 'On'
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Toggle
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Off with effect
+        id: 64
+        mandatory: false
+        manufacturer: false
+      - description: On with recall global scene
+        id: 65
+        mandatory: false
+        manufacturer: false
+      - description: On with timed off
+        id: 66
+        mandatory: false
+        manufacturer: false
+      S->C: []
+    id: 6
+    manufacturer: false
+    name: On/Off
+  - attributes:
+    - default: 254
+      id: 0
+      mandatory: true
+      manufacturer: false
+      name: CurrentLevel
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 1
+      mandatory: false
+      manufacturer: false
+      name: RemainingTime
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 2
+      mandatory: false
+      manufacturer: false
+      name: MinLevel
+      server: true
+      type: uint8
+      writable: false
+    - default: 254
+      id: 3
+      mandatory: false
+      manufacturer: false
+      name: MaxLevel
+      server: true
+      type: uint8
+      writable: false
+    - default: 0
+      id: 16
+      mandatory: false
+      manufacturer: false
+      name: OnOffTransitionTime
+      server: true
+      type: uint16
+      writable: true
+    - default: 254
+      id: 17
+      mandatory: false
+      manufacturer: false
+      name: OnLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 15
+      mandatory: false
+      manufacturer: false
+      name: Options
+      server: true
+      type: map8
+      writable: true
+    - default: 254
+      id: 16384
+      mandatory: false
+      manufacturer: false
+      name: StartUpCurrentLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S:
+      - description: Move to Level
+        id: 0
+        mandatory: true
+        manufacturer: false
+      - description: Move
+        id: 1
+        mandatory: true
+        manufacturer: false
+      - description: Step
+        id: 2
+        mandatory: true
+        manufacturer: false
+      - description: Stop
+        id: 3
+        mandatory: true
+        manufacturer: false
+      - description: Move to Level (with On/Off)
+        id: 4
+        mandatory: true
+        manufacturer: false
+      - description: Move (with On/Off)
+        id: 5
+        mandatory: true
+        manufacturer: false
+      - description: Step (with On/Off)
+        id: 6
+        mandatory: true
+        manufacturer: false
+      - description: Stop (with On/Off)
+        id: 7
+        mandatory: true
+        manufacturer: false
+      S->C: []
+    id: 8
+    manufacturer: false
+    name: Level Control
+  - attributes:
+    - default: 255
+      id: 284
+      mandatory: false
+      manufacturer: false
+      name: LastMessageLQI
+      server: true
+      type: uint8
+      writable: false
+    - default: 235
+      id: 285
+      mandatory: false
+      manufacturer: false
+      name: LastMessageRSSI
+      server: true
+      type: uint8
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S: []
+      S->C: []
+    id: 2821
+    manufacturer: false
+    name: Diagnostics
+  - attributes:
+    - default: 0
+      id: 0
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: IndicatorLuminanceLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 1
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: IndicatorColor
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 2
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: Indicator Mode
+      server: true
+      type: uint8
+      writable: true
+    - default: 0
+      id: 65533
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: true
+    - default: 0
+      id: 65533
+      mandatory: false
+      manufacturer: true
+      manufacturer_code: 4190
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: true
+    commands:
+      C->S: []
+      S->C: []
+    id: 64516
+    manufacturer: true
+    manufacturer_code: 4190
+    name: Visa Configuration
+node:
+  device_type: router
+  manufacturer_code: 4190
+  radio_power: 10

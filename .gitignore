@@ -1,7 +1,6 @@
 /build
 /database
-/files
-/firmwares
 /logs
 /venv
 /dist
+/records

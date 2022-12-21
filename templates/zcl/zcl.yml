@@ -2490,7 +2490,7 @@ clusters:
     attributes:
      - id: 0
        name: MeasuredValue
-       type: uint16
+       type: int16
        
        writable: false
        default: 0
@@ -2500,7 +2500,7 @@ clusters:
        server: true
      - id: 0x0001
        name: MinMeasuredValue
-       type: uint16
+       type: int16
        
        writable: false
        default: 1
@@ -2510,7 +2510,7 @@ clusters:
        server: true
      - id: 0x0002
        name: MaxMeasuredValue
-       type: uint16
+       type: int16
        
        writable: false
        default: 2

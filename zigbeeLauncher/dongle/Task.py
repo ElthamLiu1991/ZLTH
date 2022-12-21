@@ -15,7 +15,7 @@ class Tasks(threading.Thread):
         threading.Thread.__init__(self)
         if not self._flag:
             self._flag = True
-            print("task loopp init")
+            print("task loop init")
             self.loop = asyncio.new_event_loop()  # 获取一个事件循环
             self.start()
 

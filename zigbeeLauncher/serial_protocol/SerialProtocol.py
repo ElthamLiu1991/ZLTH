@@ -167,6 +167,9 @@ class ZLTH_Serial:
         try:
             # get serial schema
             self.schema, self.callback = response.get_schema(self.command)
+            if not self.schema:
+                logger.warning(f"not serial schema for this command:{self.command}")
+                return
             self.protocol = self.Sub_object()
             self._response_mapping(self.protocol, self.schema)
             logger.info('call %s, sequence:%d', self.command, self.sequence)

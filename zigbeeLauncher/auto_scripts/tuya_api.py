@@ -1,209 +1,281 @@
-import json
-import logging
+import asyncio
+from dataclasses import dataclass, asdict
+from functools import wraps
+from typing import Optional, Any
 
-import pytest
-import requests
 import time
 import hmac
 from hashlib import sha256
 
-global token
-global refresh_token
-global gateway_vid
-url = " https://openapi.tuyacn.com"
-client_id = "fytdc8v4txurm79sskp3"
-secret = "dwny8qy3s7epqqawcjqngqpe75mmmcsq"
-schema = "sewiserdemo"
-sign_method = "HMAC-SHA256"
-uid = "ay1600225458332csTDL"
-headers = {}
+from dacite import from_dict
+
+from zigbeeLauncher.auto_scripts.script import Http, wait_and_retry
+from zigbeeLauncher.dongle import Tasks
+from zigbeeLauncher.logging import autoLogger as logger
 
 
-def _calculate_sign():
-    timestamp = int(time.time() * 1000)
-    plaintext = client_id + str(timestamp)
-    global headers
-    sign = hmac.new(secret.encode('utf-8'), plaintext.encode('utf-8'), digestmod=sha256).digest().hex().upper()
-    headers = {
-        "client_id": client_id,
-        "sign": sign,
-        "t": str(timestamp),
-        "sign_method": sign_method
-    }
+@dataclass
+class Response:
+    success: bool
+    t: int
+    tid: str
+    result: Optional[Any]
+    code: Optional[int]
+    msg: Optional[str]
 
 
-def _calculate_sign_with_token():
-    timestamp = int(time.time() * 1000)
-    plaintext = client_id + token + str(timestamp)
-    global headers
-    sign = hmac.new(secret.encode('utf-8'), plaintext.encode('utf-8'), digestmod=sha256).digest().hex().upper()
-    headers = {
-        "client_id": client_id,
-        "sign": sign,
-        "t": str(timestamp),
-        "sign_method": sign_method,
-        "access_token": token
-    }
+@dataclass
+class Token:
+    access_token: str
+    expire_time: int
+    refresh_token: str
+    uid: str
 
 
-def _send_request(path, params=None, body=None, method='get'):
-    try:
-        if method == "get":
-            r = requests.get(url + path, params=params, headers=headers, timeout=10)
-        elif method == "post":
-            r = requests.post(url + path, params=params, headers=headers, data=body, timeout=10)
-        elif method == "put":
-            r = requests.put(url + path, params=params, headers=headers, data=body, timeout=10)
-        elif method == "delete":
-            r = requests.delete(url + path, params=params, headers=headers, data=body, timeout=10)
-        if r.status_code == 200:
-            response = r.json()
-            if response['success']:
-                return response['result']
+@dataclass
+class TokenResponse:
+    success: bool
+    t: int
+    tid: str
+    result: Token
+
+
+@dataclass
+class Status:
+    code: str
+    value: str
+
+
+@dataclass
+class Device:
+    active_time: int
+    biz_type: int
+    category: str
+    create_time: int
+    icon: str
+    id: str
+    ip: str
+    lat: str
+    local_key: str
+    lon: str
+    model: str
+    name: str
+    online: bool
+    owner_id: str
+    product_id: str
+    product_name: str
+    status: list[Status]
+    sub: bool
+    time_zone: str
+    uid: str
+    update_time: int
+    uuid: str
+
+
+@dataclass
+class DeviceResponse:
+    success: bool
+    t: int
+    tid: str
+    result: Device
+
+
+@dataclass
+class SubDevice:
+    active_time: int
+    category: str
+    icon: str
+    id: str
+    name: str
+    node_id: str
+    online: bool
+    owner_id: str
+    product_id: str
+    update_time: int
+
+
+@dataclass
+class SubDeviceResponse:
+    success: bool
+    t: int
+    tid: str
+    result: list[SubDevice]
+
+
+class TUYAAPI(Http):
+    client_id = "fytdc8v4txurm79sskp3"
+    # client_id = "fytdc8v4txurm79sskp2"
+    secret = "dwny8qy3s7epqqawcjqngqpe75mmmcsq"
+    schema = "sewiserdemo"
+    sign_method = "HMAC-SHA256"
+    uid = "ay1600225458332csTDL"
+
+    def __init__(self, vid):
+        Http.__init__(self,
+                      url="https://openapi.tuyacn.com")
+        self.gateway = vid
+        self.sign = None
+        self.timestamp = None
+        self.token = None
+        self.token = self._get_token()
+
+    def _calculate_sign(self):
+        self.timestamp = str(int(time.time() * 1000))
+        plaintext = self.client_id + self.timestamp
+        self.sign = hmac.new(self.secret.encode('utf-8'), plaintext.encode('utf-8'),
+                             digestmod=sha256).digest().hex().upper()
+        self.headers = {
+            'client_id': self.client_id,
+            'sign': self.sign,
+            't': self.timestamp,
+            'sign_method': self.sign_method
+        }
+
+    def _calculate_sign_with_token(self):
+        self.timestamp = str(int(time.time() * 1000))
+        plaintext = self.client_id + self.token.access_token + self.timestamp
+        self.sign = hmac.new(self.secret.encode('utf-8'), plaintext.encode('utf-8'),
+                             digestmod=sha256).digest().hex().upper()
+        self.headers = {
+            'client_id': self.client_id,
+            'sign': self.sign,
+            't': self.timestamp,
+            'sign_method': self.sign_method
+        }
+        if self.token:
+            self.headers.update({'access_token': self.token.access_token})
+
+    @staticmethod
+    def _decode(data):
+
+        def send(func, *args, **kwargs):
+            func(*args, **kwargs)
+            obj = args[0]
+            task = Tasks()
+            try:
+                task.add(obj.send()).result()
+            except Exception as e:
+                logger.error("TUYA request error: {}".format(repr(e)))
+                return None
+            logger.debug("TUYA response:", obj.response)
+            if obj.response.get('success'):
+                return from_dict(data_class=data, data=obj.response).result
             else:
-                logging.warning("request failed:{}".format(response))
-                if response['msg'] == 'token invalid':
-                    # refresh token
-                    if not _get_refresh_token():
-                        logging.error("failed to refresh TUYA token")
-                    else:
-                        # resend command
-                        _calculate_sign_with_token()
-                        _send_request(path, params, body, method)
-        else:
-            print(r.status_code)
-            return None
-    except requests.exceptions.ConnectTimeout as e:
-        print("timeout:", e)
-        return None
-
-
-def _get_token():
-    _calculate_sign()
-    params = {
-        "grant_type": 1
-    }
-    result = _send_request('/v1.0/token', params=params)
-    if result:
-        global token
-        global refresh_token
-        token = result['access_token']
-        refresh_token = result['refresh_token']
-        print("token:", result['access_token'])
-        print("refresh_token:", result['refresh_token'])
-        return True
-    else:
-        print("get token failed")
-        return False
-
-
-def _get_refresh_token():
-    _calculate_sign()
-    global token
-    global refresh_token
-    result = _send_request('/v1.0/token/' + refresh_token)
-    if result:
-        token = result['access_token']
-        refresh_token = result['refresh_token']
-        print("token:", result['access_token'])
-        print("refresh_token:", result['refresh_token'])
-        return True
-    else:
-        print("get token failed")
-        return False
-
-
-def set_gateway_vid(vid):
-    global gateway_vid
-    gateway_vid = vid
-    return _get_token()
-
-
-def get_gateway_online_state():
-    _calculate_sign_with_token()
-    result = _send_request('/v1.0/devices/' + gateway_vid)
-    if result:
-        if result['online']:
-            return True
-        else:
-            return False
-    else:
-        print('get gateway online state failed')
-        return False
-
-
-def get_gateway_permit_join_state():
-    _calculate_sign_with_token()
-    result = _send_request('/v1.0/devices/' + gateway_vid)
-    if result:
-        for status in result['status']:
-            if status['code'] == 'permit_join':
-                if status['value'] == 'true':
-                    return True
+                if obj.response.get('msg') == 'token invalid':
+                    logger.info('refresh token')
+                    obj.token = obj.refresh_token().result
+                    return send(func, *args, **kwargs)
                 else:
-                    return False
-    else:
-        print('get gateway permit join state failed')
-        return False
+                    logger.error('other error')
+                    return None
 
+        def function(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                return send(func, *args, **kwargs)
+            return wrapper
+        return function
 
-def get_device_state(device):
-    _calculate_sign_with_token()
-    return _send_request('/v1.0/devices/' + device)
+    @_decode(TokenResponse)
+    def _get_token(self):
+        print("get token")
+        if not self.token:
+            self.method = 'GET'
+            self.path = '/v1.0/token'
+            self.params = {"grant_type": 1}
+            self._calculate_sign()
 
+    @_decode(TokenResponse)
+    def refresh_token(self):
+        self.method = "GET"
+        self.path = '/v1.0/token/' + self.token.refresh_token
+        self.params = None
+        self._calculate_sign()
 
-def get_sub_devices():
-    _calculate_sign_with_token()
-    return _send_request('/v1.0/devices/' + gateway_vid + '/sub-devices')
+    @_decode(DeviceResponse)
+    def get_device_info(self, vid):
+        self.method = "GET"
+        self.path = '/v1.0/devices/{}'.format(vid)
+        self.params = None
+        self._calculate_sign_with_token()
 
-
-def delete_device(device):
-    _calculate_sign_with_token()
-    return _send_request('/v1.0/devices/' + device, method='delete')
-
-
-def permit_join(duration=0):
-    _calculate_sign_with_token()
-    params = {
-        "duration": duration
-    }
-    result = _send_request('/v1.0/devices/' + gateway_vid + '/enabled-sub-discovery',
-                           params=params,
-                           method='put')
-    if result:
-        return True
-    else:
-        print('permit join failed')
-        return False
-
-
-def device_command(device, code, value):
-    _calculate_sign_with_token()
-    body = {
-        "commands": [
-            {
-                "code": code,
-                "value": value
-            }
-        ]
-    }
-    result = _send_request('/v1.0/devices/' + device + '/commands',
-                           body=json.dumps(body),
-                           method='post')
-    if result:
-        return True
-    else:
-        print('send device command failed')
-        return False
-
-
-def get_status_value(device, code):
-    device = get_device_state(device)
-    if not device:
+    def is_online(self, vid=None):
+        info = self.get_device_info(vid if vid else self.gateway)
+        if info:
+            return info.online
         return None
-    else:
-        for state in device['status']:
-            if state['code'] == code:
-                return state['value']
-        print("failed to found {}".format(code))
+
+    @wait_and_retry()
+    def is_permit(self, permit):
+        info = self.get_device_info(self.gateway)
+        if info:
+            for item in info.status:
+                if item.code == 'permit_join':
+                    if item.value == "true" and permit:
+                        return True
+                    elif item.value == 'false' and not permit:
+                        return True
+                    else:
+                        return False
+        return False
+
+    def get_channel(self):
+        info = self.get_device_info(self.gateway)
+        if info:
+            for item in info.status:
+                if item.code == 'zigbee_channel':
+                    return int(item.value)
+        return None
+
+    @_decode(SubDeviceResponse)
+    def get_sub_devices(self):
+        self.method = "GET"
+        self.path = '/v1.0/devices/{}/sub-devices'.format(self.gateway)
+        self.params = None
+        self._calculate_sign_with_token()
+
+    def is_register(self, mac):
+        devices = self.get_sub_devices()
+        if devices:
+            for device in devices:
+                if device.node_id == mac:
+                    return True
+            return False
+
+    @_decode(Response)
+    def delete_device(self, vid):
+        self.method = "DELETE"
+        self.path = '/v1.0/devices/{}'.format(vid)
+        self.params = None
+        self.body = None
+        self._calculate_sign_with_token()
+
+    @_decode(Response)
+    def permit_join(self, duration):
+        self.method = 'PUT'
+        self.path = '/v1.0/devices/{}/enabled-sub-discovery'.format(self.gateway)
+        self.params = {
+            'duration': duration
+        }
+        self.body = None
+        self._calculate_sign_with_token()
+
+    @_decode(Response)
+    def request(self, vid, status):
+        self.method = 'POST'
+        self.path = '/v1.0/devices/{}/commands'.format(vid)
+        self.params = None
+        self.body = {
+            "commands": [
+                asdict(status)
+            ]
+        }
+        self._calculate_sign_with_token()
+
+    def get_value(self, vid, code):
+        info = self.get_device_info(vid)
+        if info:
+            for item in info.status:
+                if item.code == code:
+                    return item.value
         return None

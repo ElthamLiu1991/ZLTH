@@ -2,8 +2,6 @@ import asyncio
 import threading
 import time
 
-import config
-
 from zigbeeLauncher.serial_protocol.SerialProtocolF0 import *
 from zigbeeLauncher.serial_protocol.SerialProtocol02 import *
 from zigbeeLauncher.logging import dongleLogger as logger

@@ -12,7 +12,7 @@ from zigbeeLauncher.util import pack_payload, get_ip_address
 from zigbeeLauncher.logging import mqttLogger as logger
 
 
-class WiserMQTT(threading.Thread):
+class ZLTHMQTT(threading.Thread):
     def __init__(self, broker, port, role=None, connected_cb=None):
         threading.Thread.__init__(self)
         self.broker = broker

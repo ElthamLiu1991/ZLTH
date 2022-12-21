@@ -9,7 +9,7 @@ from zigbeeLauncher.dongle import init
 from zigbeeLauncher.dongle.Dongle import dongles
 from zigbeeLauncher.mqtt.Service import ServicesListener
 from zigbeeLauncher.mqtt.Callbacks import simulator_update_callback, simulator_info_callback
-from zigbeeLauncher.mqtt.Connection import WiserMQTT
+from zigbeeLauncher.mqtt.Connection import ZLTHMQTT
 from zigbeeLauncher.util import get_ip_address, get_mac_address
 from zigbeeLauncher.logging import mqttLogger as logger
 
@@ -70,7 +70,7 @@ class Simulator(threading.Thread):
 
     def register(self):
         logger.info("Run MQTT client: simulator")
-        thread = WiserMQTT('127.0.0.1', 1883, 'simulator', self.on_connected)
+        thread = ZLTHMQTT('127.0.0.1', 1883, 'simulator', self.on_connected)
         thread.start()
         self.service_browser = ServiceBrowser(Zeroconf(), "_launcher._tcp.local.", ServicesListener())
         self.info = ServiceInfo(

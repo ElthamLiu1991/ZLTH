@@ -1,6 +1,6 @@
 import time
 
-from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee
+from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee, DBAuto
 from zigbeeLauncher.util import Router, get_ip_address, get_mac_address, get_version
 mqtt_version = 'v1.0'
 router = Router()
@@ -17,6 +17,7 @@ def init():
     DBSimulator().delete()
     DBDevice().delete()
     DBZigbee().delete()
+    # DBAuto().delete()
     # get current version
     import zigbeeLauncher.mqtt.Simulator_API
     import zigbeeLauncher.mqtt.Launcher_API

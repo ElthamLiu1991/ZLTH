@@ -15,7 +15,9 @@
             // The callback function is invoked when a connection with the
             // server is established.
             socket.on('connect', function() {
-                socket.emit('my_event', {data: 'I\'m connected!'});
+                var room = $('#current_script').html();
+                console.log("room:", room);
+                socket.emit('join', {record: $('#current_script').html()});
             });
 
             // Event handler for server sent data.
@@ -39,13 +41,27 @@
                 if (cb)
                     cb();
             });
+            socket.on('my_record', function(msg, cb) {
+                data=msg.data.split('\n')
+                console.log(data)
+                for(const line in data){
+                    console.log(data[line])
+                    $('#log').append('<br>' + $('<div/>').text(data[line]).html());
+                }
+                document.getElementById('update_button').disabled=true;
+                document.getElementById('start_button').disabled=true;
+                document.getElementById('stop_button').disabled=true;
+                if (cb)
+                    cb();
+            });
             socket.on('my_config', function(msg, cb) {
                 $('#config_data').text(msg.data);
                 if (cb)
                     cb();
             });
             socket.on('finish', function(msg, cb) {
-                document.getElementById('start_button').disabled=false;
+                document.getElementById('update_button').disabled=true;
+                document.getElementById('start_button').disabled=true;
                 document.getElementById('stop_button').disabled=true;
                 if (cb)
                     cb();
@@ -55,18 +71,18 @@
             // These accept data from the user and send it to the server in a
             // variety of ways
             $('form#config').submit(function(event) {
-                socket.emit('update_request', {data: $('#config_data').val()});
+                socket.emit('update_request', {record: $('#current_script').html(), data: $('#config_data').val()});
                 return false;
             });
             $('form#start').submit(function(event) {
                 document.getElementById('log').innerHTML="";
                 document.getElementById('start_button').disabled=true;
                 document.getElementById('stop_button').disabled=false;
-                socket.emit('start_request');
+                socket.emit('start_request', {record: $('#current_script').html()});
                 return false;
             });
             $('form#stop').submit(function(event) {
-                socket.emit('stop_request');
+                socket.emit('stop_request', {record: $('#current_script').html()});
                 return false;
             });
         });
@@ -75,13 +91,14 @@
 <body>
     <h1>ZLTH Auto Testing</h1>
     <p>
-      Current Script: <b><span id="current_script"></span></b><br>
-      Current Status: <b><span id="status"></span></b><br>
+<!--      Current Script: <b><span id="current_script"></span></b><br>-->
+      Current Script: <b><span id="current_script">{[current_script]}</span></b><br>
+        Current Status: <b><span id="status"></span></b><br>
     </p>
     <h2>Config:</h2>
     <textarea style="height:200px;width: 900px;padding:0px;" name="config_data" id="config_data" placeholder=""></textarea>
     <form id="config" method="POST" action='#'>
-        <input style="width: 100px;padding:0px;" type="submit" value="Update">
+        <input style="width: 100px;padding:0px;" type="submit" value="Update", id="update_button">
     </form>
     <form id="start" method="POST" action="#">
         <input style="width: 100px;padding:0px;" type="submit" value="Start" id="start_button">

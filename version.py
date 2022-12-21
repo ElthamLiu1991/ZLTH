@@ -2,7 +2,7 @@ import os
 import time
 
 main_version = '1'
-major_version = '3'
+major_version = '4'
 minor_version = '0'
 
 

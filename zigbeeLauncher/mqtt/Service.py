@@ -1,6 +1,6 @@
 from typing import cast
 from zigbeeLauncher.logging import mqttLogger as logger
-from zigbeeLauncher.mqtt.Connection import WiserMQTT
+from zigbeeLauncher.mqtt.Connection import ZLTHMQTT
 from zigbeeLauncher.util import get_ip_address
 
 
@@ -16,7 +16,7 @@ class ServicesListener:
             if addr == ip:
                 continue
             logger.info("Run MQTT client: edge")
-            thread = WiserMQTT(addr, cast(int, info.port), 'edge')
+            thread = ZLTHMQTT(addr, cast(int, info.port), 'edge')
             thread.start()
 
     def update_service(self, zeroconf, type, name):
@@ -24,5 +24,5 @@ class ServicesListener:
         logger.info("Service %s update, service info:%s", name, info)
         for addr in info.parsed_scoped_addresses():
             logger.info("Run MQTT client: edge")
-            thread = WiserMQTT(addr, cast(int, info.port), 'edge')
+            thread = ZLTHMQTT(addr, cast(int, info.port), 'edge')
             thread.start()

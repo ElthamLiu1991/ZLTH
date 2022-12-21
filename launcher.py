@@ -28,5 +28,7 @@ if __name__ == "__main__":
         os.mkdir('./firmwares')
     if not os.path.exists('./version/'):
         os.mkdir('./version')
+    if not os.path.exists('./records/'):
+        os.mkdir('./records')
     socketio, app = create_app()
-    socketio.run(app, host='0.0.0.0', use_reloader=False)
+    socketio.run(app, host='0.0.0.0', use_reloader=False, allow_unsafe_werkzeug=True)

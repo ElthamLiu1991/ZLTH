@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1>ZLTH Auto Testing Records</h1>
+    <p>
+        {% for record, status in records.items() %}
+        <a id={[record]} href="http://localhost:5000/api/2/auto/records/" onclick="open_record(this)">{[record]}</a>
+        <b><span>: {[status]}</span></b><br>
+        {% endfor %}
+    </p>
+    <div id="records_are">
+
+    </div>
+</body>
+<script>
+    function open_record(obj){
+        console.log("obj.id", obj.id);
+        console.log("obj:", obj.innerHTML);
+        obj.href += obj.id;
+        console.log("href:", obj.href);
+    }
+</script>
+</html>

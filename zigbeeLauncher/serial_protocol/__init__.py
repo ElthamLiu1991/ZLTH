@@ -15,9 +15,11 @@ class Response(object):
         return wrapper
 
     def get_schema(self, url):
+        # return self.url_map.get(url)
         schema = self.url_map.get(url)
         if not schema:
-            raise ValueError('No serial schema for this command')
+            return None, None
+            # raise ValueError('No serial schema for this command')
         else:
             return schema
 

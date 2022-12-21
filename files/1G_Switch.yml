@@ -1,0 +1,475 @@
+endpoints:
+  - client_clusters:
+      - id: 25
+        name: Over-The-Air Upgrade
+        manufacturer: false
+        attributes:
+          - id: 0
+            name: UpgradeServerID
+            type: EUI64
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 1
+            name: FileOffset
+            type: uint32
+            writable: false
+            default: 4294967295
+            manufacturer: false
+          - id: 2
+            name: CurrentFileVersion
+            type: uint32
+            writable: false
+            default: 4294967295
+            manufacturer: false
+          - id: 3
+            name: CurrentZigBeeStackVersion
+            type: uint16
+            writable: false
+            default: 65535
+            manufacturer: false
+          - id: 4
+            name: DownloadedFileVersion
+            type: uint32
+            writable: false
+            default: 4294967295
+            manufacturer: false
+          - id: 5
+            name: DownloadedZigBeeStackVersion
+            type: uint16
+            writable: false
+            default: 65535
+            manufacturer: false
+          - id: 6
+            name: ImageUpgradeStatus
+            type: enum8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 7
+            name: ManufacturerID
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 8
+            name: ImageTypeID
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 9
+            name: MinimumBlockPeriod
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 10
+            name: ImageStamp
+            type: uint32
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: false
+            default: 1
+            manufacturer: false
+        commands:
+          C->S:
+            - id: 1
+              description: Query Next Image Request
+              manufacturer: false
+            - id: 3
+              description: Image Block Request
+              manufacturer: false
+            - id: 6
+              description: Upgrade End Request
+              manufacturer: false
+          S->C:
+            - id: 0
+              description: Image Notify
+              manufacturer: false
+            - id: 2
+              description: Query Next Image Response
+              manufacturer: false
+            - id: 5
+              description: Image Block Response
+              manufacturer: false
+            - id: 7
+              description: Upgrade End Response
+              manufacturer: false
+            - id: 9
+              description: Query Device Specific File Response
+              manufacturer: false
+    device_id: 256
+    device_version: 1
+    id: 10
+    profile_id: 260
+    server_clusters:
+      - id: 0
+        name: Basic
+        manufacturer: false
+        attributes:
+          - id: 0
+            name: ZCLVersion
+            type: uint8
+            writable: false
+            default: 2
+            manufacturer: false
+          - id: 1
+            name: ApplicationVersion
+            type: uint8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 2
+            name: StackVersion
+            type: uint8
+            writable: false
+            default: 2
+            manufacturer: false
+          - id: 3
+            name: HWVersion
+            type: uint8
+            writable: false
+            default: 1
+            manufacturer: false
+          - id: 4
+            name: ManufacturerName
+            type: string
+            length: 32
+            writable: false
+            default: Schneider Electric
+            manufacturer: false
+          - id: 5
+            name: ModelIdentifier
+            type: string
+            length: 32
+            writable: false
+            default: E8331SRY800ZB
+            manufacturer: false
+          - id: 6
+            name: DataCode
+            type: string
+            length: 16
+            writable: false
+            default: ''
+            manufacturer: false
+          - id: 7
+            name: PowerSource
+            type: enum8
+            writable: false
+            default: 1
+            manufacturer: false
+          - id: 10
+            name: ProductCode
+            type: octstr
+            length: 16
+            writable: false
+            default: ''
+            manufacturer: false
+          - id: 16384
+            name: SWBuildID
+            type: string
+            length: 16
+            writable: false
+            default: ''
+            manufacturer: false
+          - id: 57345
+            name: SoftwareVersionString
+            type: string
+            length: 20
+            writable: false
+            default: 1.1.1
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57346
+            name: HardwareVersionString
+            type: string
+            length: 20
+            writable: false
+            default: 1.1.1
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57348
+            name: SerialNumber
+            type: string
+            length: 32
+            writable: false
+            default: ''
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57351
+            name: ProductIdentifier
+            type: enum16
+            writable: false
+            default: 0
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57352
+            name: ProductRange
+            type: string
+            length: 16
+            writable: false
+            default: ''
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57353
+            name: ProductModel
+            type: string
+            length: 16
+            writable: false
+            default: ''
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57354
+            name: ProductFamily
+            type: string
+            length: 16
+            writable: false
+            default: Wiser Home
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 57355
+            name: VendorURL
+            type: string
+            length: 64
+            writable: false
+            default: 'http://www.schneider-electric.com'
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+        commands:
+          C->S:
+            - id: 0
+              description: Reset to Factory Defaults
+              manufacturer: false
+          S->C: []
+      - id: 3
+        name: Identify
+        manufacturer: false
+        attributes:
+          - id: 0
+            name: IdentifyTime
+            type: uint16
+            writable: true
+            default: 0
+            manufacturer: false
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: true
+            default: 1
+            manufacturer: false
+        commands:
+          C->S:
+            - id: 0
+              description: Identify
+              manufacturer: false
+            - id: 1
+              description: Identify Query
+              manufacturer: false
+          S->C:
+            - id: 0
+              description: Identify Query Response
+              manufacturer: false
+      - id: 4
+        name: Groups
+        manufacturer: false
+        attributes:
+          - id: 0
+            name: NameSupport
+            type: map8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+        commands:
+          C->S:
+            - id: 0
+              description: Add group
+              manufacturer: false
+            - id: 1
+              description: View group
+              manufacturer: false
+            - id: 2
+              description: Get group membership
+              manufacturer: false
+            - id: 3
+              description: Remove group
+              manufacturer: false
+            - id: 4
+              description: Remove all groups
+              manufacturer: false
+            - id: 5
+              description: Add group if identifying
+              manufacturer: false
+          S->C:
+            - id: 0
+              description: Add group response
+              manufacturer: false
+            - id: 1
+              description: View group response
+              manufacturer: false
+            - id: 2
+              description: Get group membership response
+              manufacturer: false
+            - id: 3
+              description: Remove group response
+              manufacturer: false
+      - id: 5
+        name: Scenes
+        manufacturer: false
+        attributes:
+          - id: 0
+            name: SceneCount
+            type: uint8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 1
+            name: CurrentScene
+            type: uint8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 2
+            name: CurrentGroup
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 3
+            name: SceneValid
+            type: bool
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 4
+            name: NameSupport
+            type: map8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: false
+            default: 0
+            manufacturer: false
+        commands:
+          C->S:
+            - id: 0
+              description: Add Scene
+              manufacturer: false
+            - id: 1
+              description: View Scene
+              manufacturer: false
+            - id: 2
+              description: Remove Scene
+              manufacturer: false
+            - id: 3
+              description: Remove All Scenes
+              manufacturer: false
+            - id: 4
+              description: Store Scene
+              manufacturer: false
+            - id: 5
+              description: Recall Scene
+              manufacturer: false
+            - id: 6
+              description: Get Scene Membership
+              manufacturer: false
+          S->C: []
+      - id: 6
+        name: On/Off
+        manufacturer: false
+        attributes:
+          - id: 0
+            name: OnOff
+            type: bool
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 1001
+            name: test_uint8
+            type: uint8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 2001
+            name: test_int8
+            type: int8
+            writable: false
+            default: 0
+            manufacturer: false
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: false
+            default: 1
+            manufacturer: false
+        commands:
+          C->S:
+            - id: 0
+              description: 'Off'
+              manufacturer: false
+            - id: 1
+              description: 'On'
+              manufacturer: false
+            - id: 2
+              description: Toggle
+              manufacturer: false
+          S->C: []
+      - id: 64516
+        name: Visa Configuration
+        manufacturer: true
+        manufacturer_code: 4190
+        attributes:
+          - id: 0
+            name: IndicatorLuminanceLevel
+            type: uint8
+            writable: true
+            default: 0
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 1
+            name: IndicatorColor
+            type: uint8
+            writable: true
+            default: 0
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 2
+            name: Indicator Mode
+            type: uint8
+            writable: true
+            default: 0
+            manufacturer: true
+            manufacturer_code: 4190
+          - id: 65533
+            name: ClusterRevision
+            type: uint16
+            writable: true
+            default: 1
+            manufacturer: true
+            manufacturer_code: 4190
+        commands:
+          C->S: []
+          S->C: []
+node:
+  device_type: router
+  manufacturer_code: 4190
+  radio_power: 10

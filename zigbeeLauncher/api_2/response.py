@@ -25,6 +25,7 @@ class Response:
         60001: 'device {} is configuring, please try later',
         70000: 'script {} not exist',
         70001: 'script {} is running',
+        70002: '{} not supported',
         90000: "internal error: {}",
         90001: "missing mandatory item {}",
         90002: "unsupported command: {}",

@@ -2,8 +2,7 @@ import rapidjson
 from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
 from . import devices
-from zigbeeLauncher.database.interface import DBDevice, DBZigbee, DBZigbeeEndpoint, DBZigbeeEndpointCluster, \
-    DBZigbeeEndpointClusterAttribute
+from zigbeeLauncher.database.interface import DBDevice, DBZigbee
 from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..response import Response

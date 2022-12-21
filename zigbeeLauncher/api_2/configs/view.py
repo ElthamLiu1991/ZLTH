@@ -8,8 +8,6 @@ from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
 from werkzeug.utils import secure_filename
 
-from zigbeeLauncher.database.interface import DBDevice, DBZigbee, DBZigbeeEndpoint, DBZigbeeEndpointCluster, \
-    DBZigbeeEndpointClusterAttribute
 from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2, simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..json_schemas import config_schema

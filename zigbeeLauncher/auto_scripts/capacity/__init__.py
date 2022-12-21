@@ -5,267 +5,259 @@ import time
 
 from zigbeeLauncher.auto_scripts import PREPARING, ERROR, INFO, WORKING, START, WARNING, DONE, FINISH, SUCCESS, FAILED, \
     auto_record, STOP
-from zigbeeLauncher.auto_scripts.tuya_api import *
-from zigbeeLauncher.auto_scripts.zlth_api import *
+from zigbeeLauncher.auto_scripts.script import Script
+from zigbeeLauncher.auto_scripts.tuya_api import TUYAAPI
+from zigbeeLauncher.auto_scripts.zlth_api import ZLTHAPI
 from zigbeeLauncher.logging import autoLogger as logger
 from zigbeeLauncher import base_dir, socketio
 
-SCRIPT = 'capacity'
 
+class Testing(Script):
 
-class Testing(threading.Thread):
-    _script = 'capacity'
-    _status = SUCCESS
-    _repeat = 1
-    _batch = 1
-    _stop = False
-    _dongles = []
+    def __init__(self, status_callback):
+        super().__init__(script='capacity', path=os.path.join(base_dir, 'scripts/capacity.json'), status_callback=status_callback)
+        self.tuya = None
+        self.zlth = None
+        self.joined = []
+        self.result = []
+        self.pending = []
+        self.dongle_offset = 0
+        self.trigger = 0
+        self.channel = 0
+        self._load_config()
 
-    def name(self):
-        return self._script
+    def _load_config(self):
+        if self.config:
+            self.vid = self.config.get("gateway_vid")
+            self.count = self.config.get('count')
+            if not self.count:
+                self.count = -1
+            self.repeat = self.config.get("repeat")
+            if not self.repeat:
+                self.repeat = 1
+            self.batch = self.config.get('batch')
+            if not self.batch:
+                self.batch = 1
+        else:
+            logger.error("Get config failed, stop")
+            self.log(ERROR, "Cannot get config")
+            self.update(FINISH, STOP)
 
-    def __init__(self, status_callback=None):
-        threading.Thread.__init__(self)
-        with open(os.path.join(base_dir, 'scripts/capacity.json'), encoding='utf-8') as f:
-            self.config = json.loads(f.read())
-        self.status_update = status_callback
+    def _update_result(self, status, descriptor):
+        if self.result:
+            for item in self.result:
+                if item.get('repeat') == self.repeat:
+                    item['record'].append(descriptor)
 
-    def preparing(self):
-        if self.status_update:
-            self.status_update(PREPARING, self._status)
+        self.result.append({
+            'repeat': self.repeat, 'status': status, 'target': self.count, 'devices': self.trigger, 'record': [descriptor]
+        })
+
+    def set_config(self, config):
+        self.config = config
+        self._load_config()
+
+    def start(self):
         try:
-            auto_record(PREPARING, INFO, 'preparing testing environment')
-            if 'gateway_vid' not in self.config:
-                auto_record(PREPARING, ERROR, 'failed to get gateway virtual id')
-                logger.error('Please provide gateway virtual id')
-                raise
-            if not set_gateway_vid(self.config['gateway_vid']):
-                auto_record(PREPARING, ERROR, 'failed to get tuya token')
-                logger.error('Get tuya token failed')
-                raise
-                # check gateway status
-            if not get_gateway_online_state():
-                auto_record(PREPARING, ERROR, 'gateway is offline')
-                logger.error('Gateway is offline')
-                raise
-            if 'repeat' in self.config:
-                self._repeat = self.config['repeat'] + 1
-            if 'batch' in self.config:
-                self._batch = self.config['batch']
-            # get dongles list
-            result, dongles = get_devices()
-            if not result:
-                auto_record(PREPARING, ERROR, 'ZLTH service not response')
-                logger.error("ZLTH not response")
-                raise
-            if not dongles:
-                auto_record(PREPARING, ERROR, 'not available ZLTH dongle')
-                logger.error("Not available ZLTH dongles")
-                raise
-            auto_record(PREPARING, INFO, 'preparing testing environment Done')
-            auto_record(PREPARING, INFO,
-                        '{} testing ready, ZLTH dongles: {}, batch: {}, repeat: {}'.format(
-                            self._script, len(dongles), self._batch, self._repeat - 1))
-
-        except RuntimeError as e:
-            logger.error("preparing failed, finish")
-            self._status = FAILED
-            if self.status_update:
-                self.status_update(PREPARING, self._status)
-            return False
-        return True
+            self.running = True
+            self.tuya = TUYAAPI(self.vid)
+            self.zlth = ZLTHAPI()
+            self.preparing()
+        except Exception as e:
+            logger.exception("ERROR:")
+            self.log(ERROR, repr(e))
+            self.update(FINISH, STOP)
+            self.stop()
 
     def stop(self):
-        self._stop = True
+        self.running = False
 
-    def run(self):
-        if self.status_update:
-            self.status_update(WORKING, self._status)
-        iterate = 0
-        while not self._stop and iterate < self._repeat:
-            auto_record(START, INFO, 'Iterate:{}'.format(iterate))
-            auto_record(WORKING, INFO, "reset devices ...")
-            devices = get_sub_devices()
-            # leave devices from tuya
-            self.leave_device_from_tuya(devices)
-            # leave device from ZLTH
-            self.leave_device_from_zlth()
-            auto_record(WORKING, INFO, "reset devices done")
-            time.sleep(5)
-            result, self._dongles = get_devices()
-            offset = 0
-            retry = 5
-            verify_list = []
-            try:
-                while not self._stop:
-                    if not self.adding(retry):
-                        if retry == 0:
-                            raise
-                        retry -= 1
-                        time.sleep(2)
-                        continue
-                    pending = []
-                    offset = self.joining(pending, offset)
-                    if not pending:
-                        break
-                    verify_list = verify_list + pending
-                    if not self.checking(pending):
-                        self._status = FAILED
-                    self.close()
-                    if self._stop:
-                        break
-                    if offset == len(self._dongles) - 1:
-                        break
-                if self.verify(verify_list):
-                    if self._stop:
-                        break
-                    auto_record(DONE, INFO, "Iterate:{} {}".format(iterate, SUCCESS))
-                else:
-                    self._status = FAILED
-                    auto_record(DONE, INFO, "Iterate:{} {}".format(iterate, FAILED))
-                iterate += 1
-            except RuntimeError as e:
-                self._status = FAILED
-                break
-        if self._stop:
-            self._status = STOP
-            auto_record(FINISH, INFO, STOP)
-        elif self._status == FAILED:
-            auto_record(FINISH, ERROR, FAILED)
+    def preparing(self):
+        """
+        checking available ZLTH dongles
+        get IOT token
+        check hub is online
+        get zigbee network channel
+        :return:
+        :exception:
+            1. not ZLTH dongle available
+            2. get IOT token failed
+            3. hub is offline
+            4. not zigbee network
+        """
+        self.log(INFO, 'preparing testing environment')
+        self.update(PREPARING, SUCCESS)
+        if not self.vid:
+            raise Exception('please provide gateway vid')
+        if not self.zlth.dongles:
+            raise Exception('ZLTH: no available dongles')
+        if not self.tuya.token:
+            raise Exception('HUB: failed to get tuya IOT token')
+        if not self.tuya.is_online():
+            raise Exception('HUB: hub is offline')
+        self.channel = self.tuya.get_channel()
+        if not self.channel:
+            raise Exception('HUB: cannot get zigbee network channel')
+        self.working()
+
+    def working(self):
+        if self.repeat:
+            self.log(INFO, "Repeat:{}".format(self.repeat))
+            self.dongle_offset = 0
+            self.trigger = 0
+            self.pending = []
+            # reset device
+            self.hub_reset()
         else:
-            auto_record(FINISH, INFO, SUCCESS)
-        if self.status_update:
-            self.status_update(FINISH, self._status)
+            self.log(INFO, "Finish")
+            self.log(INFO, repr(self.result))
+            for item in self.result:
+                if item['status'] == FAILED:
+                    self.update(FINISH, FAILED)
+                    return
+            self.update(FINISH, SUCCESS)
+            self.running = False
 
-    def leave_device_from_tuya(self, devices):
-        auto_record(WORKING, INFO, "unregister devices from APP ...")
-        for device in devices:
-            # auto_record(WORKING, INFO, "unregister {} from APP ...".format(device['node_id'].upper()))
-            delete_device(device['id'])
-            # auto_record(WORKING, INFO, "unregister {} from Done".format(device['node_id'].upper()))
-        auto_record(WORKING, INFO, 'unregister devices from APP done')
-
-    def leave_device_from_zlth(self):
-        auto_record(WORKING, INFO, "leaving network from ZLTH ...")
-        result, self._dongles = get_devices()
-        for device in self._dongles:
-            mac = device['mac']
-            if device['state'] != 1:
-                # auto_record(WORKING, INFO, "leaving network {} ...".format(mac))
-                result, data = device_leave(mac)
-                if not result:
-                    auto_record(WORKING, WARNING, "leaving network {} failed".format(mac))
-                    logger.warning("%s leave network failed", mac)
-                # auto_record(WORKING, INFO, "leaving network {} done".format(mac))
-        auto_record(WORKING, INFO, "leaving network from ZLTH done")
-
-    def adding(self, retry):
-        # open permit join
-        auto_record(WORKING, INFO, "open permit join window[{}] ...".format(retry))
-        if not permit_join(180):
-            auto_record(WORKING, WARNING, "open permit join window[{}] failed".format(retry))
-            logger.error("Send permit jon command failed")
-            return False
-        time.sleep(1)
-        if not get_gateway_permit_join_state():
-            auto_record(WORKING, WARNING, "open permit join window[{}] failed".format(retry))
-            logging.error("Open permit join window failed")
-            return False
-        auto_record(WORKING, INFO, "open permit join window[{}] done".format(retry))
-        return True
-
-    def close(self):
-        # open permit join
-        auto_record(WORKING, INFO, "close permit join window ...")
-        if not permit_join(0):
-            auto_record(WORKING, WARNING, "close permit join window failed")
-            logger.error("Send permit jon command failed")
-            return False
-        time.sleep(1)
-        if get_gateway_permit_join_state():
-            auto_record(WORKING, WARNING, "close permit join window failed")
-            logging.error("close permit join window failed")
-            return False
-        auto_record(WORKING, INFO, "close permit join window done")
-        return True
-
-    def joining(self, pending, offset):
-        new_offset = 0
-        batch = self._batch
-        logger.info("Add %s devices at once", self._batch)
-        auto_record(WORKING, INFO, "add {} devices ...".format(self._batch))
-        for index, device in enumerate(self._dongles):
-            if offset != 0 and index <= offset:
-                continue
-            new_offset = index
+    def joining(self):
+        """
+        trigger batch devices joining network
+        :return:
+        :exception
+            1. trigger dongle permit join failed
+            2. open/close permit join window
+        """
+        self.update(WORKING, SUCCESS)
+        batch = self.batch
+        offset = 0
+        for i, dongle in enumerate(self.zlth.dongles):
+            if not self.running:
+                return
             if batch == 0:
                 break
-            mac = device['mac']
-            connected = device['connected']
-            state = device['state']
-            if not connected:
-                auto_record(WORKING, WARNING, "device {} is offline".format(mac))
-                logger.warning("Dongle %s is offline", mac)
+            if self.dongle_offset != 0 and i <= self.dongle_offset:
                 continue
-            if state != 1:
-                auto_record(WORKING, WARNING, "device {} is not ready".format(mac))
-                logger.warning("Dongle %s is not ready for joining:%d", mac, state)
+            offset = i+1
+            if not dongle.connected:
+                self.log(WARNING, "ZLTH: device {} is offline".format(dongle.mac))
                 continue
-            auto_record(WORKING, INFO, "adding {} to network ..".format(mac))
-            result, response = device_join(mac)
-            if not result:
-                auto_record(WORKING, ERROR, "device {} not response".format(mac))
-                logger.error("Trigger dongle %s joining failed", mac)
+            if dongle.state != 1:
+                self.log(WARNING, "ZLTH: device {} is not ready".format(dongle.mac))
                 continue
+            self.log(INFO, "ZLTH: trigger {} join...".format(dongle.mac))
+            if not self.zlth.join(dongle.mac, [self.channel]):
+                raise Exception("ZLTH: failed to trigger device {} join".format(dongle.mac))
             batch -= 1
-            pending.append(mac)
-        auto_record(WORKING, INFO, "add {} devices done".format(self._batch))
-        return new_offset
+            self.pending.append(dongle.mac)
+            self.trigger += 1
+            if self.count != -1 and self.trigger == self.count:
+                self.log(INFO, "{} devices are operated")
+                break
+        if batch == self.batch:
+            self.log(INFO, "ZLTH: all devices added")
+            self.verify()
+            self.repeat -= 1
+            self.working()
+        else:
+            if not self.tuya.permit_join(254):
+                raise Exception("HUB: failed to open permit join")
+            if not self.tuya.is_permit(True):
+                raise Exception("HUB: permit join window not open")
+            self.log(INFO, "ZLTH: trigger {} devices done".format(self.batch))
+            self.dongle_offset = offset
+            if self.checking():
+                # close permit join
+                self.log(INFO, "HUB: close permit join")
+                if not self.tuya.permit_join(0):
+                    raise Exception("HUB: failed to close permit join")
+                if not self.tuya.is_permit(False):
+                    raise Exception("HUB: permit join window not close")
+            self.joining()
 
-    def checking(self, pending):
-        logger.info("Waiting for commissioned")
-        auto_record(WORKING, INFO, "check device registration on tuya ...")
-        while not self._stop and get_gateway_permit_join_state():
-            # get device list from tuya
-            devices = get_sub_devices()
-            for device in devices:
-                mac = device['node_id'].upper()
-                if mac in pending and device['online']:
-                    auto_record(WORKING, INFO, "device {} registered".format(mac))
-                    logger.info("Device %s registered", mac)
-                    # check state in dongle
-                    result, data = get_device(mac)
-                    if not result:
-                        auto_record(WORKING, ERROR, "device {} not exist".format(mac))
-                    elif data['state'] != 6:
-                        auto_record(WORKING, ERROR, "device {} not commissioned".format(mac))
-                        logger.error("Device %s commission failed", mac)
-                    else:
-                        auto_record(WORKING, INFO, "device {} commissioned".format(mac))
-                        pending.remove(mac)
-            if not pending:
-                auto_record(WORKING, INFO, "check device registration on tuya done")
+    def checking(self):
+        """
+        check IOT platform and dongle every 5 seconds,
+        if device registered and joined(state=6),
+        remove this record from pending list, stop loop if
+        pending list is empty or permit join close
+        :return:
+            True: pending list is empty
+            False: permit join timeout
+        """
+        while self.running and self.tuya.is_permit(True):
+            for device in self.pending:
+                # check device register and ZLTH status is joined
+                if self.tuya.is_register(device) and self.zlth.is_joined(device):
+                    self.log(INFO, "{} joined".format(device))
+                    self.joined.append(device)
+                    self.pending.remove(device)
+            if not self.pending:
+                self.log(INFO, "pending devices are joined")
                 return True
             time.sleep(5)
-        if self._stop:
-            return True
-        auto_record(WORKING, ERROR, "permit jon timeout, {} not registered".format(pending))
-        logger.error("Permit join timeout, %s join failed", pending)
+        if self.running:
+            # verify current batch all joined or not in case missing some join notification
+            for device in self.pending:
+                if self.zlth.is_joined(device):
+                    self.pending.remove(device)
+
+            if not self.pending:
+                return True
+            self.log(ERROR, "timeout, devices {} not joined".format(self.pending))
+            self._update_result(FAILED, 'permit join timeout, devices {} not joined'.format(self.pending))
         return False
 
-    def verify(self, devices):
-        ret = True
-        auto_record(WORKING, INFO, "verify all devices state ...")
-        for mac in devices:
-            if self._stop:
-                return True
-            result, data = get_device(mac)
-            if not result:
-                auto_record(WORKING, ERROR, "device {} not exist".format(mac))
-                ret = False
-            elif data['state'] != 6:
-                auto_record(WORKING, ERROR, "device {} not commissioned".format(mac))
-                ret = False
-                logger.error("Device %s commission failed", mac)
-        auto_record(WORKING, INFO, "verify all devices state done")
-        return ret
+    def verify(self):
+        """
+        verify all device are joined
+        :return:
+        """
+        result = True
+        for device in self.joined:
+            dongle = self.zlth.get_device(device)
+            if not dongle:
+                result = False
+                self.log(ERROR, "dongle {} disappear".format(device))
+                self._update_result(FAILED, 'dongle {} disappear'.format(device))
+            elif not dongle.connected:
+                result = False
+                self.log(ERROR, "dongle {} is offline".format(device))
+                self._update_result(FAILED, 'dongle {} is offline'.format(device))
+            elif dongle.state != 6:
+                result = False
+                self.log(ERROR, "device {} is not joined".format(device))
+                self._update_result(FAILED, 'device {} is not joined'.format(device))
+        if result:
+            self._update_result(SUCCESS, 'all device are joined')
+
+    def hub_reset(self):
+        """
+        remove all device from hub
+        :return:
+        """
+        self.log(INFO, "remove all devices from IOT")
+        devices = self.tuya.get_sub_devices()
+        if devices:
+            for device in devices:
+                self.tuya.delete_device(device.id)
+        self.zlth_reset()
+
+    def zlth_reset(self):
+        """
+        reset all dongles
+        :return:
+        """
+        self.zlth.refresh()
+        self.log(INFO, "ZLTH: reset all dongles")
+        self.log(INFO, "ZLTH: get {} dongles".format(len(self.zlth.dongles)))
+        # reset dongle first
+        for dongle in self.zlth.dongles:
+            if dongle.connected and dongle.state != 1:
+                self.zlth.leave(dongle.mac)
+        time.sleep(5)
+        self.log(INFO, "ZLTH: check all dongles are reset")
+        self.zlth.refresh()
+        for dongle in self.zlth.dongles:
+            if dongle.connected and not self.zlth.is_reset(dongle.mac):
+                self.log(WARNING, "ZLTH: device {} is not reset".format(dongle.mac))
+        self.zlth.refresh()
+        self.joining()
