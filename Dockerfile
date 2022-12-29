@@ -7,7 +7,7 @@ ADD launcher.py .
 ADD logConfig.json .
 ADD version/ ./version
 ADD templates/ ./templates
-Add scripts/ ./scripts
+ADD scripts/ ./scripts
 ADD zigbeeLauncher/ ./zigbeeLauncher
 
 CMD [ "python", "launcher.py" ]

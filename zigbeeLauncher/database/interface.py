@@ -175,14 +175,14 @@ class DBAuto(DBInterface):
                 self.update({
                     'script': data['script'],
                     'state': data['state'],
-                    'status': data['status'],
+                    'result': data['result'],
                     'record': data['record'],
                     'config': data['config'],
                 })
             else:
                 auto = Auto(data["script"],
                             data["state"],
-                            data['status'],
+                            data['result'],
                             data["record"],
                             data["config"])
                 self._add(auto)

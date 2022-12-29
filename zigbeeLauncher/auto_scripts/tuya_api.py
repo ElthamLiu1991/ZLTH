@@ -157,13 +157,13 @@ class TUYAAPI(Http):
             except Exception as e:
                 logger.error("TUYA request error: {}".format(repr(e)))
                 return None
-            logger.debug("TUYA response:", obj.response)
+            logger.debug(f"TUYA response:{obj.response}")
             if obj.response.get('success'):
                 return from_dict(data_class=data, data=obj.response).result
             else:
                 if obj.response.get('msg') == 'token invalid':
                     logger.info('refresh token')
-                    obj.token = obj.refresh_token().result
+                    obj.token = obj.refresh_token()
                     return send(func, *args, **kwargs)
                 else:
                     logger.error('other error')

@@ -182,6 +182,7 @@ class WiserAPI:
 
     @_wait_response(RSP.DEVICE)
     def get_device(self, id):
+        self.device = None
         topic = "ZLTH/v2/REQ/WDC/Device/{}".format(id)
         payload = self.sequence
         logger.info("Get join devices list")

@@ -192,6 +192,13 @@ class ZLTHAPI(Http):
         self.params = None
         self.body = {'leave': {}}
 
+    @_decode(Response)
+    def reset(self, mac):
+        self.method = 'PUT'
+        self.path = f'/api/2/devices/{mac}'
+        self.params = None
+        self.body = {'reset': {}}
+
     @wait_and_retry()
     def is_reset(self, mac):
         device = self.get_device(mac)

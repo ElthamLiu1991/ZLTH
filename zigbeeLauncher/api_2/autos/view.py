@@ -8,7 +8,7 @@ from zigbeeLauncher.api_2.autos import scripts
 from zigbeeLauncher.database.interface import DBAuto
 from zigbeeLauncher.logging import flaskLogger as logger
 from zigbeeLauncher.api_2.response import Response
-from zigbeeLauncher.auto_scripts import AutoTesting, WORKING, FINISH
+from zigbeeLauncher.auto_scripts import AutoTesting, State, Result
 
 
 class AutoResource(Resource):
@@ -37,15 +37,21 @@ class AutoOperationResource(Resource):
             return Response(operation, code=70002).pack()
         if operation == 'running':
             for record in DBAuto().retrieve():
-                if record['state'] != FINISH:
+                if record['state'] != State.FINISH:
                     records.append(record)
         elif operation == 'history':
-            records = DBAuto(state=FINISH).retrieve()
+            records = DBAuto().retrieve()
+            for item in records:
+                if item['state'] == State.FINISH:
+                    records.remove(item)
         elif operation == 'records':
             records = DBAuto().retrieve()
         data = {}
         for record in records:
-            data[record['record']] = record['status']
+            if record['state'] != State.FINISH:
+                data[record['record']] = record['state']
+            else:
+                data[record['record']] = record['result']
         html = render_template('records.html', records=data)
 
         return make_response(html)

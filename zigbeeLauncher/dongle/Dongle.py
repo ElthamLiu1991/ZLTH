@@ -256,6 +256,7 @@ class Dongles:
                                 )
                                 command.request_cb = reset_request_handle
                                 await command.send()
+                                Info(self.dongle)
                         elif key == 'label':
                             command.request_cb = label_write_handle
                             label = data['data']

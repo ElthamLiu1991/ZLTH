@@ -5,68 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/capacity_local.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/records.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/database/auto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/development.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CP210x_Universal_Windows_Driver.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/CP210x_Universal_Windows_Driver_ReleaseNotes.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/SLAB_License_Agreement_VCP_Windows.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/arm/silabser.sys" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/arm64/silabser.sys" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/silabser.cat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/silabser.inf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/x64/silabser.sys" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/CP210x_Universal_Windows_Driver/x86/silabser.sys" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/launcher.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/run.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/templates/assets/signin.2a501e4e.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/templates/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/templates/images/signin.jpeg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/templates/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/dist/version/version.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/emqx-4.4.3-otp24.2.1-windows-amd64.zip" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/launcher.spec" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/logConfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/logConfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/readme.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/capacity.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/capacity.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/template/index.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/autos.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/autos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/zcl/zcl.yml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/zcl/zcl.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version.py" beforeDir="false" afterPath="$PROJECT_DIR$/version.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/records.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/records.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version_file.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/response.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/response.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/zigbees/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/zigbees/view.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/auto.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/interface.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/zigbee.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/zigbee.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Config.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/Config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Task.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/Task.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Connection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Service.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Simulator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/mqtt/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocol.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocol.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Dongle.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/Dongle.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,16 +117,5 @@
       <updated>1671180276711</updated>
     </task>
     <servers />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/__init__.py</url>
-          <line>190</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

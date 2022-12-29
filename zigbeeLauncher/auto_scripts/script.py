@@ -8,33 +8,31 @@ import rapidjson as json
 
 from zigbeeLauncher.auto_scripts import auto_record
 from zigbeeLauncher.dongle import Tasks
+from zigbeeLauncher.logging import autoLogger as logger
 
 
-class Basic_script(metaclass=abc.ABCMeta):
+class Basic_script():
+    def __init__(self):
+        self.running = False
+        self.record = None
+        self.config = None
+        self.script = None
+        self.state = None
 
-    @abc.abstractmethod
-    def get_record(self):
-        """
-        return current record filename
-        :return:
-        """
-        pass
+    def is_running(self):
+        return self.running
 
-    @abc.abstractmethod
+    def get_state(self):
+        return self.state
+
     def get_config(self):
-        """
-        return current config json
-        :return:
-        """
-        pass
+        return self.config
 
-    @abc.abstractmethod
+    def get_record(self):
+        return self.record
+
     def get_script(self):
-        """
-        return current script name
-        :return:
-        """
-        pass
+        return self.script
 
     @abc.abstractmethod
     def set_config(self, config):
@@ -48,10 +46,7 @@ class Basic_script(metaclass=abc.ABCMeta):
 
 class Script(Basic_script):
     def __init__(self, script, path, status_callback):
-        self.running = False
-        self.record = None
-        self.config = None
-        self.stage = 0
+        Basic_script.__init__(self)
         self.script = script
         self.update_callback = status_callback
         with open(path, encoding='utf-8') as f:
@@ -90,25 +85,13 @@ class Script(Basic_script):
         """
         pass
 
-    def get_config(self):
-        return self.config
-
-    def get_record(self):
-        return self.record
-
-    def get_script(self):
-        return self.script
-
-    def is_running(self):
-        return self.running
-
-    def update(self, stage, status):
-        self.stage = stage
+    def update(self, state, result):
+        self.state = state
         if self.update_callback:
-            self.update_callback(self.record, stage, status)
+            self.update_callback(self.record, self.state, result)
 
-    def log(self, level, message):
-        auto_record(self.record, self.stage, level, message)
+    def log(self, status, message):
+        auto_record(self.record, self.state, status, message)
         pass
 
 
@@ -124,7 +107,7 @@ class Http:
 
     async def send(self):
         async with httpx.AsyncClient() as client:
-            print("request:", self.url + self.path)
+            logger.debug(f"request:{self.url}{self.path}")
             if self.method == 'GET':
                 r = await client.get(self.url + self.path,
                                      params=self.params,
@@ -145,7 +128,7 @@ class Http:
                                         params=self.params,
                                         headers=self.headers)
             if r.status_code != 200:
-                raise Exception(str(r.status_code))
+                raise Exception(f"{r.status_code}: {r.json()}")
             else:
                 self.response = r.json()
 

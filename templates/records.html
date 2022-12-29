@@ -8,7 +8,7 @@
     <h1>ZLTH Auto Testing Records</h1>
     <p>
         {% for record, status in records.items() %}
-        <a id={[record]} href="http://localhost:5000/api/2/auto/records/" onclick="open_record(this)">{[record]}</a>
+        <a id={[record]} href="/api/2/auto/records/" onclick="open_record(this)">{[record]}</a>
         <b><span>: {[status]}</span></b><br>
         {% endfor %}
     </p>
@@ -20,7 +20,10 @@
     function open_record(obj){
         console.log("obj.id", obj.id);
         console.log("obj:", obj.innerHTML);
-        obj.href += obj.id;
+        console.log("href:", obj.href)
+        console.log("host:", window.location.host)
+<!--        obj.href = "http://"+window.location.host + obj.href + obj.id-->
+        obj.href = obj.href+obj.id
         console.log("href:", obj.href);
     }
 </script>
