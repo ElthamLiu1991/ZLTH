@@ -1,51 +1,23 @@
 {
-    "gateway_vid": "6c367244ee2ff6f38csuru",
-    "repeat": 0,
-    "features": [
+    "duration": 1,
+    "vid": "6ce8e7bfca90878970akyr",
+    "ip": "192.168.121.1",
+    "interval": 20,
+    "validation": 5,
+    "devices": [
         {
-            "tuya_product_name": "按键开关",
-            "tuya_product_id": "x7zpydy5",
-            "state": [
-                {
-                    "status": {
-                        "code": "switch_1",
-                        "type": "Boolean"
-                    },
-                    "zlth": {
-                        "cluster": "On/Off",
-                        "name": "OnOff",
-                        "type": "attribute"
-                    },
-                    "request": {
-                        "value": true,
-                        "validation": 1
-                    },
-                    "report": {
-                        "value": 0,
-                        "validation": "false"
-                    }
-                }
+            "name": "puck_dimmer",
+            "pid": "bat2u3vq",
+            "functions": [
+                "switch_led_1",
+                "bright_value_1"
             ]
         },
         {
-            "tuya_product_name": "温湿度传感器",
-            "tuya_product_id": "fent9g4p",
-            "state": [
-                {
-                    "status": {
-                        "code": "va_temperature",
-                        "type": "Integer"
-                    },
-                    "zlth": {
-                        "cluster": "Temperature Measurement",
-                        "name": "MeasuredValue",
-                        "type": "attribute"
-                    },
-                    "report": {
-                        "value": 3000,
-                        "validation": "300"
-                    }
-                }
+            "name": "door_window_sensor",
+            "pid": "jdknwriz",
+            "functions": [
+                "doorcontact_state"
             ]
         }
     ]

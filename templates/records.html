@@ -23,7 +23,8 @@
         console.log("href:", obj.href)
         console.log("host:", window.location.host)
 <!--        obj.href = "http://"+window.location.host + obj.href + obj.id-->
-        obj.href = obj.href+obj.id
+        path = "/api/2/auto/records/"
+        obj.href = path+obj.id
         console.log("href:", obj.href);
     }
 </script>

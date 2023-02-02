@@ -26,7 +26,11 @@
             // to the client. The data is then displayed in the "Received"
             // section of the page.
             socket.on('my_response', function(msg, cb) {
-                $('#log').append('<br>' + $('<div/>').text(msg.timestamp + ':' +  msg.state + ':' + msg.status + ': '+msg.data).html());
+                console.log("response data:", msg.data);
+                if (msg.state == 'FINISH')
+                    $('#log').append('<br>' + $('<div/>').text(msg.data).html());
+                else
+                    $('#log').append('<br>' + $('<div/>').text(msg.timestamp + ':' +  msg.state + ':' + msg.status + ': '+msg.data).html());
                 if (cb)
                     cb();
                 var div = document.getElementById('log');
@@ -51,6 +55,11 @@
                     document.getElementById('update_button').disabled=true;
                     document.getElementById('start_button').disabled=true;
                     document.getElementById('stop_button').disabled=true;
+                } else if(msg.state == 'START'){
+                    $('#state').text(msg.result);
+                    document.getElementById('update_button').disabled=true;
+                    document.getElementById('start_button').disabled=true;
+                    document.getElementById('stop_button').disabled=false;
                 } else {
                     $('#state').text(msg.state);
                     document.getElementById('update_button').disabled=true;
@@ -63,6 +72,7 @@
             socket.on('my_record', function(msg, cb) {
                 console.log("my record, append:", append);
                 if(append){
+                    console.log(msg.data)
                     data=msg.data.split('\n');
                     console.log(data);
                     for(const line in data){
@@ -74,6 +84,7 @@
                     cb();
             });
             socket.on('my_config', function(msg, cb) {
+                console.log(msg.data);
                 $('#config_data').text(msg.data);
                 if (cb)
                     cb();
@@ -95,9 +106,9 @@
                 return false;
             });
             $('form#start').submit(function(event) {
-                document.getElementById('log').innerHTML="";
-                document.getElementById('start_button').disabled=true;
-                document.getElementById('stop_button').disabled=false;
+<!--                document.getElementById('log').innerHTML="";-->
+<!--                document.getElementById('start_button').disabled=true;-->
+<!--                document.getElementById('stop_button').disabled=false;-->
                 socket.emit('start_request', {record: $('#current_script').html()});
                 return false;
             });

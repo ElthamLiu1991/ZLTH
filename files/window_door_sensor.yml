@@ -619,6 +619,6 @@ endpoints:
     manufacturer: false
     name: Diagnostics
 node:
-  device_type: router
+  device_type: sleepy_end_device
   manufacturer_code: 4190
   radio_power: 10

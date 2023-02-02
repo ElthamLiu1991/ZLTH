@@ -55,3 +55,7 @@ Werkzeug==2.2.2
 wsproto==1.2.0
 xmodem==0.4.6
 zeroconf==0.39.4
+
+paramiko~=2.12.0
+pexpect~=4.8.0
+scp~=0.14.4

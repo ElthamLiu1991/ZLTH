@@ -1,9 +1,12 @@
 import datetime
 import importlib
-import json
+import rapidjson as json
 import os
 import threading
 import time
+from enum import Enum
+
+from rapidjson import JSONDecodeError
 
 from zigbeeLauncher.database.interface import DBAuto
 from zigbeeLauncher.logging import autoLogger as logger
@@ -33,6 +36,20 @@ class Result:
     STOP = 'STOP'
 
 
+class Error(Enum):
+    NO_ERROR = 0
+    NOT_FOUND = 1
+    INVALID_CONFIG = 2
+    NOT_RUNNING = 3
+    RUNNING = 4
+
+
+class ScriptName:
+    CAPACITY = 'capacity'
+    CAPACITY_LOCAL = 'capacity_local'
+    STABILITY = 'stability'
+    COMPOSE = 'compose'
+
 # @socketio.event
 # def connect():
 #     script = AutoTesting().get_script()
@@ -47,25 +64,42 @@ class Result:
 
 @socketio.on('join')
 def join(message):
-    script = message['record']
-    logger.debug(f'join room:{script}')
-    join_room(script)
-    record = DBAuto(record=script).retrieve()
-    if record:
-        state = record[0]['state']
-        result = record[0]['result']
-        emit('my_state', {'state': state, 'result': result}, room=script)
-        if state != State.FINISH:
-            with open(os.path.join(base_dir, 'scripts/' + script.split('-')[0] + '.json'), encoding='utf-8') as f:
-                emit('my_config', {'data': f.read()}, room=script)
-            if state != State.READY:
-                with open(os.path.join(base_dir, 'records/' + script)) as f:
-                    emit('my_record', {'data': f.read()}, room=script)
+    record = message['record']
+    logger.info(f'join room:{record}')
+    join_room(record)
+
+    records = DBAuto(record=record).retrieve()
+    if records:
+        state = records[0]['state']
+        result = records[0]['result']
+        config = records[0]['config']
+
+        test = AutoTesting().get_record(record)
+        try:
+            emit('my_config', {'data': json.dumps(json.loads(config), indent=4)}, room=record)
+        except JSONDecodeError as e:
+            emit('my_config', {'data': config}, room=record)
+        if not test:
+            logger.info(f"{record} is history record")
+            if state != State.FINISH:
+                emit('my_state', {'state': State.FINISH, 'result': Result.STOP}, room=record)
+            else:
+                emit('my_state', {'state': state, 'result': result}, room=record)
+
+            try:
+                with open(os.path.join(base_dir, 'records/' + record)) as f:
+                    emit('my_record', {'data': f.read()}, room=record)
+            except FileNotFoundError as e:
+                logger.warning(f"{record} has not log")
+                emit('my_record', {'data': "no log"}, room=record)
         else:
-            logger.debug(f"{script} is history record")
-            emit('my_config', {'data': record[0]['config']}, room=script)
-            with open(os.path.join(base_dir, 'records/' + script)) as f:
-                emit('my_record', {'data': f.read()}, room=script)
+            emit('my_state', {'state': state, 'result': result}, room=record)
+            if state != State.READY:
+                with open(os.path.join(base_dir, 'records/' + record)) as f:
+                    emit('my_record', {'data': f.read()}, room=record)
+    else:
+        # not in database
+        emit('my_state', {'state': State.FINISH, 'result': Result.STOP}, room=record)
 
 
 @socketio.on('close')
@@ -75,17 +109,17 @@ def close(message):
 
 @socketio.event
 def update_request(message):
-    logger.debug("update config {} for script:{}".format(message['data'], message["record"]))
+    logger.info(f"update config {message['data']} for script:{message['record']}")
     config = json.loads(message['data'])
-    script = message['record']
+    record = message['record']
 
-    AutoTesting().update_config(script, config)
+    AutoTesting().update_config(record, config)
 
 
 @socketio.event
 def start_request(message):
     record = message['record']
-    logger.debug(f"start script:{record}")
+    logger.info(f"start script:{record}")
     # emit('my_state', {'data': 'running'}, room=record)
     AutoTesting().start(record)
 
@@ -93,7 +127,7 @@ def start_request(message):
 @socketio.event
 def stop_request(message):
     record = message['record']
-    logger.debug(f"stop script:{record}")
+    logger.info(f"stop script:{record}")
     # emit('my_state', {'data': 'stopping'}, room=record)
     AutoTesting().stop(record)
 
@@ -115,7 +149,10 @@ def auto_record(record, state, status, message):
                                str(datetime.datetime.now().microsecond * 1000)[:4])
     with open(os.path.join(base_dir, 'records/' + record), 'a+') as f:
         data = f'{timestamp}:{state}:{status}:{message}\n'
+        print("log record:", record)
         logger.info(data)
+        if state == State.FINISH:
+            data = message
         f.write(data)
         socketio.emit('my_response',
                       {
@@ -128,8 +165,7 @@ def auto_record(record, state, status, message):
 
 class AutoTesting:
     _instance = None
-    _records = {}
-    _script = None
+    _script_instances = {}
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -140,53 +176,96 @@ class AutoTesting:
         pass
 
     def set_script(self, script):
-        self._script = script
-        return self.run()
+        return self.run(script)
 
-    def run(self):
-        testing = importlib.import_module('zigbeeLauncher.auto_scripts.' + self._script)
+    def run(self, script):
+        testing = importlib.import_module('zigbeeLauncher.auto_scripts.' + script)
         test = testing.Testing(self.on_status)
         record = test.get_record()
-        if record:
-            self._records[record] = test
-            # add to database
-            DBAuto(record=record).add({
-                'script': test.get_script(),
-                'state': State.READY,
-                'result': Result.SUCCESS,
-                'record': record,
-                'config': json.dumps(test.get_config())
-            })
-
+        config = test.get_config()
+        if not test.is_ready():
+            logger.error(f'{record} config invalid: {config}')
+            auto_record(record, State.READY, Status.ERROR, test.get_error())
+        # add to database
+        DBAuto(record=record).add({
+            'script': script,
+            'state': State.READY,
+            'result': Result.SUCCESS,
+            'record': record,
+            'config': config if isinstance(config, str) else json.dumps(config, indent=4)
+        })
+        self._script_instances[record] = test
         return record
 
     def update_config(self, record, config):
-        if record in self._records:
-            with open(os.path.join(base_dir, 'scripts/' + record.split('-')[0] + '.json'), 'w', encoding='utf-8') as f:
-                f.write(json.dumps(config, indent=4))
-            auto_record(record, State.READY, Status.INFO, "update config: {}".format(config))
-            self._records[record].set_config(config)
-            # update config
-            DBAuto(record=record).update({'config': json.dumps(config)})
-            return True
+        test = self.get_record(record)
+        if test:
+            if test.is_running():
+                logger.error(f'{record} is running, please wait it finish')
+                auto_record(record, State.READY, Status.ERROR, f'{record} is running, please wait it finish')
+                return Error.RUNNING
+            else:
+                test.set_config(config)
+                if not test.is_ready():
+                    logger.error(f'invalid config')
+                    auto_record(record, State.READY, Status.ERROR, test.get_error())
+                    return Error.INVALID_CONFIG
+                else:
+                    with open(os.path.join(base_dir, 'scripts/' + test.get_script() + '.json'), 'w',
+                              encoding='utf-8') as f:
+                        f.write(json.dumps(config, indent=4))
+                    auto_record(record, State.READY, Status.INFO, f"update config: {config}")
+                    DBAuto(record=record).update({'config': json.dumps(config, indent=4)})
+                    return Error.NO_ERROR
         else:
-            return False
+            logger.error(f'{record} not found')
+            return Error.NOT_FOUND
 
     def start(self, record):
-        if record in self._records:
-            self._records[record].start()
+        # if already has script running, don't start
+        test = self.get_record(record)
+        if test:
+            if test.is_running():
+                logger.error(f'{record} is running, please wait it finish')
+                auto_record(record, State.START, Status.ERROR, f'{record} is running, please wait it finish')
+                return Error.RUNNING
+            elif not test.is_ready():
+                logger.error(f'{record} is not ready, please update config')
+                auto_record(record, State.START, Status.ERROR, test.get_error())
+                return Error.INVALID_CONFIG
+            else:
+                for k, v in self._script_instances.items():
+                    if v.is_running():
+                        logger.error(f"{k} is running, please wait it finish")
+                        auto_record(record, State.START, Status.ERROR, f'{k} is running, please wait it finish')
+                        return Error.RUNNING
+                test.start()
+                return Error.NO_ERROR
         else:
-            logger.warning("%s is not in record", record)
+            logger.error(f'{record} not found')
+            return Error.NOT_FOUND
 
     def stop(self, record):
-        if record in self._records:
-            self._records[record].stop()
-            auto_record(record, State.FINISH, Status.INFO, "user stopped")
-            self.on_status(record, State.FINISH, Result.STOP)
+        test = self.get_record(record)
+        if test:
+            if not test.is_running():
+                logger.error(f'{record} is not running')
+                auto_record(record, State.READY, Status.ERROR,f'{record} is not running')
+                return Error.NOT_RUNNING
+            else:
+                test.stop()
+                auto_record(record, State.FINISH, Status.INFO, "user stopped")
+                self.on_status(record, State.FINISH, Result.STOP)
+                return Error.NO_ERROR
         else:
-            logger.warning("%s is not running", record)
+            logger.error(f'{record} not found')
+            return Error.NOT_FOUND
 
     def on_status(self, record, state, result=Result.SUCCESS):
+        # if script is compose, bypass other script FINISH state update
+        if ScriptName.COMPOSE in record and state == State.FINISH and result == Result.SUCCESS:
+            if record in self._script_instances and self._script_instances[record].get_state() != State.FINISH:
+                return
         DBAuto(record=record).update({
             'state': state,
             'result': result
@@ -194,12 +273,13 @@ class AutoTesting:
 
         if state == State.FINISH:
             # script finish
-            if record in self._records:
-                del self._records[record]
-            # socketio.emit('finish', {'data': result})
-            socketio.emit('my_state', {'state': state, 'result': result})
-            
-            pass
+            if record in self._script_instances:
+                del self._script_instances[record]
+            socketio.emit('my_state', {'state': state, 'result': result}, room=record)
         else:
-            socketio.emit('my_state', {'state': state, 'result': result})
+            socketio.emit('my_state', {'state': state, 'result': result}, room=record)
 
+    def get_record(self, record):
+        if record in self._script_instances:
+            return self._script_instances[record]
+        return None

@@ -1,0 +1,63 @@
+{
+    "basic": {
+        "protocol": "zigbee",
+        "endpoints": [
+            {
+                "device_id": 1026,
+                "endpoint": 1,
+                "profile": 260,
+                "domains": [
+                    {
+                        "name": "Security",
+                        "reporting": [
+                            "Battery",
+                            "Alarm"
+                        ],
+                        "initializing": [
+                            "Battery",
+                            "Alarm"
+                        ],
+                        "setting": []
+                    }
+                ]
+            }
+        ],
+        "manufacturer": "Schneider Electric",
+        "manufacturer_code": 4190,
+        "model": "CCT592011_AS",
+        "name": "Water Leakage Sensor"
+    },
+    "tuya": {
+        "pid": {
+            "development": "vjbambb2",
+            "field_test": "kypoprsm",
+            "release": "0r1az3ld",
+            "staging": "1vpxjvqj"
+        },
+        "config": {
+            "1": {
+                "endpoint": 1,
+                "type": "enum",
+                "enumerate": [
+                   1,
+                   0
+                ],
+                "report": {
+                    "domain": "Security",
+                    "type": "attribute",
+                    "name": "Alarm"
+                }
+            },
+            "2": {
+                "endpoint": 1,
+                "type": "int",
+                "report": {
+                    "domain": "Security",
+                    "type": "attribute",
+                    "name": "Battery"
+                }
+            }
+        }
+    },
+    "version": 3
+}

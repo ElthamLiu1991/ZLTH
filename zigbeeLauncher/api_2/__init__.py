@@ -17,7 +17,7 @@ device_api.add_resource(DeviceConfigResource, '/devices/<string:mac>/config')
 zigbee_api = Api(api)
 zigbee_api.add_resource(ZigbeesResource, '/zigbees')
 zigbee_api.add_resource(ZigbeeResource, '/zigbees/<string:mac>')
-zigbee_api.add_resource(ZigbeeAttributesResource, '/zigbees/<string:mac>/attributes/')
+zigbee_api.add_resource(ZigbeeAttributesResource, '/zigbees/<string:mac>/attributes')
 
 simulator_api = Api(api)
 simulator_api.add_resource(SimulatorsResource, '/simulators')

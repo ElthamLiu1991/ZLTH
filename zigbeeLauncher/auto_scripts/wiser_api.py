@@ -200,7 +200,7 @@ class WiserAPI:
         # get network
         return self.permit
 
-    def on_device_add(id, device):
+    def on_device_add(self, id, device):
         """
         notify there is a new device join
         :param id: device id
@@ -249,18 +249,22 @@ class WiserAPI:
         self.rsp = self.RSP.NETWORK
 
 
-class WiserMQTT(threading.Thread):
-    def __init__(self, script):
-        threading.Thread.__init__(self)
+class WiserMQTT:
+    def __init__(self, ip, wiser_api=None):
+        self.ip = ip
+        self.wiser_api = wiser_api if wiser_api else WiserAPI()
+        self.wiser_api.set_client(self)
         self.client = None
-        self.script = script
         self.connected = False
         self._topic = ""
         self._payload = ""
         self._need_resend = False
+        self._stop = False
+        self.start()
 
     def stop(self):
         self.client.disconnect()
+        self._stop = True
 
     def send(self, topic, payload):
         self._topic = topic
@@ -274,7 +278,7 @@ class WiserMQTT(threading.Thread):
             self.client.publish(self._topic, self._payload, qos=2)
             self._need_resend = False
 
-    def run(self) -> None:
+    def start(self) -> None:
         def on_connect(client, userdata, flags, rc):
             logger.info("Wiser Standard Hub connected")
             client.subscribe("WDC/+/ADD/Device/+", qos=2)
@@ -290,8 +294,11 @@ class WiserMQTT(threading.Thread):
                 logger.error("Wiser hub disconnected unexpected:%s", rc)
                 time.sleep(1)
                 self._need_resend = True
-                self.run()
-            client.disconnect()
+                connect()
+                return
+                # self.run()
+            self.connected = False
+            logger.info("Wiser hub disconnected")
 
         def on_message(client, userdata, msg):
             topic = msg.topic
@@ -311,7 +318,7 @@ class WiserMQTT(threading.Thread):
                 id = items[-1]
                 if items[3] == "Device":
                     device = from_dict(data_class=Device, data=payload)
-                    self.script.on_device_add(id, device)
+                    self.wiser_api.on_device_add(id, device)
                 else:
                     # TODO: application
                     pass
@@ -320,7 +327,7 @@ class WiserMQTT(threading.Thread):
                 # WDC/v2/DEL/Device/1
                 id = items[-1]
                 if items[3] == "Device":
-                    self.script.on_device_del(id)
+                    self.wiser_api.on_device_del(id)
                 else:
                     # TODO: application
                     pass
@@ -332,14 +339,14 @@ class WiserMQTT(threading.Thread):
                 if items[3] == "Device":
                     id = items[-2]
                     attribute = items[-1]
-                    self.script.on_device_data(id, attribute, payload)
+                    self.wiser_api.on_device_data(id, attribute, payload)
                 elif items[3] == "Network":
                     attribute = items[-1]
-                    self.script.on_network_data(attribute, payload)
+                    self.wiser_api.on_network_data(attribute, payload)
                 else:
                     id = items[-2]
                     attribute = items[-1]
-                    self.script.on_application_data(id, attribute, payload)
+                    self.wiser_api.on_application_data(id, attribute, payload)
             elif type == "RSP":
                 # retrieve device list response
                 # WDC/v2/RSP/ZLTH/Device
@@ -353,16 +360,16 @@ class WiserMQTT(threading.Thread):
                 attribute = items[6] if len(items) > 6 else None
                 if name == "Device":
                     if attribute:
-                        self.script.on_device_attribute_rsp(id, attribute, payload)
+                        self.wiser_api.on_device_attribute_rsp(id, attribute, payload)
                     elif id:
                         device = from_dict(data_class=Device, data=payload)
-                        self.script.on_device_rsp(device)
+                        self.wiser_api.on_device_rsp(device)
                     else:
                         devices = from_dict(data_class=Devices, data=payload).Device
-                        self.script.on_devices_rsp(devices)
+                        self.wiser_api.on_devices_rsp(devices)
                 elif name == "Network":
                     network = from_dict(data_class=Network, data=payload)
-                    self.script.on_network_rsp(network)
+                    self.wiser_api.on_network_rsp(network)
                 else:
                     # TODO: application response
                     pass
@@ -370,16 +377,19 @@ class WiserMQTT(threading.Thread):
         def on_subscribe(client, userdata, mid, granted_qos):
             pass
 
-        try:
-            logger.info("Trying to connect Wiser Standard Hub %s", self.script.ip)
-            self.client = mqtt.Client("ZLTH-" + get_ip_address() + "-" + str(random.randint(1, 1000)))
-            self.client.on_connect = on_connect
-            self.client.on_message = on_message
-            self.client.on_subscribe = on_subscribe
-            self.client.on_disconnect = on_disconnect
-            self.client.connect(self.script.ip, 1883, 10)
-            self.client.loop_forever()
-        except Exception as e:
-            logger.exception("MQTT connect failed, try again")
-        finally:
-            logger.info("Wiser Standard Hub disconnect")
+        def connect():
+            try:
+                logger.info("Connecting to Wiser Standard Hub %s", self.ip)
+                self.client.connect(self.ip, 1883, 10)
+            except Exception as e:
+                logger.error("MQTT connect failed, try again")
+                time.sleep(5)
+                connect()
+
+        self.client = mqtt.Client("ZLTH-" + get_ip_address() + "-" + str(int(time.time())))
+        self.client.on_connect = on_connect
+        self.client.on_message = on_message
+        self.client.on_subscribe = on_subscribe
+        self.client.on_disconnect = on_disconnect
+        connect()
+        self.client.loop_start()

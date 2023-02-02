@@ -8,6 +8,7 @@ ADD logConfig.json .
 ADD version/ ./version
 ADD templates/ ./templates
 ADD scripts/ ./scripts
+ADD dcf/ ./dcf
 ADD zigbeeLauncher/ ./zigbeeLauncher
 
 CMD [ "python", "launcher.py" ]

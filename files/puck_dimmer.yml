@@ -806,6 +806,45 @@ endpoints:
     manufacturer: false
     name: Level Control
   - attributes:
+    - default: 1
+      id: 0x0010
+      mandatory: true
+      manufacturer: false
+      name: MinLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 254
+      id: 0x0011
+      mandatory: false
+      manufacturer: false
+      name: MaxLevel
+      server: true
+      type: uint8
+      writable: true
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: true
+      type: uint16
+      writable: false
+    - default: 1
+      id: 65533
+      mandatory: true
+      manufacturer: false
+      name: ClusterRevision
+      server: false
+      type: uint16
+      writable: false
+    commands:
+      C->S: []
+      S->C: []
+    id: 0x0301
+    manufacturer: false
+    name: Ballast Configuration
+  - attributes:
     - default: 255
       id: 284
       mandatory: false
@@ -820,7 +859,7 @@ endpoints:
       manufacturer: false
       name: LastMessageRSSI
       server: true
-      type: uint8
+      type: int8
       writable: false
     - default: 1
       id: 65533
@@ -897,6 +936,35 @@ endpoints:
     manufacturer: true
     manufacturer_code: 4190
     name: Visa Configuration
+- device_id: 0x0061
+  device_version: 1
+  id: 0xF2
+  profile_id: 0xA1E0
+  server_clusters: []
+  client_clusters:
+  - attributes:
+      - default: 1
+        id: 65533
+        mandatory: true
+        manufacturer: false
+        name: ClusterRevision
+        server: true
+        type: uint16
+        writable: false
+      - default: 1
+        id: 65533
+        mandatory: true
+        manufacturer: false
+        name: ClusterRevision
+        server: false
+        type: uint16
+        writable: false
+    commands:
+      C->S: []
+      S->C: []
+    id: 0x0021
+    manufacturer: false
+    name: On/Off
 node:
   device_type: router
   manufacturer_code: 4190

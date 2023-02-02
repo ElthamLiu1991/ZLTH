@@ -1,0 +1,263 @@
+{
+    "basic": {
+        "protocol": "zigbee",
+        "endpoints": [
+            {
+                "device_id": 257,
+                "endpoint": 3,
+                "profile": 260,
+                "domains": [
+                    {
+                        "name": "Lighting",
+                        "reporting": [
+                            "RSSI",
+                            "LQI",
+                            "On",
+                            "Brightness"
+                        ],
+                        "initializing": [
+                            "On",
+                            "Brightness"
+                        ],
+                        "setting": [
+                            "BrightnessMax",
+                            "BrightnessMin",
+                            "BrightnessOn",
+                            "DimmingMode"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "manufacturer": "Schneider Electric",
+        "manufacturer_code": 4190,
+        "model": "PUCK/DIMMER/1",
+        "name": "PUCK Dimmer"
+    },
+    "tuya": {
+        "pid": {
+            "development": "aitkp0ex",
+            "field_test": "giteaqsb",
+            "release": "bat2u3vq",
+            "staging": "moexciiq"
+        },
+        "config": {
+            "1": {
+                "endpoint": 3,
+                "type": "bool",
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "On"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "On"
+                }
+            },
+            "2": {
+                "endpoint": 3,
+                "type": "int",
+                "scale": 3.937,
+                "value_range": {
+                    "min": 10,
+                    "max": 1000
+                },
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "Brightness"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "Brightness"
+                }
+            },
+            "3": {
+                "endpoint": 3,
+                "type": "int",
+                "value_range": {
+                    "min": 1,
+                    "max": 254
+                },
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "Config",
+                    "attribute": "BrightnessMin"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "BrightnessMin"
+                }
+            },
+            "4": {
+                "endpoint": 3,
+                "type": "enum",
+                "enumerate": [
+                    0,
+                    3
+                ],
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "Config",
+                    "attribute": "DimmingMode"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "DimmingMode"
+                }
+            },
+            "101": {
+                "endpoint": 3,
+                "type": "int",
+                "value_range": {
+                    "min": 1,
+                    "max": 254
+                },
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "Config",
+                    "attribute": "BrightnessMax"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "BrightnessMax"
+                }
+            },
+            "102": {
+                "endpoint": 3,
+                "type": "enum",
+                "enumerate": [
+                    254,
+                    255
+                ],
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "Config",
+                    "attribute": "BrightnessOn"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "BrightnessOn"
+                }
+            }
+        }
+    },
+    "zlth": {
+        "switch_led_1": {
+            "endpoint": 3,
+            "requestable": true,
+            "request": {
+                "domain": "Lighting",
+                "attribute": "On",
+                "data": [
+                    {
+                        "value": "true",
+                        "verify": 1
+                    },
+                    {
+                        "value": "false",
+                        "verify": 0
+                    }
+                ]
+            },
+            "reportable": true,
+            "report": {
+                "domain": "Lighting",
+                "attribute": "On",
+                "data": [
+                    {
+                        "value": 1,
+                        "verify": "true"
+                    },
+                    {
+                        "value":0,
+                        "verify": "false"
+                    }
+                ]
+            }
+        },
+        "bright_value_1": {
+            "endpoint": 3,
+            "requestable": true,
+            "request": {
+                "domain": "Lighting",
+                "attribute": "Brightness",
+                "data": [
+                    {
+                        "value": "1000",
+                        "verify": 254
+                    },
+                    {
+                        "value": "10",
+                        "verify": 3
+                    }
+                ]
+            },
+            "reportable": true,
+            "report": {
+                "domain": "Lighting",
+                "attribute": "Brightness",
+                "data": [
+                    {
+                        "value": 254,
+                        "verify": "1000"
+                    },
+                    {
+                        "value": 3,
+                        "verify": "10"
+                    }
+                ]
+            }
+        },
+        "brightness_min_1": {
+            "endpoint": 3,
+            "requestable": true,
+            "request": {
+                "domain": "Lighting",
+                "attribute": "BrightnessMin",
+                "data": [
+                    {
+                        "value": 100,
+                        "verify": 100
+                    },
+                    {
+                        "value": 254,
+                        "verify": 254
+                    }
+                ]
+            },
+            "reportable": false
+        },
+        "brightness_max_1": {
+            "endpoint": 3,
+            "requestable": true,
+            "request": {
+                "domain": "Lighting",
+                "attribute": "BrightnessMax",
+                "data": [
+                    {
+                        "value": 100,
+                        "verify": 100
+                    },
+                    {
+                        "value": 254,
+                        "verify": 254
+                    }
+                ]
+            },
+            "reportable": false
+        }
+    },
+    "version": 3
+}

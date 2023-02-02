@@ -1,0 +1,134 @@
+{
+    "version": 3,
+    "domain": "Lighting",
+    "attributes": {
+        "zigbee": {
+            "LQI": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 2821,
+                "cluster_name": "Diagnostic",
+                "attribute": 284,
+                "type": 32,
+                "reportable": true,
+                "report": {
+                    "min": 900,
+                    "max": 900,
+                    "change": 255
+                },
+                "remote": false
+            },
+            "RSSI": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 2821,
+                "cluster_name": "Diagnostic",
+                "attribute": 285,
+                "type": 40,
+                "reportable": true,
+                "report": {
+                    "min": 900,
+                    "max": 900,
+                    "change": 17
+                },
+                "remote": false
+            },
+            "On": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 6,
+                "cluster_name": "On/Off",
+                "attribute": 0,
+                "type": 16,
+                "reportable": true,
+                "report": {
+                    "min": 0,
+                    "max": 900,
+                    "change": 1
+                },
+                "remote": false
+            },
+            "Brightness": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 8,
+                "cluster_name": "Level Control",
+                "attribute": 0,
+                "type": 32,
+                "reportable": true,
+                "report": {
+                    "min": 0,
+                    "max": 900,
+                    "change": 1
+                },
+                "remote": false
+            },
+            "BrightnessOn": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 8,
+                "cluster_name": "Level Control",
+                "attribute": 17,
+                "type": 32,
+                "reportable": false,
+                "remote": false
+            },
+            "BrightnessStartup": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 8,
+                "cluster_name": "Level Control",
+                "attribute": 16384,
+                "type": 32,
+                "reportable": false,
+                "remote": false
+            },
+            "BrightnessMin": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 769,
+                "cluster_name": "Ballast Configuration",
+                "attribute": 16,
+                "type": 32,
+                "reportable": false,
+                "remote": false
+            },
+            "BrightnessMax": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 769,
+                "cluster_name": "Ballast Configuration",
+                "attribute": 17,
+                "type": 32,
+                "reportable": false,
+                "remote": false
+            },
+            "DimmingMode": {
+                "manufacturer": true,
+                "manufacturer_code": 4190,
+                "cluster": 769,
+                "cluster_name": "Ballast Configuration",
+                "attribute": 57344,
+                "type": 48,
+                "reportable": false,
+                "remote": false
+            }
+        }
+    },
+    "commands": {
+        "zigbee": {
+            "On": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 6,
+                "command": 0
+            },
+            "Brightness": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 8,
+                "command": 4
+            }
+        }
+    }
+}

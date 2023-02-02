@@ -1,0 +1,41 @@
+{
+    "version": 3,
+    "domain": "Security",
+    "attributes": {
+        "zigbee": {
+            "Battery": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 1,
+                "cluster_name": "Power Configuration",
+                "attribute": 33,
+                "type": 32,
+                "reportable": true,
+                "report": {
+                    "min": 900,
+                    "max": 3600,
+                    "change": 2
+                },
+                "remote": false
+            },
+            "Alarm": {
+                "manufacturer": false,
+                "manufacturer_code": 0,
+                "cluster": 1280,
+                "cluster_name": "IAS Zone",
+                "attribute": 2,
+                "type": 25,
+                "reportable": true,
+                "report": {
+                    "min": 0,
+                    "max": 0,
+                    "change": 0
+                },
+                "remote": false
+            }
+        }
+    },
+    "commands": {
+        "zigbee": {}
+    }
+}

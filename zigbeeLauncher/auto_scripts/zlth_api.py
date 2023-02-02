@@ -2,7 +2,7 @@ import json
 import asyncio
 from dataclasses import dataclass, asdict
 from functools import wraps
-from typing import Optional
+from typing import Optional, Any
 
 from dacite import from_dict
 
@@ -18,6 +18,26 @@ class Response:
     code: int
     message: str
     data: object
+
+
+@dataclass
+class Simulator:
+    connected: bool
+    version: str
+    label: str
+    name: str
+    ip: str
+    mac: str
+    devices: list[str]
+
+
+@dataclass
+class SimulatorsResponse:
+    uuid: str
+    timestamp: int
+    code: int
+    message: str
+    data: list[Simulator]
 
 
 @dataclass
@@ -81,6 +101,7 @@ class ZigbeesResponse:
 
 @dataclass
 class AttributeQuery:
+    endpoint: int
     cluster: int
     server: int
     attribute: int
@@ -92,12 +113,12 @@ class AttributeQuery:
 class Attribute:
     endpoint: int
     cluster: int
-    server: int
+    server: bool
     attribute: int
     type: str
-    value: any
-    manufacturer: int = 0
-    manufacturer_code: int = 0
+    value: Any
+    manufacturer: bool
+    manufacturer_code: Optional[int]
 
 
 @dataclass
@@ -114,6 +135,7 @@ class ZLTHAPI(Http):
     def __init__(self):
         Http.__init__(self, url='http://localhost:5000',
                       headers={'Content-Type': 'application/json'})
+        self.simulators = self._get_simulators()
         self.dongles = self._get_devices()
 
     @staticmethod
@@ -141,11 +163,18 @@ class ZLTHAPI(Http):
 
         return function
 
+    @_decode(SimulatorsResponse)
+    def _get_simulators(self):
+        self.method = 'GET'
+        self.path = '/api/2/simulators'
+        self.params = None
+        self.body = None
+
     @_decode(DevicesResponse)
-    def _get_devices(self):
+    def _get_devices(self, params=None):
         self.method = 'GET'
         self.path = '/api/2/devices'
-        self.params = None
+        self.params = params
         self.body = None
 
     def refresh(self):
@@ -180,7 +209,7 @@ class ZLTHAPI(Http):
     @wait_and_retry()
     def is_joined(self, mac):
         device = self.get_device(mac)
-        if device.state == 6:
+        if device and device.state == 6:
             return True
         else:
             return False
@@ -205,14 +234,15 @@ class ZLTHAPI(Http):
         if device.state == 1:
             return True
         else:
+            self.reset(mac)
             return False
 
     @_decode(Response)
-    def write(self, mac, attribute):
+    def write(self, mac, attribute: Attribute):
         """
         update attribute value
         :param mac: dongle mac address
-        :param attribute: AttributeQuery object
+        :param attribute: Attribute object
         :return:
         """
         self.method = 'PUT'
@@ -242,8 +272,20 @@ class ZLTHAPI(Http):
         self.body = None
 
     @_decode(AttributeResponse)
-    def get_attribute(self, mac, attribute_request):
+    def get_attribute(self, mac, attribute: AttributeQuery):
         self.method = 'GET'
         self.path = '/api/2/zigbees/{}/attributes'.format(mac)
-        self.params = asdict(attribute_request)
+        self.params = asdict(attribute)
         self.body = None
+
+    def has_device(self, mac):
+        for dongle in self.dongles:
+            if dongle.mac == mac:
+                return dongle
+        return None
+
+    def has_simulator(self, ip):
+        for simulator in self.simulators:
+            if simulator.ip == ip:
+                return simulator
+        return None

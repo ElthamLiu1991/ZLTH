@@ -1,0 +1,55 @@
+{
+    "basic": {
+        "protocol": "zigbee",
+        "endpoints": [
+            {
+                "device_id": 256,
+                "endpoint": 1,
+                "profile": 260,
+                "domains": [
+                    {
+                        "name": "Lighting",
+                        "reporting": [
+                            "RSSI",
+                            "LQI",
+                            "On"
+                        ],
+                        "initializing": [
+                            "On"
+                        ],
+                        "setting": []
+                    }
+                ]
+            }
+        ],
+        "manufacturer": "Schneider Electric",
+        "manufacturer_code": 4190,
+        "model": "PUCK/SWITCH/1",
+        "name": "PUCK Switch"
+    },
+    "tuya": {
+        "pid": {
+            "development": "adys8axm",
+            "field_test": "67teklsb",
+            "release": "avcpmrz7",
+            "staging": "h8btklfd"
+        },
+        "config": {
+            "1": {
+                "endpoint": 1,
+                "type": "bool",
+                "request": {
+                    "domain": "Lighting",
+                    "type": "command",
+                    "name": "On"
+                },
+                "report": {
+                    "domain": "Lighting",
+                    "type": "attribute",
+                    "name": "On"
+                }
+            }
+        }
+    },
+    "version": 3
+}

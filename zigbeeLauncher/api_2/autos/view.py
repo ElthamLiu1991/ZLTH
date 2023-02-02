@@ -8,7 +8,7 @@ from zigbeeLauncher.api_2.autos import scripts
 from zigbeeLauncher.database.interface import DBAuto
 from zigbeeLauncher.logging import flaskLogger as logger
 from zigbeeLauncher.api_2.response import Response
-from zigbeeLauncher.auto_scripts import AutoTesting, State, Result
+from zigbeeLauncher.auto_scripts import AutoTesting, State, Result, Error
 
 
 class AutoResource(Resource):
@@ -91,10 +91,17 @@ class AutoScriptsResource(Resource):
         # 进入auto_scripts加载对应的script, 返回record的文件名称，并保持到数据库中
         record = AutoTesting().set_script(script)
         if record:
-            AutoTesting().start(record)
-            return Response(data={'record': record}).pack()
+            result = AutoTesting().start(record)
+            if result == Error.NO_ERROR:
+                return Response(data={'record': record}).pack()
+            elif result == Error.RUNNING:
+                return Response(record, code=70004).pack()
+            elif result == Error.INVALID_CONFIG:
+                return Response(record, code=70002).pack()
+            elif result == Error.NOT_FOUND:
+                return Response(record, code=70001).pack()
         else:
-            return Response(script, code=70001).pack()
+            return Response(script, code=70000).pack()
 
 
 class AutoScriptsConfigResource(Resource):

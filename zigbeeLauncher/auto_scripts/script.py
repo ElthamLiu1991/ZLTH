@@ -18,6 +18,10 @@ class Basic_script():
         self.config = None
         self.script = None
         self.state = None
+        self.result = None
+        self.setting = None
+        self.ready = False
+        self.error = None
 
     def is_running(self):
         return self.running
@@ -50,8 +54,33 @@ class Script(Basic_script):
         self.script = script
         self.update_callback = status_callback
         with open(path, encoding='utf-8') as f:
-            self.config = json.loads(f.read())
-            self.record = self.script + '-'+time.strftime("%Y-%m-%d_%H-%M-%S") + '.log'
+            self.record = self.script + '-' + time.strftime("%Y-%m-%d_%H-%M-%S") + '.log'
+            try:
+                self.config = f.read()
+                self.config = json.loads(self.config)
+            except json.JSONDecodeError as e:
+                logger.exception(f'invalid JSON format, {self.config}')
+                self.error = f'config is not valid JSON format'
+            else:
+                self.load_config()
+
+    @abc.abstractmethod
+    def update_result(self, result, descriptor):
+        """
+        store failed record
+        :param result: result
+        :param descriptor: record
+        :return:
+        """
+        pass
+
+    @abc.abstractmethod
+    def load_config(self):
+        """
+        load script config
+        :return:
+        """
+        pass
 
     @abc.abstractmethod
     def start(self):
@@ -85,14 +114,32 @@ class Script(Basic_script):
         """
         pass
 
+    def set_config(self, config):
+        self.config = config
+        self.load_config()
+
     def update(self, state, result):
         self.state = state
+        self.result = result
         if self.update_callback:
             self.update_callback(self.record, self.state, result)
+
 
     def log(self, status, message):
         auto_record(self.record, self.state, status, message)
         pass
+
+    def is_ready(self):
+        return self.ready
+
+    def get_error(self):
+        return self.error
+
+    def set_record(self, record):
+        self.record = record
+
+    def get_state(self):
+        return self.state
 
 
 class Http:
@@ -107,7 +154,7 @@ class Http:
 
     async def send(self):
         async with httpx.AsyncClient() as client:
-            logger.debug(f"request:{self.url}{self.path}")
+            logger.info(f"request:{self.url}{self.path}")
             if self.method == 'GET':
                 r = await client.get(self.url + self.path,
                                      params=self.params,
@@ -128,8 +175,10 @@ class Http:
                                         params=self.params,
                                         headers=self.headers)
             if r.status_code != 200:
+                logger.info(f"HTTP response failed: {r.json()}")
                 raise Exception(f"{r.status_code}: {r.json()}")
             else:
+                logger.info(f"HTTP response success: {r.json()}")
                 self.response = r.json()
 
 

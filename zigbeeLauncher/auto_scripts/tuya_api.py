@@ -41,7 +41,7 @@ class TokenResponse:
 
 
 @dataclass
-class Status:
+class DPStatus:
     code: str
     value: str
 
@@ -64,7 +64,7 @@ class Device:
     owner_id: str
     product_id: str
     product_name: str
-    status: list[Status]
+    status: list[DPStatus]
     sub: bool
     time_zone: str
     uid: str
@@ -261,7 +261,7 @@ class TUYAAPI(Http):
         self._calculate_sign_with_token()
 
     @_decode(Response)
-    def request(self, vid, status):
+    def request(self, vid, status: DPStatus):
         self.method = 'POST'
         self.path = '/v1.0/devices/{}/commands'.format(vid)
         self.params = None
@@ -271,11 +271,3 @@ class TUYAAPI(Http):
             ]
         }
         self._calculate_sign_with_token()
-
-    def get_value(self, vid, code):
-        info = self.get_device_info(vid)
-        if info:
-            for item in info.status:
-                if item.code == code:
-                    return item.value
-        return None

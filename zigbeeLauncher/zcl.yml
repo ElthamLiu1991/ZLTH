@@ -4199,7 +4199,7 @@ clusters:
        server: true
      - id: 0x011C
        name: LastMessageLQI
-       type: uint16
+       type: uint8
        
        writable: false
        default: 0
@@ -4209,7 +4209,7 @@ clusters:
        server: true
      - id: 0x011D
        name: LastMessageRSSI
-       type: uint16
+       type: int8
        
        writable: false
        default: 0

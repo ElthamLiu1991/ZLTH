@@ -1,0 +1,80 @@
+{
+    "basic": {
+        "protocol": "zigbee",
+        "endpoints": [
+            {
+                "device_id": 1026,
+                "endpoint": 1,
+                "profile": 260,
+                "domains": [
+                    {
+                        "name": "Security",
+                        "reporting": [
+                            "Battery",
+                            "Alarm"
+                        ],
+                        "initializing": [
+                            "Battery",
+                            "Alarm"
+                        ],
+                        "setting": []
+                    }
+                ]
+            }
+        ],
+        "manufacturer": "Schneider Electric",
+        "manufacturer_code": 4190,
+        "model": "CCT591011_AS",
+        "name": "Door/Window Sensor"
+    },
+    "tuya": {
+        "pid": {
+            "development": "ajnebdtw",
+            "field_test": "dz5mih8x",
+            "release": "jdknwriz",
+            "staging": "hoe95iu0"
+        },
+        "config": {
+            "1": {
+                "endpoint": 1,
+                "type": "bool",
+                "report": {
+                    "domain": "Security",
+                    "type": "attribute",
+                    "name": "Alarm"
+                }
+            },
+            "2": {
+                "endpoint": 1,
+                "type": "int",
+                "report": {
+                    "domain": "Security",
+                    "type": "attribute",
+                    "name": "Battery"
+                }
+            }
+        }
+    },
+    "zlth": {
+        "doorcontact_state": {
+            "endpoint": 1,
+            "requestable": false,
+            "reportable": true,
+            "report": {
+                "domain": "Security",
+                "attribute": "Alarm",
+                "data": [
+                    {
+                        "value": 49,
+                        "verify": "true"
+                    },
+                    {
+                        "value": 48,
+                        "verify": "false"
+                    }
+                ]
+            }
+        }
+    },
+    "version": 3
+}
