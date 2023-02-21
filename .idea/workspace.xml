@@ -4,194 +4,61 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/dcf/Lighting.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dcf/Security.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dcf/door_window_sensor.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dcf/puck_dimmer.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dcf/puck_switch.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dcf/water_leakage_sensor.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/firmwares/WiserZLTH-V1.0.4.gbl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/firmwares/WiserZLTH-V1.0.5.gbl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/firmwares/WiserZLTH-V1.0.6.gbl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/1/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/1/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/1/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/1/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/1/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/1/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/10/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/10/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/10/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/10/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/10/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/10/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/2/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/2/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/2/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/2/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/2/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/2/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/3/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/3/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/3/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/3/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/3/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/3/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/4/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/4/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/4/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/4/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/4/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/4/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/5/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/5/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/5/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/5/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/5/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/5/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/6/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/6/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/6/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/6/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/6/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/6/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/7/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/7/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/7/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/7/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/7/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/7/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/8/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/8/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/8/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/8/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/8/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/8/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/9/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/9/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/9/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/9/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/9/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_14-11-15.log/9/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-38-13.log/11/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-38-13.log/11/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-38-13.log/11/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-38-13.log/11/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-38-13.log/11/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-38-13.log/11/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-50-14.log/10/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-50-14.log/10/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-50-14.log/10/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-50-14.log/10/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-50-14.log/10/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_15-50-14.log/10/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-05-13.log/10/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-05-13.log/10/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-05-13.log/10/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-05-13.log/10/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-05-13.log/10/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-05-13.log/10/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-12-09.log/10/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-12-09.log/10/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-12-09.log/10/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-12-09.log/10/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-12-09.log/10/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-12-09.log/10/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/1/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/1/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/1/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/1/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/1/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/1/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/10/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/10/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/10/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/10/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/10/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/10/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/2/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/2/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/2/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/2/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/2/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/2/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/3/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/3/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/3/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/3/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/3/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/3/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/4/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/4/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/4/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/4/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/4/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/4/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/5/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/5/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/5/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/5/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/5/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/5/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/6/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/6/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/6/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/6/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/6/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/6/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/7/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/7/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/7/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/7/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/7/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/7/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/8/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/8/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/8/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/8/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/8/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/8/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/9/device.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/9/log/SYSMGR.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/9/log/WISERDEV.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/9/log/WISERSE.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/9/log/udp-bcast-relay.log" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/hub/capacity-2023-02-01_16-18-04.log/9/wse.db" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/compose.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/compose/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/dcf_api.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/hub_api.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/stability/__init__.py" afterDir="false" />
+    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish">
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/command.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/exceptions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_01.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_02.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_f0.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/client.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/handler.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/simulator.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/topic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/1G_dimmer_template.yml" beforeDir="false" afterPath="$PROJECT_DIR$/files/1G_dimmer_template.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/2G_dimmer_template.yml" beforeDir="false" afterPath="$PROJECT_DIR$/files/2G_dimmer_template.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/puck_dimmer.yml" beforeDir="false" afterPath="$PROJECT_DIR$/files/puck_dimmer.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/window_door_sensor.yml" beforeDir="false" afterPath="$PROJECT_DIR$/files/window_door_sensor.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/logConfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/logConfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/capacity.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/capacity.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/capacity_local.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/capacity_local.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/stability.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/stability.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/autos.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/autos.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/records.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/records.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/zcl/zcl.yml" beforeDir="false" afterPath="$PROJECT_DIR$/templates/zcl/zcl.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/firmwares/WiserZLTH-V1.0.3_WiserZLTH-V1.0.3.gbl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/firmwares/WiserZLTH-V1.0.4.gbl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/run_mqtt.py" beforeDir="false" afterPath="$PROJECT_DIR$/run_mqtt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/response.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/response.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/devices/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/devices/view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/firmwares/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/firmwares/view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/simulators/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/simulators/view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/zigbees/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/zigbees/view.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/zcl.yml" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/zcl.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/device.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/device.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/simulator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/zigbee.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/zigbee.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Config.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Dongle.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Info.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/info.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Serial.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/serial.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Task.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/tasks.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Upgrade.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/upgrade.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/Xmodem.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/xmodem.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/management.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/logging/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/logging/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Callbacks.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Connection.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Launcher_API.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Service.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Simulator.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/Simulator_API.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/mqtt/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/request_and_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/wait_response.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocol.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/serial_protocol.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocol01.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/serial_protocol_01.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocol02.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/serial_protocol_02.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocol03.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/serial_protocol_03.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocolF0.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/serial_protocol_F0.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/zigbee/DataType.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/zigbee/data_type.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/zigbee/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/zigbee/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -220,15 +87,18 @@
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/Info.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/info.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/dcf/puck_switch.json" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/serial_protocol/SerialProtocolF0.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/__init__.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/serial_protocol/serial_protocol_F0.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_01.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/management.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/readme.txt" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_02.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/version/version.txt" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/dcf/Lighting.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/test.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/dcf/door_window_sensor.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/scripts/stability.json" root0="FORCE_HIGHLIGHTING" />
@@ -244,15 +114,19 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/scripts" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/zigbeeLauncher/serial_protocol" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\serial_protocol" />
       <recent name="D:\projects\zigbee_launcher\development-new\scripts" />
       <recent name="D:\projects\zigbee_launcher\development-new\dcf" />
       <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\auto_scripts" />
       <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\auto_scripts\capacity" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher" />
     </key>
   </component>
   <component name="RunManager" selected="Python.launcher">
@@ -269,6 +143,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/launcher.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="sp" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="development-new" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/zigbeeLauncher/serial_protocol" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -302,6 +197,7 @@
       <list>
         <item itemvalue="Python.launcher" />
         <item itemvalue="Python.test" />
+        <item itemvalue="Python.sp" />
       </list>
     </recent_temporary>
   </component>
@@ -314,6 +210,14 @@
       <option name="presentableId" value="Default" />
       <updated>1671180276711</updated>
     </task>
+    <task id="LOCAL-00001" summary="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish">
+      <created>1675300799239</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1675300799239</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -328,6 +232,10 @@
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -336,7 +244,17 @@
           <line>45</line>
           <option name="timeStamp" value="59" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test.py</url>
+          <line>13</line>
+          <option name="timeStamp" value="224" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="data" language="Python" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

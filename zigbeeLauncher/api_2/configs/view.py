@@ -8,7 +8,6 @@ from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
 from werkzeug.utils import secure_filename
 
-from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2, simulator_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
 from ..json_schemas import config_schema
 from ..response import Response
@@ -17,7 +16,7 @@ from jsonschema.exceptions import SchemaError, ValidationError
 
 from ..util import handle_devices, check_device_exist, check_device_state, config_validation
 from ... import base_dir
-from ...mqtt import get_mac_address, get_ip_address
+from ...simulator import get_mac_address, get_ip_address
 
 
 class ConfigResource(Resource):

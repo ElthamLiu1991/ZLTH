@@ -9,7 +9,7 @@ class Zigbee(db.Model):
     extended_pan_id = db.Column(db.String(32))
     node_id = db.Column(db.Integer())
 
-    def __init__(self, mac, device_type, channel, pan_id, extended_pan_id, node_id):
+    def __init__(self, mac=None, device_type=None, channel=None, pan_id=None, extended_pan_id=None, node_id=None):
         self.mac = mac
         self.device_type = device_type
         self.channel = channel

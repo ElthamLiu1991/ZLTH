@@ -5,125 +5,136 @@ import werkzeug
 import yaml
 from flask import jsonify, render_template, request
 from flask_restful import Api, Resource, reqparse
-from werkzeug.utils import secure_filename
+from jsonschema import validate
+from jsonschema._format import draft7_format_checker
 
-from . import devices
 from zigbeeLauncher.database.interface import DBDevice
-from zigbeeLauncher.mqtt.Launcher_API import dongle_command_2
 from zigbeeLauncher.logging import flaskLogger as logger
-from ..response import Response
-from jsonschema import validate, draft7_format_checker
-from jsonschema.exceptions import SchemaError, ValidationError
 from ..json_schemas import config_schema
 
-from ..util import check_device_exist, check_device_state, config_validation
+from ..util import check_device_exist, check_device_state, config_validation, send_command
 from ... import base_dir
+from ...exceptions import exception, DeviceOffline, InvalidPayload, Unsupported, DeviceNotFound, DeviceNotReady
 
 
 class DevicesResource(Resource):
+    """
+    /devices
+    """
+
     def get(self):
-        """
-        获取数据库device表并传给前端
-        :return: device所有数据
-        """
-        if request.args:
-            try:
-                paras = {}
-                for key in request.args:
-                    paras[key] = request.args[key]
-                return Response(data=DBDevice(**paras).retrieve()).pack()
-            except Exception as e:
-                logger.exception("request error")
-                return Response("bad parameters:"+str(request.args), code=90000)
-        return Response(data=DBDevice().retrieve()).pack()
+        @exception
+        def handle():
+            paras = request.args
+            devices = DBDevice(**paras).retrieve()
+            return devices
+
+        return handle()
 
 
 class DeviceResource(Resource):
+    """
+    /devices/<mac>
+    """
 
-    commands = ['identify', 'reset', 'label', 'online']
-    schema = {
-        "type": "object",
-        "properties": {
-            "identify": {
-                "type": "object",
-                "properties": {},
-                "description": "identify request"
-            },
-            "reset": {
-                "type": "object",
-                "properties": {},
-                "description": "reset request"
-            },
-            "label": {
-                "type": "object",
-                "properties": {
-                    "data": {
-                        "type": "string",
-                        "description": "label"
-                    }
+    def get(self, mac):
+        @exception
+        def handle():
+            device = DBDevice(mac=mac).retrieve()
+            if not device:
+                raise DeviceNotFound(mac)
+            else:
+                return device[0]
+
+        return handle()
+
+    def put(self, mac):
+        commands = ['identify', 'reset', 'label']
+        schema = {
+            "type": "object",
+            "properties": {
+                "identify": {
+                    "type": "object",
+                    "properties": {},
+                    "description": "identify request"
                 },
-                "description": "label modification request",
-                "required": [
-                    "data"
-                ]
+                "reset": {
+                    "type": "object",
+                    "properties": {},
+                    "description": "reset request"
+                },
+                "label": {
+                    "type": "object",
+                    "properties": {
+                        "data": {
+                            "type": "string",
+                            "description": "label"
+                        }
+                    },
+                    "description": "label modification request",
+                    "required": [
+                        "data"
+                    ]
+                }
             }
         }
-    }
 
-    @check_device_exist
-    def get(self, mac, device):
-        return Response(data=device).pack()
+        @exception
+        def handle():
+            device = DBDevice(mac=mac).retrieve()
+            if not device:
+                raise DeviceNotFound(mac)
+            else:
+                device = device[0]
 
-    @check_device_state
-    def put(self, mac, device):
-        args = request.get_json()
-        ip = device['ip']
-        state = device['state']
-        try:
-            for key in args.keys():
-                if key not in self.commands:
-                    return Response(key, code=90002).pack()
-            for key in args.keys():
-                if key != 'reset':
-                    if state == 2:
-                        return Response(mac, code=10002).pack()
-                    if key == 'label':
-                        # label size should not more than 64 characters
-                        if len(args[key]['data']) > 63:
-                            return Response('data', code=90005).pack()
-                if state == 3:
-                    return Response(mac, code=10003).pack()
-                if state == 9:
-                    return Response(mac, code=10009).pack()
-                try:
-                    validate(instance=args, schema=self.schema,
-                             format_checker=draft7_format_checker)
-                except SchemaError as e:
-                    logger.exception('illegal schema: %s', e.message)
-                    return Response(e.message, code=90003).pack()
-                except ValidationError as e:
-                    logger.exception('json validation failed:%s', e.message)
-                    return Response(e.message, code=90004).pack()
-                else:
-                    response = dongle_command_2(ip, mac, args)
-                    return Response(**response).pack()
-        except Exception as e:
-            return Response(str(e), code=90000).pack()
+            if not device.get('connected'):
+                raise DeviceOffline(mac)
+            try:
+                validate(instance=request.get_json(), schema=schema,
+                         format_checker=draft7_format_checker)
+            except Exception as e:
+                raise InvalidPayload(e.description)
+            for k, v in request.get_json().items():
+                if k not in commands:
+                    raise Unsupported(k)
+                return send_command(ip=device.get('ip'), mac=mac, command={k: v})
+
+        return handle()
 
 
 class DeviceConfigResource(Resource):
-    @check_device_state
-    def get(self, mac, device):
-        if not device['configured']:
-            return Response(mac, code=60000).pack()
-        if device['state'] == 9:
-            return Response(mac, code=60001).pack()
-        ip = device['ip']
-        response = dongle_command_2(ip, mac, {
-            "config": {
-            }
-        })
-        return Response(**response).pack()
+    """
+    /devices/<mac>/config
+    """
+
+    def get(self, mac):
+        @exception
+        def handle():
+            device = DBDevice(mac=mac).retrieve()
+            if not device:
+                raise DeviceNotFound(mac)
+            else:
+                device = device[0]
+                if not device.get('connected'):
+                    raise DeviceOffline(mac)
+                if not device.get('configured'):
+                    raise DeviceNotReady(mac)
+                return send_command(ip=device.get('ip'), mac=mac, command={'config': {}})
+
+        return handle()
+
+    # @check_device_state
+    # def get(self, mac, device):
+    #     if not device['configured']:
+    #         return Response(mac, code=60000).pack()
+    #     if device['state'] == 9:
+    #         return Response(mac, code=60001).pack()
+    #     ip = device['ip']
+    #     response = dongle_command_2(ip, mac, {
+    #         "config": {
+    #         }
+    #     })
+    #     return Response(**response).pack()
 
     @check_device_state
     def put(self, mac, device):
@@ -197,4 +208,3 @@ class DeviceConfigResource(Resource):
             logger.exception('load YAML failed:%s', str(e))
             return Response(str(e), code=90000).pack()
         pass
-

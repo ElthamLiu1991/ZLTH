@@ -274,9 +274,10 @@ class WiserMQTT:
 
     def resend(self):
         if self._need_resend:
-            logger.debug(f"resend:{self._topic}, {self._payload}")
-            self.client.publish(self._topic, self._payload, qos=2)
-            self._need_resend = False
+            if self._topic and self._payload:
+                logger.debug(f"resend:{self._topic}, {self._payload}")
+                self.client.publish(self._topic, self._payload, qos=2)
+                self._need_resend = False
 
     def start(self) -> None:
         def on_connect(client, userdata, flags, rc):
@@ -294,8 +295,8 @@ class WiserMQTT:
                 logger.error("Wiser hub disconnected unexpected:%s", rc)
                 time.sleep(1)
                 self._need_resend = True
-                connect()
-                return
+                # connect()
+                # return
                 # self.run()
             self.connected = False
             logger.info("Wiser hub disconnected")

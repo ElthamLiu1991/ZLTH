@@ -9,7 +9,7 @@ class Auto(db.Model):
     record = db.Column(db.String())
     config = db.Column(db.String())
 
-    def __init__(self, script, state, result, record, config):
+    def __init__(self, script=None, state=None, result=None, record=None, config=None):
         self.script = script
         self.state = state
         self.result = result

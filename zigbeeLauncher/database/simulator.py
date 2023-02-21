@@ -8,14 +8,16 @@ class Simulator(db.Model):
     label = db.Column(db.String(50))
     connected = db.Column(db.Boolean())
     version = db.Column(db.String(10))
+    broker = db.Column(db.String(20))
 
-    def __init__(self, ip, name, mac, label, connected, version):
+    def __init__(self, ip=None, name=None, mac=None, label=None, connected=None, version=None, broker=None):
         self.ip = ip
         self.name = name
         self.mac = mac
         self.label = label
         self.connected = connected
         self.version = version
+        self.broker = broker
 
 
 class SimulatorSchema(ma.SQLAlchemyAutoSchema):

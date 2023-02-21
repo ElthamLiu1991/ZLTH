@@ -12,8 +12,8 @@ class Device(db.Model):
     swversion = db.Column(db.String(10))
     hwversion = db.Column(db.String(10))
 
-    def __init__(self, ip, name, mac, label, connected, configured, state,
-                 swversion, hwversion):
+    def __init__(self, ip=None, name=None, mac=None, label=None, connected=None, configured=None, state=None,
+                 swversion=None, hwversion=None):
         self.ip = ip
         self.name = name
         self.mac = mac

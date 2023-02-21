@@ -1,4 +1,4 @@
-from zigbeeLauncher.zigbee.DataType import data_type_value_table, data_type_table
+from zigbeeLauncher.zigbee.data_type import data_type_value_table, data_type_table
 
 
 def type_exist(_type):

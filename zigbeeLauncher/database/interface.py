@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass, asdict
 
 from flask import current_app
 
@@ -58,31 +59,25 @@ class DBDevice(DBInterface):
     def __init__(self, **kwargs):
         super(DBDevice, self).__init__(table=Device, **kwargs)
 
-    def add(self, data):
+    @dataclass
+    class DataModel:
+        ip: str
+        mac: str
+        name: str
+        connected: bool
+        state: int
+        label: str
+        configured: bool
+        swversion: str
+        hwversion: str
+
+    def add(self, instance: DataModel):
         try:
             if self.retrieve():
                 # self.delete()
-                self.update({
-                    'ip': data['ip'],
-                    'name': data['name'],
-                    'mac': data['mac'],
-                    'label': data['label'],
-                    'connected': data['connected'],
-                    'configured': data['configured'],
-                    'state': data['state'],
-                    'swversion': data['swversion'],
-                    'hwversion': data['hwversion']
-                })
+                self.update(instance.__dict__)
             else:
-                device = Device(data["ip"],
-                                data["name"],
-                                data["mac"],
-                                data["label"],
-                                data["connected"],
-                                data["configured"],
-                                data["state"],
-                                data["swversion"],
-                                data["hwversion"])
+                device = Device(**instance.__dict__)
                 self._add(device)
         except Exception as e:
             log.warning("inset device to database failed:%s", e)
@@ -93,34 +88,32 @@ class DBDevice(DBInterface):
     def delete(self):
         self._delete()
 
-    def retrieve(self):
-        return self._retrieve(DeviceSchema(many=True))
+    def retrieve(self, many=True):
+        return self._retrieve(DeviceSchema(many=many))
 
 
 class DBSimulator(DBInterface):
     def __init__(self, **kwargs):
         super(DBSimulator, self).__init__(table=Simulator, **kwargs)
 
-    def add(self, data):
+    @dataclass
+    class DataModel:
+        ip: str
+        mac: str
+        label: str
+        version: str
+        name: str
+        connected: bool
+        broker: str
+
+    def add(self, instance: DataModel):
         try:
             if self.retrieve():
                 # self.delete()
                 # update
-                self.update({
-                    'ip': data['ip'],
-                    'name': data['name'],
-                    'mac': data['mac'],
-                    'label': data['label'],
-                    'connected': data['connected'],
-                    'version': data['version']
-                })
+                self.update(instance.__dict__)
             else:
-                simulator = Simulator(data["ip"],
-                                      data["name"],
-                                      data["mac"],
-                                      data["label"],
-                                      data["connected"],
-                                      data["version"])
+                simulator = Simulator(**instance.__dict__)
                 self._add(simulator)
         except Exception as e:
             log.warning("inset simulator to database failed:%s", e)
@@ -131,24 +124,28 @@ class DBSimulator(DBInterface):
     def delete(self):
         self._delete()
 
-    def retrieve(self):
-        return self._retrieve(SimulatorSchema(many=True))
+    def retrieve(self, many=True):
+        return self._retrieve(SimulatorSchema(many=many))
 
 
 class DBZigbee(DBInterface):
     def __init__(self, **kwargs):
         super(DBZigbee, self).__init__(table=Zigbee, **kwargs)
 
-    def add(self, data):
+    @dataclass
+    class DataModel:
+        mac: str
+        device_type: str
+        channel: int
+        node_id: int
+        pan_id: int
+        extended_pan_id: str
+
+    def add(self, instance: DataModel):
         try:
             if self.retrieve():
                 self.delete()
-            zigbee = Zigbee(data['mac'],
-                            data['device_type'],
-                            data['channel'],
-                            data['pan_id'],
-                            hex(data['extended_pan_id'])[2:],
-                            data['node_id'])
+            zigbee = Zigbee(**instance.__dict__)
             self._add(zigbee)
         except Exception as e:
             log.exception("inset zigbee to database failed:%s", e)
@@ -167,24 +164,22 @@ class DBAuto(DBInterface):
     def __init__(self, **kwargs):
         super(DBAuto, self).__init__(table=Auto, **kwargs)
 
-    def add(self, data):
+    @dataclass
+    class DataModel:
+        script: str
+        state: str
+        result: str
+        record: str
+        config: str
+
+    def add(self, instance: DataModel):
         try:
             if self.retrieve():
                 # self.delete()
                 # update
-                self.update({
-                    'script': data['script'],
-                    'state': data['state'],
-                    'result': data['result'],
-                    'record': data['record'],
-                    'config': data['config'],
-                })
+                self.update(asdict(instance))
             else:
-                auto = Auto(data["script"],
-                            data["state"],
-                            data['result'],
-                            data["record"],
-                            data["config"])
+                auto = Auto(asdict(instance))
                 self._add(auto)
         except Exception as e:
             log.warning("inset auto to database failed:%s", e)

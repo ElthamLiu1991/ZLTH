@@ -48,9 +48,9 @@ def create_app():
     from .api_2 import api as v2
     app.register_blueprint(v2)
     # run Simulator
-    from .mqtt import init
+    from .simulator import init
     init()
-    from . import request_and_response
-    request_and_response.init()
+    from . import wait_response
+    wait_response.init()
     #return app
     return socketio, app

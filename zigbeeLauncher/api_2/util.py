@@ -1,12 +1,50 @@
 import json
+import time
+import uuid
 from functools import wraps
 
 import requests
+
+from zigbeeLauncher.data_model import Message
+from zigbeeLauncher.exceptions import Timeout
 from zigbeeLauncher.logging import flaskLogger as logger
 from zigbeeLauncher.api_2.response import Response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator, DBZigbee
-from zigbeeLauncher.mqtt import get_mac_address
+from zigbeeLauncher.wait_response import wait_response
+from zigbeeLauncher.simulator import get_mac_address
+from zigbeeLauncher.simulator.handler import handle_device_command, handler_command
+from zigbeeLauncher.util import get_ip_address, Global
 from zigbeeLauncher.zigbee import type_exist, format_validation, value_validation
+
+
+def send_command(ip=None, mac=None, command=None, timeout=10):
+    timestamp = int(round(time.time() * 1000))
+    uid = str(uuid.uuid1())
+    # 加入request等待队列
+    task = wait_response(timestamp, uid, timeout)
+    message = Message(uuid=uid, timestamp=timestamp, data=command, code=0, message="")
+    # if ip == get_ip_address():
+    if False:
+        logger.info(f'local command:{command}')
+        if mac:
+            # device command
+            handle_device_command(message, ip, mac)
+            pass
+        else:
+            # simulator command
+            handler_command(message, ip)
+    else:
+        logger.info(f'remote command:{command}')
+        simulator = Global.get(Global.SIMULATOR)
+        if mac:
+            simulator.client.send_device_command(ip, mac, message)
+        else:
+            # simulator command
+            simulator.client.send_simulator_command(ip, message)
+    timeout, data = task.result()
+    if timeout:
+        raise Timeout()
+    return data
 
 
 def handle_devices(devices):
@@ -166,3 +204,4 @@ def config_validation(config):
             if not result:
                 return False, 'endpoints:{}:client_'.format(endpoint['id'])+error
     return True, None
+

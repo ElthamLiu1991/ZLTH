@@ -9,92 +9,135 @@ from werkzeug.utils import secure_filename
 
 from ..response import Response
 from zigbeeLauncher.database.interface import DBDevice, DBSimulator
-from zigbeeLauncher.mqtt import get_mac_address, get_ip_address
-from zigbeeLauncher.mqtt.Launcher_API import simulator_command_2
+from zigbeeLauncher.simulator import get_mac_address, get_ip_address
 from zigbeeLauncher.logging import flaskLogger as logger
-from ..util import handle_devices
+from ..util import handle_devices, send_command
 from ... import base_dir
+from ...exceptions import exception, InvalidPayload, NotFound, DeviceNotFound, DeviceOffline, Unreachable
 
 
 class FirmwareResource(Resource):
-
+    """
+    /firmwares
+    """
     def get(self):
-        """
-        获取保存的固件列表
-        :return:
-        """
-        data = []
-        for root, dirs, files in os.walk('./firmwares'):
-            data = data + files
-            return Response(data=data).pack()
+        @exception
+        def handle():
+            data = []
+            for root, dirs, files in os.walk('./firmwares'):
+                data += files
+                return data
+        return handle()
 
     def delete(self):
-        args = request.get_json()
-        if 'filename' not in args:
-            return Response('filename', code=90001).pack()
-        file =args['filename']
-        path = os.path.join(base_dir, './firmwares') + '/' + file
-        if not os.path.isfile(path):
-            return Response(file, code=50000).pack()
-        else:
-            os.remove(os.path.join(path))
-            return Response().pack()
+        @exception
+        def handle():
+            try:
+                file = f"./firmwares/{request.get_json()['filename']}"
+            except Exception as e:
+                raise InvalidPayload('missing filename')
+            # path = os.path.join(base_dir, '/firmwares') + '/'+ filename
+            if not os.path.isfile(file):
+                raise NotFound(file)
+            # os.remove(os.path.join(base_dir, f'./firmwares/{filename}'))
+            os.remove(file)
+            return {}
+        return handle()
 
     def post(self):
-        """
-        保存新的固件, 可以接收多个文件
-        :param mac:
-        :return:
-        """
-        files = request.files.getlist('file')
-        try:
-            for file in files:
+        @exception
+        def handle():
+            for file in request.files.getlist('file'):
                 filename = secure_filename(file.filename)
-                file.save(os.path.join('./firmwares', filename))
-        except Exception as e:
-            logger.exception("request error")
-            return Response(str(e), code=90000).pack()
-        return Response().pack()
+                file.save(f'./firmwares/{filename}')
+            return {}
+        return handle()
 
     def put(self):
-        """
-        对指定设备应用指定固件
-        :return:
-        """
-        args = request.get_json()
-        if 'devices' not in args and 'filename' not in args:
-            return Response(code=90001).pack()
-        else:
-            file = args['filename']
-            path = os.path.join(base_dir, './firmwares') + '/' + file
-            if not os.path.isfile(path):
-                return Response(file, code=50000).pack()
-            else:
-                # send this file to another simulator
-                result, code = handle_devices(args['devices'])
-                if code != 200:
-                    return result, 500
+        @exception
+        def handle():
+            try:
+                filename = request.get_json()['filename']
+                file = f'./firmwares/{filename}'
+                devices = request.get_json()['devices']
+            except Exception as e:
+                raise InvalidPayload('missing filename or devices')
+            if not os.path.isfile(file):
+                raise NotFound(file)
+            simulators = {}
+            for mac in devices:
+                device = DBDevice(mac=mac).retrieve()
+                if not device:
+                    raise DeviceNotFound(mac)
                 else:
-                    with open(path, 'rb') as f:
-                        data = base64.b64encode(f.read()).decode()
-                        for ip in result.keys():
-                            if ip == get_ip_address():
-                                response = simulator_command_2(ip, {
-                                    "firmware": {
-                                        "filename": file,
-                                        "devices": result[ip]
-                                    }
-                                })
-                            else:
-                                response = simulator_command_2(ip, {
-                                    "firmware": {
-                                        "filename": file,
-                                        "data": data,
-                                        "devices": result[ip]
-                                    }
-                                })
-                            code = response['code']
-                            if code != 0:
-                                return Response(**response).pack()
-
-                    return Response(**response).pack()
+                    device = device[0]
+                if not device.get('connected'):
+                    raise DeviceOffline(mac)
+                simulator = device.get('ip')
+                if simulator not in simulators:
+                    simulators.update({simulator: [mac]})
+                else:
+                    simulators[simulator].append(mac)
+            # if device belongs to another simulator, post file to that simulator first
+            for simulator, devices in simulators.items():
+                if simulator != get_ip_address():
+                    url = f'http://{simulator}:5000/api/2/firmwares'
+                    files = {'file': open(file, 'r')}
+                    try:
+                        r = requests.post(url, files=files)
+                    except Exception as e:
+                        raise Unreachable(simulator)
+                    logger.info(r.json())
+                result = send_command(ip=simulator, command={
+                    'firmware': {
+                        'filename': filename,
+                        'devices': devices
+                    }
+                })
+                if result != {}:
+                    return result
+            return {}
+        return handle()
+    # def put(self):
+    #     """
+    #     对指定设备应用指定固件
+    #     :return:
+    #     """
+    #     args = request.get_json()
+    #     if 'devices' not in args and 'filename' not in args:
+    #         return Response(code=90001).pack()
+    #     else:
+    #         file = args['filename']
+    #         path = os.path.join(base_dir, './firmwares') + '/' + file
+    #         if not os.path.isfile(path):
+    #             return Response(file, code=50000).pack()
+    #         else:
+    #             # send this file to another simulator
+    #             result, code = handle_devices(args['devices'])
+    #             if code != 200:
+    #                 return result, 500
+    #             else:
+    #                 # TODO: if involve other simulator, send this file to other simulator via HTTP
+    #                 with open(path, 'rb') as f:
+    #                     data = base64.b64encode(f.read()).decode()
+    #                     for ip in result.keys():
+    #                         if ip == get_ip_address():
+    #                             response = simulator_command_2(ip, {
+    #                                 "firmware": {
+    #                                     "filename": file,
+    #                                     "devices": result[ip]
+    #                                 }
+    #                             })
+    #                         else:
+    #                             response = simulator_command_2(ip, {
+    #                                 "firmware": {
+    #                                     "filename": file,
+    #                                     "data": data,
+    #                                     "devices": result[ip]
+    #                                 }
+    #                             })
+    #                         code = response['code']
+    #                         if code != 0:
+    #                             return Response(**response).pack()
+    #
+    #                 return Response(**response).pack()

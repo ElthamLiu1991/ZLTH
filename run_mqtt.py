@@ -1,9 +1,9 @@
 import os
 import time
 
-from zigbeeLauncher import mqtt
+from zigbeeLauncher import simulator
 import sys
-from zigbeeLauncher.mqtt.WiserZigbeeGlobal import get_value
+from zigbeeLauncher.simulator.WiserZigbeeGlobal import get_value
 
 if __name__ == "__main__":
     # create folder firmwares and logs
@@ -13,6 +13,6 @@ if __name__ == "__main__":
         os.mkdir('./logs')
     if len(sys.argv) == 2:
         print(sys.argv[1])
-        mqtt.init(sys.argv[1])
+        simulator.init(sys.argv[1])
     else:
-        mqtt.init("simulator")
+        simulator.init("simulator")
