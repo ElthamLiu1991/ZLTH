@@ -49,6 +49,15 @@ def exception(func):
         except Timeout as e:
             response = e
             logger.exception("error:")
+        except ConfigInvalid as e:
+            response = e
+            logger.exception("error:")
+        except ScriptNotReady as e:
+            response = e
+            logger.exception("error:")
+        except ScriptRunning as e:
+            response = e
+            logger.exception("error:")
         except Exception as e:
             response = RequestException(200, 'internal error')
             logger.exception("error:")
@@ -71,6 +80,10 @@ class RequestException(Exception):
     _OutOfRange = 108
 
     _Timeout = 109
+
+    _ConfigInvalid = 110
+    _ScriptRunning = 111
+    _scriptNotReady = 112
 
     def __init__(self, code=0, message="", uid=None, timestamp=None):
         self._error = ErrorMessage(
@@ -194,3 +207,27 @@ class Timeout(RequestException):
     """
     def __init__(self, uuid=None, timestamp=None):
         super().__init__(self._Timeout, f'{self.__class__.__name__}', uuid, timestamp)
+
+
+class ConfigInvalid(RequestException):
+    """
+    raise this exception when the config of script is invalid
+    """
+    def __init__(self, uuid=None, timestamp=None):
+        super().__init__(self._ConfigInvalid, f'{self.__class__.__name__}', uuid, timestamp)
+
+
+class ScriptRunning(RequestException):
+    """
+    raise this exception when a same script is running
+    """
+    def __init__(self, uuid=None, timestamp=None):
+        super().__init__(self._ScriptRunning, f'{self.__class__.__name__}', uuid, timestamp)
+
+
+class ScriptNotReady(RequestException):
+    """
+    raise this exception when a same script is running
+    """
+    def __init__(self, uuid=None, timestamp=None):
+        super().__init__(self._ScriptNotReady, f'{self.__class__.__name__}', uuid, timestamp)

@@ -107,7 +107,8 @@ class SerialProtocol:
     # attrs = []
 
     def __init__(self, id):
-        id = id
+        self.id = id
+        self.sequence = 0
         self.attrs = []
         self.sp_response = SPResponse(code=0, message="", data={})
         pass
@@ -121,9 +122,10 @@ class SerialProtocol:
         将类转化为串口数据
         :return: bytes, prefix+payload+CRC
         """
+        self.sequence = sequence
         data = self._prefix(sequence)
         length, payload = self._encode()
-        data += length
+        data += encode_int(length, 1)
         data += payload
         # data += self._encode()
         data += crc_calculate(data)
@@ -137,6 +139,7 @@ class SerialProtocol:
         :param data: 串口数据
         :return:
         """
+        self.sequence = sequence
         self.dongle = Global.get(Global.DONGLES).get(mac)
         if not self.dongle:
             logger.warning(f'donge {mac} not found')
@@ -176,15 +179,15 @@ class SerialProtocol:
             elif type == SPType.OBJ:
                 _len, payload = value._encode()
                 data += payload
-                len += int.from_bytes(_len, byteorder='little')
+                len += _len
                 pass
             elif type == SPType.ARR:
                 for obj in value:
                     _len, payload = obj._encode()
                     data += payload
-                    len += int.from_bytes(_len, byteorder='little')
+                    len += _len
                 pass
-        return encode_int(len, 1), data
+        return len, data
 
     def _decode(self, data):
         """
@@ -216,7 +219,7 @@ class SerialProtocol:
             elif type == SPType.OBJ:
                 obj = getattr(self, attr)()
                 # instance = obj()
-                offset = obj.deserialize(data[index:])
+                offset = obj._decode(data[index:])
                 index += offset
                 setattr(self, attr, obj)
                 pass
@@ -225,7 +228,7 @@ class SerialProtocol:
                 obj = getattr(self, attr)
                 for i in range(0, getattr(self, count)):
                     instance = obj()
-                    offset = instance.descrialize(data[index:])
+                    offset = instance._decode(data[index:])
                     value.append(instance)
                     index += offset
                 setattr(self, attr, value)
@@ -242,6 +245,14 @@ class Response:
     def __call__(self):
         obj = self._sp()
         return obj
+
+
+class ACK(SerialProtocol):
+    id = 0
+
+    def __init__(self, command=None):
+        super().__init__(command)
+        self.register('payload', SPType.INT, 1, 0)
 
 
 @dataclass

@@ -1,14 +1,12 @@
 import asyncio
 
 from zigbeeLauncher.dongle.command import Request
-from zigbeeLauncher.data_model import ErrorMessage
+from zigbeeLauncher.logging import dongleLogger as logger
 from zigbeeLauncher.exceptions import NotFound
 from zigbeeLauncher.serial_protocol.sp_01 import Leave
 from zigbeeLauncher.serial_protocol.sp_f0 import EnterBootloader, BOOTLOADER_SEQ, RESET_SEQ, UPGRADE_START_SEQ
 from zigbeeLauncher.tasks import Tasks
 from zigbeeLauncher.dongle.info import Info
-from zigbeeLauncher.serial_protocol.serial_protocol_F0 import *
-from zigbeeLauncher.serial_protocol.serial_protocol_01 import *
 from zigbeeLauncher.dongle.xmodem import XMODEM
 
 

@@ -2,39 +2,44 @@ import os
 
 from flask import render_template, make_response
 from flask_restful import Resource
-
-from zigbeeLauncher import base_dir
 from zigbeeLauncher.api_2.autos import scripts
 from zigbeeLauncher.database.interface import DBAuto
+from zigbeeLauncher.exceptions import exception, Unsupported, NotFound, ConfigInvalid, ScriptRunning, ScriptNotReady
 from zigbeeLauncher.logging import flaskLogger as logger
-from zigbeeLauncher.api_2.response import Response
 from zigbeeLauncher.auto_scripts import AutoTesting, State, Result, Error
 
 
 class AutoResource(Resource):
+    """
+    /auto
+    """
 
     def get(self):
         """
         获取内置自动化脚本列表
         :return:
         """
-        return Response(data=scripts).pack()
+        @exception
+        def handle():
+            return scripts
+        return handle
 
 
 class AutoOperationResource(Resource):
+    """
+    /auto/<operation>
+    """
     operations = ['running', 'history', 'records']
 
     def get(self, operation):
         """
-        running: 获取正在允许的列表
+        running: 获取正在运行的列表
         history: 获取以及结束的列表
         records: 获取所有的列表
         :param operation:
         :return:
         """
         records = []
-        if operation not in self.operations:
-            return Response(operation, code=70002).pack()
         if operation == 'running':
             for record in DBAuto().retrieve():
                 if record['state'] != State.FINISH:
@@ -59,7 +64,9 @@ class AutoOperationResource(Resource):
 
 
 class AutoOperationRecordsResource(Resource):
-
+    """
+    /auto/records/<record>
+    """
     def get(self, record):
         html = render_template('autos.html', current_script=record)
 
@@ -74,8 +81,6 @@ class AutoScriptsResource(Resource):
         :param script:
         :return:
         """
-        if script not in scripts:
-            return Response(script, code=70000).pack()
         record = AutoTesting().set_script(script)
         html = render_template('autos.html', current_script=record)
         return make_response(html)
@@ -85,23 +90,26 @@ class AutoScriptsResource(Resource):
         触发内置自动化脚本
         :return:
         """
-        if script not in scripts:
-            return Response(script, code=70000).pack()
-        logger.info('triggering script:%s', script)
-        # 进入auto_scripts加载对应的script, 返回record的文件名称，并保持到数据库中
-        record = AutoTesting().set_script(script)
-        if record:
-            result = AutoTesting().start(record)
-            if result == Error.NO_ERROR:
-                return Response(data={'record': record}).pack()
-            elif result == Error.RUNNING:
-                return Response(record, code=70004).pack()
-            elif result == Error.INVALID_CONFIG:
-                return Response(record, code=70002).pack()
-            elif result == Error.NOT_FOUND:
-                return Response(record, code=70001).pack()
-        else:
-            return Response(script, code=70000).pack()
+        @exception
+        def handle():
+            if script not in scripts:
+                raise Unsupported(script)
+            logger.info(f'triggering script:{script}')
+            record = AutoTesting().set_script(script)
+            if record:
+                result = AutoTesting().start(record)
+                if result == Error.NO_ERROR:
+                    return {'record': record}
+                elif result == Error.RUNNING:
+                    raise ScriptRunning(script)
+                elif result == Error.INVALID_CONFIG:
+                    raise ConfigInvalid(script)
+                elif result == Error.NOT_FOUND:
+                    raise NotFound(script)
+            else:
+                raise ScriptNotReady(script)
+
+        return handle()
 
 
 class AutoScriptsConfigResource(Resource):

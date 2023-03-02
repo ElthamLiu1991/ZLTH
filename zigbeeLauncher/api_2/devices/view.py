@@ -14,7 +14,9 @@ from ..json_schemas import config_schema
 
 from ..util import check_device_exist, check_device_state, config_validation, send_command
 from ... import base_dir
-from ...exceptions import exception, DeviceOffline, InvalidPayload, Unsupported, DeviceNotFound, DeviceNotReady
+from ...dongle.dongle import Dongle
+from ...exceptions import exception, DeviceOffline, InvalidPayload, Unsupported, DeviceNotFound, DeviceNotReady, \
+    NotFound
 
 
 class DevicesResource(Resource):
@@ -119,92 +121,896 @@ class DeviceConfigResource(Resource):
                     raise DeviceOffline(mac)
                 if not device.get('configured'):
                     raise DeviceNotReady(mac)
-                return send_command(ip=device.get('ip'), mac=mac, command={'config': {}})
+                return send_command(ip=device.get('ip'), mac=mac, command={'get_config': {}})
 
         return handle()
 
-    # @check_device_state
-    # def get(self, mac, device):
-    #     if not device['configured']:
-    #         return Response(mac, code=60000).pack()
-    #     if device['state'] == 9:
-    #         return Response(mac, code=60001).pack()
-    #     ip = device['ip']
-    #     response = dongle_command_2(ip, mac, {
-    #         "config": {
-    #         }
-    #     })
-    #     return Response(**response).pack()
+    def put(self, mac):
+        schema = {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "endpoints": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "client_clusters": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "attributes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "default": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "integer"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "length": {
+                                                                "type": "integer"
+                                                            },
+                                                            "manufacturer": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "manufacturer_code": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "writable": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "default",
+                                                            "id",
+                                                            "manufacturer",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-orders": [
+                                                            "default",
+                                                            "id",
+                                                            "length",
+                                                            "manufacturer",
+                                                            "manufacturer_code",
+                                                            "name",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-ignore-properties": []
+                                                    }
+                                                },
+                                                "commands": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "S->C": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        },
+                                                        "C->S": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-orders": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-ignore-properties": []
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "manufacturer": {
+                                                    "type": "boolean"
+                                                },
+                                                "manufacturer_code": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer"
+                                            ],
+                                            "x-apifox-orders": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer",
+                                                "manufacturer_code",
+                                                "name"
+                                            ],
+                                            "x-apifox-ignore-properties": []
+                                        }
+                                    },
+                                    "device_id": {
+                                        "type": "integer"
+                                    },
+                                    "device_version": {
+                                        "type": "integer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "profile_id": {
+                                        "type": "integer"
+                                    },
+                                    "server_clusters": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "attributes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "default": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "integer"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "length": {
+                                                                "type": "integer"
+                                                            },
+                                                            "manufacturer": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "manufacturer_code": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "writable": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "default",
+                                                            "id",
+                                                            "manufacturer",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-orders": [
+                                                            "default",
+                                                            "id",
+                                                            "length",
+                                                            "manufacturer",
+                                                            "manufacturer_code",
+                                                            "name",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-ignore-properties": []
+                                                    }
+                                                },
+                                                "commands": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "S->C": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        },
+                                                        "C->S": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-orders": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-ignore-properties": []
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "manufacturer": {
+                                                    "type": "boolean"
+                                                },
+                                                "manufacturer_code": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer"
+                                            ],
+                                            "x-apifox-orders": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer",
+                                                "manufacturer_code",
+                                                "name"
+                                            ],
+                                            "x-apifox-ignore-properties": []
+                                        }
+                                    }
+                                },
+                                "x-apifox-orders": [
+                                    "client_clusters",
+                                    "device_id",
+                                    "device_version",
+                                    "id",
+                                    "profile_id",
+                                    "server_clusters"
+                                ],
+                                "x-apifox-ignore-properties": []
+                            }
+                        },
+                        "node": {
+                            "type": "object",
+                            "properties": {
+                                "device_type": {
+                                    "type": "string"
+                                },
+                                "manufacturer_code": {
+                                    "type": "integer"
+                                },
+                                "radio_power": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "device_type",
+                                "manufacturer_code",
+                                "radio_power"
+                            ],
+                            "x-apifox-orders": [
+                                "device_type",
+                                "manufacturer_code",
+                                "radio_power"
+                            ],
+                            "x-apifox-ignore-properties": []
+                        }
+                    },
+                    "required": [
+                        "endpoints",
+                        "node"
+                    ],
+                    "x-apifox-orders": [
+                        "endpoints",
+                        "node"
+                    ],
+                    "x-apifox-ignore-properties": []
+                }
+            },
+            "required": [
+                "config"
+            ],
+            "x-apifox-orders": [
+                "config"
+            ],
+            "x-apifox-ignore-properties": []
+        }
 
-    @check_device_state
-    def put(self, mac, device):
-        if device['state'] == 9:
-            return Response(mac, code=60001).pack()
-        args = request.get_json()
-        ip = device['ip']
-        if 'filename' in args:
-            # check this file exist or not
-            file = args['filename']
-            path = os.path.join(base_dir, './files') + '/' + file
-            if not os.path.isfile(path):
-                return Response(file, code=50000).pack()
+        @exception
+        def handle():
+            device = DBDevice(mac=mac).retrieve()
+            if not device:
+                raise DeviceNotFound(mac)
             else:
-                with open(path, 'r') as f:
-                    data = yaml.safe_load(f.read())
-                    response = dongle_command_2(ip, mac, {
-                        "config": data
-                    })
-        elif 'config' in args:
-            # verify the config is meet JSON schema requirement
-            try:
-                validate(instance=args, schema=config_schema,
-                         format_checker=draft7_format_checker)
-                result, error = config_validation(args['config'])
+                device = device[0]
+                if not device.get('connected'):
+                    raise DeviceOffline(mac)
+                if device.get('state') == Dongle.DongleState.CONFIGURING:
+                    raise DeviceNotReady(mac)
+                try:
+                    validate(instance=request.get_json(), schema=schema,
+                             format_checker=draft7_format_checker)
+                except Exception as e:
+                    raise InvalidPayload(e.description)
+                result, error = config_validation(request.get_json()['config'])
                 if not result:
-                    return Response(error, code=90005).pack()
-                response = dongle_command_2(ip, mac, args)
-            except SchemaError as e:
-                logger.exception('illegal schema: %s', e.message)
-                return Response(e.message, code=90003).pack()
-            except ValidationError as e:
-                logger.exception('json validation failed:%s', e.message)
-                return Response(e.message, code=90004).pack()
-        else:
-            return Response('filename or config', code=90001).pack()
-        return Response(**response).pack()
+                    raise InvalidPayload(error)
 
-    @check_device_state
-    def post(self, mac, device):
-        if device['state'] == 9:
-            return Response(mac, code=60001).pack()
-        ip = device['ip']
-        # verify the file is meet JSON schema requirement or not
-        parser = reqparse.RequestParser()
-        parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
-        args = parser.parse_args()
-        content = args.get('file')
-        if not content:
-            return Response(None, code=50001).pack()
-        try:
-            y = yaml.safe_load(content.read())
-            validate(instance={'config': y}, schema=config_schema,
-                     format_checker=draft7_format_checker)
-            result, error = config_validation(y)
-            if not result:
-                return Response(error, code=90005).pack()
-            # single device configuration may take more than 10 seconds depends on number of endpoints,
-            # so set timeout to at least 30 seconds
-            response = dongle_command_2(ip, mac, {
-                "config": y
-            }, timeout=30)
-            return Response(**response).pack()
-        except SchemaError as e:
-            logger.exception('illegal schema: %s', e.message)
-            return Response(e.message, code=90003).pack()
-        except ValidationError as e:
-            logger.exception('json validation failed:%s', e.message)
-            return Response(e.message, code=90004).pack()
-        except Exception as e:
-            logger.exception('load YAML failed:%s', str(e))
-            return Response(str(e), code=90000).pack()
-        pass
+                return send_command(ip=device.get('ip'), mac=mac, command=request.get_json())
+
+        return handle()
+
+    def post(self, mac):
+        schema = {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "endpoints": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "client_clusters": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "attributes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "default": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "integer"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "length": {
+                                                                "type": "integer"
+                                                            },
+                                                            "manufacturer": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "manufacturer_code": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "writable": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "default",
+                                                            "id",
+                                                            "manufacturer",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-orders": [
+                                                            "default",
+                                                            "id",
+                                                            "length",
+                                                            "manufacturer",
+                                                            "manufacturer_code",
+                                                            "name",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-ignore-properties": []
+                                                    }
+                                                },
+                                                "commands": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "S->C": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        },
+                                                        "C->S": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-orders": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-ignore-properties": []
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "manufacturer": {
+                                                    "type": "boolean"
+                                                },
+                                                "manufacturer_code": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer"
+                                            ],
+                                            "x-apifox-orders": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer",
+                                                "manufacturer_code",
+                                                "name"
+                                            ],
+                                            "x-apifox-ignore-properties": []
+                                        }
+                                    },
+                                    "device_id": {
+                                        "type": "integer"
+                                    },
+                                    "device_version": {
+                                        "type": "integer"
+                                    },
+                                    "id": {
+                                        "type": "integer"
+                                    },
+                                    "profile_id": {
+                                        "type": "integer"
+                                    },
+                                    "server_clusters": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "attributes": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "default": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "integer"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "length": {
+                                                                "type": "integer"
+                                                            },
+                                                            "manufacturer": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "manufacturer_code": {
+                                                                "type": "integer"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "type": {
+                                                                "type": "string"
+                                                            },
+                                                            "writable": {
+                                                                "type": "boolean"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "default",
+                                                            "id",
+                                                            "manufacturer",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-orders": [
+                                                            "default",
+                                                            "id",
+                                                            "length",
+                                                            "manufacturer",
+                                                            "manufacturer_code",
+                                                            "name",
+                                                            "type",
+                                                            "writable"
+                                                        ],
+                                                        "x-apifox-ignore-properties": []
+                                                    }
+                                                },
+                                                "commands": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "S->C": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        },
+                                                        "C->S": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "description": {
+                                                                        "type": "string"
+                                                                    },
+                                                                    "id": {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    "manufacturer": {
+                                                                        "type": "boolean"
+                                                                    },
+                                                                    "manufacturer_code": {
+                                                                        "type": "integer"
+                                                                    }
+                                                                },
+                                                                "required": [
+                                                                    "id",
+                                                                    "manufacturer"
+                                                                ],
+                                                                "x-apifox-orders": [
+                                                                    "description",
+                                                                    "id",
+                                                                    "manufacturer",
+                                                                    "manufacturer_code"
+                                                                ],
+                                                                "x-apifox-ignore-properties": []
+                                                            }
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-orders": [
+                                                        "S->C",
+                                                        "C->S"
+                                                    ],
+                                                    "x-apifox-ignore-properties": []
+                                                },
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "manufacturer": {
+                                                    "type": "boolean"
+                                                },
+                                                "manufacturer_code": {
+                                                    "type": "integer"
+                                                },
+                                                "name": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "required": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer"
+                                            ],
+                                            "x-apifox-orders": [
+                                                "attributes",
+                                                "commands",
+                                                "id",
+                                                "manufacturer",
+                                                "manufacturer_code",
+                                                "name"
+                                            ],
+                                            "x-apifox-ignore-properties": []
+                                        }
+                                    }
+                                },
+                                "x-apifox-orders": [
+                                    "client_clusters",
+                                    "device_id",
+                                    "device_version",
+                                    "id",
+                                    "profile_id",
+                                    "server_clusters"
+                                ],
+                                "x-apifox-ignore-properties": []
+                            }
+                        },
+                        "node": {
+                            "type": "object",
+                            "properties": {
+                                "device_type": {
+                                    "type": "string"
+                                },
+                                "manufacturer_code": {
+                                    "type": "integer"
+                                },
+                                "radio_power": {
+                                    "type": "integer"
+                                }
+                            },
+                            "required": [
+                                "device_type",
+                                "manufacturer_code",
+                                "radio_power"
+                            ],
+                            "x-apifox-orders": [
+                                "device_type",
+                                "manufacturer_code",
+                                "radio_power"
+                            ],
+                            "x-apifox-ignore-properties": []
+                        }
+                    },
+                    "required": [
+                        "endpoints",
+                        "node"
+                    ],
+                    "x-apifox-orders": [
+                        "endpoints",
+                        "node"
+                    ],
+                    "x-apifox-ignore-properties": []
+                }
+            },
+            "required": [
+                "config"
+            ],
+            "x-apifox-orders": [
+                "config"
+            ],
+            "x-apifox-ignore-properties": []
+        }
+
+        @exception
+        def handle():
+            parser = reqparse.RequestParser()
+            parser.add_argument('file', type=werkzeug.datastructures.FileStorage, location='files')
+            args = parser.parse_args()
+            content = args.get('file')
+            if not content:
+                raise NotFound("file not found")
+            device = DBDevice(mac=mac).retrieve()
+            if not device:
+                raise DeviceNotFound(mac)
+            else:
+                device = device[0]
+                if not device.get('connected'):
+                    raise DeviceOffline(mac)
+                if device.get('state') == Dongle.DongleState.CONFIGURING:
+                    raise DeviceNotReady(mac)
+                try:
+                    y = yaml.safe_load(content.read())
+                    validate(instance={'config': y}, schema=schema,
+                             format_checker=draft7_format_checker)
+                except Exception as e:
+                    raise InvalidPayload(e.description)
+                result, error = config_validation(y)
+                if not result:
+                    raise InvalidPayload(error)
+                return send_command(ip=device.get('ip'), mac=mac, command={'config': y})
+
+        return handle()

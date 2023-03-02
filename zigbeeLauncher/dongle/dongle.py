@@ -1,10 +1,5 @@
-import abc
-import asyncio
 import copy
-import threading
-from dataclasses import asdict
 from functools import wraps
-from multiprocessing import Queue
 from binascii import unhexlify, hexlify
 
 from dacite import from_dict
@@ -20,10 +15,8 @@ from zigbeeLauncher.exceptions import InvalidPayload, exception, Unsupported, Ou
 from zigbeeLauncher.serial_protocol.sp import decode_int, crc_verify, SPResponse
 from zigbeeLauncher.tasks import Tasks
 from zigbeeLauncher.dongle.upgrade import WiserFile, Upgrade
-from zigbeeLauncher.serial_protocol.serial_protocol_01 import *
-from zigbeeLauncher.serial_protocol.serial_protocol_02 import *
-from zigbeeLauncher.serial_protocol.serial_protocol_F0 import *
 from zigbeeLauncher.util import Global, get_ip_address
+from zigbeeLauncher.logging import dongleLogger as logger
 
 
 class DongleMetaData:
@@ -34,6 +27,7 @@ class DongleMetaData:
         PAIRING = 4
         JOINED = 6
         ORPHAN = 7
+        CONFIGURING = 9
 
     class DongleConfigured:
         FACTORY_DEFAULT = 0
@@ -346,6 +340,8 @@ class Dongle(DongleMetaData, Request):
             self.flag = data
         else:
             self._data += data
+            print('current serial data:')
+            print(self._data)
             while True:
                 if not self._data:
                     break
@@ -377,7 +373,6 @@ class Dongle(DongleMetaData, Request):
                             logger.warning(f'command {command} is not register')
                         else:
                             sp = sp()
-
                             sp.deserialize(self.mac, sequence, payload)
 
     def handle(self, message: Message, sender):
@@ -402,13 +397,9 @@ class Dongle(DongleMetaData, Request):
                 # update Update class
                 Upgrade(self, file, message)
             elif command.config is not None:
-                if command.config.endpoints is not None:
-                    # set config
-                    # TODO: update SetConfig class
-                    SetConfig(self, command.config, message.uuid, message.timestamp)
-                else:
-                    # get config
-                    GetConfig(self, message)
+                SetConfig(self, message, command.config)
+            elif command.get_config is not None:
+                GetConfig(self, message)
             elif command.label is not None:
                 request = self.pack_request(message=message,
                                             request=WriteLabel(command.label.data),

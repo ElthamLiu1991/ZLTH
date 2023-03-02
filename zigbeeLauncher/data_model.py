@@ -94,24 +94,24 @@ class Config:
             class Attribute:
                 id: int
                 manufacturer: int
-                manufacturer_code: int
+                manufacturer_code: Optional[int]
                 type: str
                 writable: bool
                 length: Optional[int]
                 default: Any
-                name: str
+                name: Optional[str]
 
             @dataclass
             class Command:
                 id: int
                 manufacturer: bool
                 manufacturer_code: Optional[int]
-                description: str
+                description: Optional[str]
 
             id: int
             manufacturer: bool
             manufacturer_code: Optional[int]
-            name: str
+            name: Optional[str]
             attributes: list[Attribute]
             commands: Any
             server_commands: list[Command] = field(init=False)
@@ -133,11 +133,11 @@ class Config:
         profile_id: int
         device_id: int
         device_version: int
-        server_cluster: list[Cluster]
-        client_cluster: list[Cluster]
+        server_clusters: list[Cluster]
+        client_clusters: list[Cluster]
 
-    node: Optional[ConfigNode]
-    endpoints: Optional[list[Endpoint]]
+    node: ConfigNode
+    endpoints: list[Endpoint]
 
 
 @dataclass
@@ -147,7 +147,8 @@ class CommandSimulator:
         devices: list[str]
 
     @dataclass
-    class ConfigSimulator(Config):
+    class ConfigSimulator:
+        config: Config
         devices: list[str]
 
     firmware: Optional[FirmwareSimulator]
@@ -160,6 +161,7 @@ class CommandDevice:
     firmware: Optional[Firmware]
     label: Optional[Label]
     config: Optional[Config]
+    get_config: Optional[Any]
 
     identify: Optional[Any]
     reset: Optional[Any]

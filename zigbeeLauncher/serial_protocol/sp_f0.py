@@ -1,4 +1,4 @@
-from zigbeeLauncher.serial_protocol.sp import SerialProtocol, Response, SPType
+from zigbeeLauncher.serial_protocol.sp import SerialProtocol, Response, SPType, ACK
 
 BOOTLOADER_SEQ = 0x1000
 UPGRADE_START_SEQ = 0x1001
@@ -64,6 +64,7 @@ class LabelResponse(SerialProtocol):
     id = 0xF005
 
     def __setattr__(self, key, value):
+        print(key, value)
         if value is not None:
             if key == 'label':
                 self.dongle.label = value
@@ -105,6 +106,8 @@ class StateResponse(SerialProtocol):
     def __setattr__(self, key, value):
         if value is not None:
             if key == 'configuration':
+                data = ACK(self.id).serialize(self.sequence)
+                self.dongle.write(data)
                 self.dongle.configured = False if value == 1 else True
                 self.dongle.boot = True
         self.__dict__[key] = value
@@ -124,7 +127,7 @@ class SetConfiguration(SerialProtocol):
             configuration = 0x02
         else:
             configuration = 0x01
-        self.register('configuration', SPType.BOOL, self.len, configuration)
+        self.register('configuration', SPType.BOOL, 1, configuration)
 
 
 @Response
@@ -164,4 +167,4 @@ class StatusResponse(SerialProtocol):
 
     def __init__(self):
         super().__init__(self.id)
-        self.register('code', SPType.INT, self.len)
+        self.register('code', SPType.INT, 1)

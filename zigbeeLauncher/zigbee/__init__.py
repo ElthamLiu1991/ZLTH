@@ -1,4 +1,4 @@
-from zigbeeLauncher.zigbee.data_type import data_type_value_table, data_type_table
+from zigbeeLauncher.zigbee.data_type import data_type_value_table, data_type_table, get_data_type
 
 
 def type_exist(_type):
@@ -17,17 +17,15 @@ def format_validation(_type, value):
     return True
 
 
-def value_validation(_type, value):
-    _type = data_type_value_table[_type]
-    _len = data_type_table[_type]
-    if _len != 0:
-        if 0x28 <= _type <= 0x2f:
-            maximum = (1 << 8 * _len) / 2
-            if not (-maximum) <= value < maximum:
+def value_validation(type, value):
+    id, name, length = get_data_type(name=type)
+    if length != 0:
+        maximum = (1 << 8 * length)
+        if 0x28 <= id <= 0x2f:
+            if not (-maximum/2) <= value < maximum/2:
                 return False
         else:
-            if not 0 <= value < (1 << 8 * _len):
+            if not 0 <= value < maximum:
                 return False
-        return True
-    else:
-        return True
+    return True
+
