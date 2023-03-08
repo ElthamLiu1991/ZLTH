@@ -10,7 +10,7 @@ from typing import Optional, Any
 import rapidjson as json
 from dacite import from_dict
 
-from zigbeeLauncher.dongle import Tasks
+from zigbeeLauncher.tasks import Tasks
 from zigbeeLauncher.logging import autoLogger as logger
 
 import paho.mqtt.client as mqtt

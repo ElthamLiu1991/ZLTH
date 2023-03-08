@@ -187,13 +187,13 @@ class AutoTesting:
             logger.error(f'{record} config invalid: {config}')
             auto_record(record, State.READY, Status.ERROR, test.get_error())
         # add to database
-        DBAuto(record=record).add({
-            'script': script,
-            'state': State.READY,
-            'result': Result.SUCCESS,
-            'record': record,
-            'config': config if isinstance(config, str) else json.dumps(config, indent=4)
-        })
+        DBAuto(record=record).add(DBAuto.DataModel(
+            script=script,
+            state=State.READY,
+            result=Result.SUCCESS,
+            record=record,
+            config=config if isinstance(config, str) else json.dumps(config, indent=4))
+        )
         self._script_instances[record] = test
         return record
 

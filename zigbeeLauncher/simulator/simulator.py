@@ -227,12 +227,12 @@ class Simulator(SimulatorMetaData):
         self._brokers = brokers
         ip = self._brokers[0].ip
         if self.broker != ip:
+            logger.info(f"switch to broker: {ip}")
             self.broker = ip
             if self.client:
                 self.client.stop()
                 self.client = None
-            else:
-                self.client = ZLTHClient(broker=self.broker, name=self.name, connection_cb=self._on_connection)
+            self.client = ZLTHClient(broker=self.broker, name=self.name, connection_cb=self._on_connection)
 
     def _on_connection(self, connected):
         if connected:

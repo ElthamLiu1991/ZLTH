@@ -17,7 +17,7 @@ ZIGBEE Launcher Test Harness is a local web service
 3. install modules: `pip install -r requirements.txt`, or use different package source: `pip install -r requirements.txt -i https://pypi.douban.com/simple`
 ### Docker
 build docker image for different platform(Linux only)
-`docker buildx build --platform linux/arm64/v8,linux/arm/v7 -t elthamliudocker/wiser_zigbee_launcher --push .`
+`docker buildx build --platform linux/arm64/v8,linux/arm/v7 -t eltham/zigbee_launcher_testharness --push .`
 ## How to Run
 Before running ZLTH service, please make sure a MQTT broker service already running on your machine
 ### Windows
@@ -29,4 +29,4 @@ double click ***launcher.exe***
 `python launcher.py`
 ### Docker
 ## How to Use
-Open web browser and enter: http://localhost:5000, enjoy!
+Open web browser and enter: http://localhost:5000, or any ZLTH service IP address instead of *localhost*, **http://{ip}:5000**, enjoy!

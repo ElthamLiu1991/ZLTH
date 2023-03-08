@@ -46,10 +46,11 @@ class Topic:
         try:
             route_match = self.get_match_route(path)
             if route_match:
-                if simulator.client.ip == simulator.client.broker:
-                    if '/info' in path or '/update' in path or '/error' in path:
-                        # forward to web client
-                        simulator.client.forward(path, payload)
+                # disable it because need web page update
+                # if simulator.client.ip == simulator.client.broker:
+                if '/info' in path or '/update' in path or '/error' in path:
+                    # forward to web client
+                    simulator.client.forward(path, payload)
                 kwargs, view_function = route_match
                 kwargs['sender'] = sender
                 return view_function(message, **kwargs)

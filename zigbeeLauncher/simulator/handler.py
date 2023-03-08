@@ -64,6 +64,22 @@ def handler_sync(message: Message, ip, sender):
 @topic.route('/<ip>/simulator/synced')
 def handler_synced(message: Message, ip, sender):
     """
+    同步回复，收到该消息后应该更新本地对应的simulator和devices数据,
+    同时，也发送自己的simulator数据给对方
+    :param message: data_model.Message object
+    :param ip: 本机的IP
+    :return:
+    """
+    synced = from_dict(data_class=SimulatorInfo, data=message.data)
+    insert_simulator(synced)
+    if synced.ip != ip:
+        simulator = Global.get(Global.SIMULATOR)
+        simulator.client.send_simulator_received(synced.ip, simulator.info)
+
+
+@topic.route('/<ip>/simulator/received')
+def handler_synced(message: Message, ip, sender):
+    """
     同步回复，收到该消息后应该更新本地对应的simulator和devices数据
     :param message: data_model.Message object
     :param ip: 本机的IP
@@ -71,6 +87,7 @@ def handler_synced(message: Message, ip, sender):
     """
     synced = from_dict(data_class=SimulatorInfo, data=message.data)
     insert_simulator(synced)
+
 
 
 @topic.route('/<ip>/simulator/devices/<mac>/sync')

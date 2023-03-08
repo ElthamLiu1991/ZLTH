@@ -1,4 +1,4 @@
-# MQTT Data Model v1.0
+ # MQTT Data Model v1.0
 In ZLTH system, there are two role will folllow this specification for communication, Edge and Web
 
 **topic**: {version}/{ip}/simulator[/{PATH}]\

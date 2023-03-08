@@ -177,9 +177,9 @@ class DBAuto(DBInterface):
             if self.retrieve():
                 # self.delete()
                 # update
-                self.update(asdict(instance))
+                self.update(**instance.__dict__)
             else:
-                auto = Auto(asdict(instance))
+                auto = Auto(**instance.__dict__)
                 self._add(auto)
         except Exception as e:
             log.warning("inset auto to database failed:%s", e)

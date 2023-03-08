@@ -38,7 +38,9 @@ class MQTTClient:
 
         self._client = mqtt.Client(self.name, protocol=mqtt.MQTTv5)
         if self.will_topic and self.will_payload:
-            self._client.will_set(self.will_topic, payload=json.dumps(self.will_payload), qos=2)
+            props = mqtt.Properties(PacketTypes.PUBLISH)
+            props.UserProperty = ('ip', self.ip)
+            self._client.will_set(self.will_topic, payload=json.dumps(self.will_payload), qos=1, properties=props)
         self._client.reconnect_delay_set(min_delay=1, max_delay=10)
         self._client.on_connect = self._on_connect
         self._client.on_message = self._on_message
@@ -138,6 +140,7 @@ class ZLTHClient(MQTTClient):
     topic_sync_device = f'{version}/{ip}/simulator/devices/+/synced'
     topic_synced_simulator = f'{version}/{ip}/simulator/synced'
     topic_synced_device = f'{version}/{ip}/simulator/devices/+/synced'
+    topic_received_simulator = f'{version}/{ip}/simulator/received'
 
     topic_simulator_command = f'{version}/{ip}/simulator/command'
     topic_device_command = f'{version}/{ip}/simulator/devices/+/command'
@@ -172,6 +175,7 @@ class ZLTHClient(MQTTClient):
         client.subscribe(ZLTHClient.topic_sync_device, qos=2)
         client.subscribe(ZLTHClient.topic_synced_simulator, qos=2)
         client.subscribe(ZLTHClient.topic_synced_device, qos=2)
+        client.subscribe(ZLTHClient.topic_received_simulator, qos=2)
 
         client.subscribe(ZLTHClient.topic_simulator_command, qos=2)
         client.subscribe(ZLTHClient.topic_device_command, qos=2)
@@ -243,6 +247,19 @@ class ZLTHClient(MQTTClient):
         topic = f'{version}/{ip}/simulator/devices/{mac}/synced'
         info = asdict(info)
         del info['device']
+        payload = pack_payload(info)
+        self._send(topic, payload)
+
+    def send_simulator_received(self, ip, info: SimulatorInfo):
+        if not self._connected:
+            logger.warning(f'MQTT client not connect')
+            return
+        topic = f'{version}/{ip}/simulator/received'
+        # remove simulator attr
+        info = asdict(info)
+        del info['simulator']
+        for item in info['devices']:
+            del item['device']
         payload = pack_payload(info)
         self._send(topic, payload)
 

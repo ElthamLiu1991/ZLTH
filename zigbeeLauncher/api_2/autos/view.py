@@ -22,7 +22,7 @@ class AutoResource(Resource):
         @exception
         def handle():
             return scripts
-        return handle
+        return handle()
 
 
 class AutoOperationResource(Resource):

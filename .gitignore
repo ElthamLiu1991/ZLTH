@@ -2,7 +2,9 @@
 /database
 /logs
 /venv
+/myvenv
 /dist
 /records
 /hub/
 **/__pycache__
+.idea/

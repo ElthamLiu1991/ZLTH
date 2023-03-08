@@ -10,7 +10,7 @@ from hashlib import sha256
 from dacite import from_dict
 
 from zigbeeLauncher.auto_scripts.script import Http, wait_and_retry
-from zigbeeLauncher.dongle import Tasks
+from zigbeeLauncher.tasks import Tasks
 from zigbeeLauncher.logging import autoLogger as logger
 
 

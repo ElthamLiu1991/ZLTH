@@ -7,7 +7,7 @@ from dacite import from_dict
 
 from zigbeeLauncher import base_dir
 from zigbeeLauncher.logging import autoLogger as logger
-from zigbeeLauncher.zigbee.DataType import data_type_name_table
+from zigbeeLauncher.zigbee.data_type import data_type_name_table
 
 
 @dataclass
