@@ -10,7 +10,7 @@ ZIGBEE Launcher Test Harness is a local web service
 2. activate virtual environment: `myvenv\Scripts\activate`
 3. install modules: `pip install -r requirements.txt`, or use different package source: `pip install -r requirements.txt -i https://pypi.douban.com/simple`
 4. build executable application for windows:
-`pyinstaller -F -p {project path}\myvenv\Lib\site-packages -w -i logo.ico --version-file version_file.txt launcher.py`
+`pyinstaller.exe -F -p .\venv\Lib\site-packages\ -w -i .\windows_component\logo.ico --version-file .\version_file.txt launcher.py --hidden-import engineio.async_drivers.threading`
 ### Linux
 1. setup python virtual environment: `python -m venv myvenv`
 2. activate virtual environment: `source myvenv/bin/activate`

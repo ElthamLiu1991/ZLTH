@@ -7,7 +7,7 @@ from zeroconf import ServiceBrowser, ServiceInfo, Zeroconf, IPVersion
 
 from zigbeeLauncher.database.interface import DBSimulator, DBDevice
 from zigbeeLauncher.dongle.management import init
-from zigbeeLauncher.simulator.client import ZLTHClient
+from zigbeeLauncher.simulator.client import ZLTHClient, LocalClient
 from zigbeeLauncher.data_model import SimulatorInfo
 from zigbeeLauncher.tasks import Tasks
 from zigbeeLauncher.util import get_ip_address, get_mac_address, Global
@@ -66,7 +66,6 @@ class ServicesListener:
 class SimulatorMetaData:
     def __init__(self, ip, mac, label, version, update_cb):
         self.update_cb = update_cb
-        Global.set(Global.DONGLES, {})
         self._info = SimulatorInfo(
             ip=ip,
             mac=mac,
@@ -77,6 +76,7 @@ class SimulatorMetaData:
             broker="",
             devices=[]
         )
+        Global.set(Global.DONGLES, {})
 
     @staticmethod
     def update(func):
@@ -161,6 +161,8 @@ class Simulator(SimulatorMetaData):
         self._service_browser = None
         self._retry = 0
         self._brokers = None
+        self.local_client = LocalClient()
+        Global.set(Global.SIMULATOR, self)
 
         self._register()
 

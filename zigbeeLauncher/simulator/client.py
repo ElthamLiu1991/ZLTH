@@ -125,6 +125,8 @@ class MQTTClient:
                 self._payload = None
             else:
                 logger.warning(f'send {topic} failed')
+        else:
+            logger.error(f'client {self.name} is not ready')
 
 
 class ZLTHClient(MQTTClient):
@@ -333,9 +335,21 @@ class ZLTHClient(MQTTClient):
         payload = asdict(command)
         self._send(topic, payload)
 
-    def forward(self, topic, payload):
-        if not self._connected:
-            logger.warning(f'MQTT client not connect')
-            return
-        topic = f'{version}/web{topic}'
+
+class LocalClient(MQTTClient):
+    def __init__(self):
+        MQTTClient.__init__(self, broker='localhost', port=1883, name='simulator-local')
+
+    @staticmethod
+    def _on_connect(client, userdata, flags, rc, properties):
+        logger.info(f"local client connected:{rc}")
+        userdata._connected = True
+        pass
+
+    @staticmethod
+    def _on_message(client, userdata, msg):
+        pass
+
+    def sync(self, path, payload):
+        topic = f'{version}/web{path}'
         self._send(topic, payload)

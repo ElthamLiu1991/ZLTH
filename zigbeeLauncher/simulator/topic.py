@@ -50,7 +50,8 @@ class Topic:
                 # if simulator.client.ip == simulator.client.broker:
                 if '/info' in path or '/update' in path or '/error' in path:
                     # forward to web client
-                    simulator.client.forward(path, payload)
+                    # simulator.client.forward(path, payload)
+                    simulator.local_client.sync(path, payload)
                 kwargs, view_function = route_match
                 kwargs['sender'] = sender
                 return view_function(message, **kwargs)

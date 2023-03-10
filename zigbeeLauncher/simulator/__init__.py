@@ -21,5 +21,4 @@ def init():
     # DBAuto().delete()
     # get current version
     simulator = Simulator(client_ip, client_mac, user_label, version)
-    Global.set(Global.SIMULATOR, simulator)
 
