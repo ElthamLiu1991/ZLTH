@@ -13,10 +13,10 @@ if __name__ == "__main__":
     # 判断服务是否已经启动
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    ret = s.connect_ex(('localhost', 5000))
+    ret = s.connect_ex(('localhost', 5050))
     if ret == 0:
         from zigbeeLauncher.logging import flaskLogger as logger
-        logger.fatal("5000 in used")
+        logger.fatal("5050 in use")
         sys.exit(-1)
 
     if not os.path.exists('./database'):
@@ -33,4 +33,4 @@ if __name__ == "__main__":
     if not os.path.exists('./hub/'):
         os.mkdir('./hub')
     socketio, app = create_app()
-    socketio.run(app, host='0.0.0.0', use_reloader=False, allow_unsafe_werkzeug=True)
+    socketio.run(app, host='0.0.0.0', port=5050, use_reloader=False, allow_unsafe_werkzeug=True)
