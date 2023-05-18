@@ -4,7 +4,7 @@ WORKDIR /usr/local/app
 ADD requirements.txt ./
 RUN pip install -r requirements.txt -i https://pypi.douban.com/simple
 ADD launcher.py .
-ADD logConfig.json .
+ADD config.json .
 ADD version/ ./version
 ADD templates/ ./templates
 ADD scripts/ ./scripts

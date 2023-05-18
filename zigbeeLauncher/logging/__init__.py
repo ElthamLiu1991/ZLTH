@@ -5,10 +5,10 @@ import os
 import sys
 
 
-with open('./logConfig.json', 'r') as f:
+with open('./config.json', 'r') as f:
     print("read logConfig.py")
-    dict_conf = json.load(f)
-logging.config.dictConfig(dict_conf)
+    conf = json.load(f)
+logging.config.dictConfig(conf.get('logging'))
 
 launcherLogger = logging.getLogger('Launcher')
 simulatorLogger = logging.getLogger('Simulator')

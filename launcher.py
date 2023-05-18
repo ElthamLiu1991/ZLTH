@@ -6,9 +6,14 @@ import socket
 import json
 
 from zigbeeLauncher import create_app
-port = 5000
+# port = 5001
 
 if __name__ == "__main__":
+    # 解析配置文件
+    with open('./config.json', 'r') as f:
+        config = json.load(f)
+        port = config.get('port')
+        print(f'port: {port}')
     if not os.path.exists('./logs'):
         os.mkdir('./logs')
     # 判断服务是否已经启动

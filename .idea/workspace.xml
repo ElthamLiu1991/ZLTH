@@ -4,9 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. update port to 5050">
+    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. service port set to 5000">
+      <change afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logConfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/version_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version_file.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/logging/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/logging/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,28 +77,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/document/MATTER/CTO/Matter_DAC_Generation.md&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/projects/zigbee_launcher/development-new/dist",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\projects\zigbee_launcher\development-new\dist" />
       <recent name="C:\Users\eltha\PycharmProjects\wiser_zigbee_launcher\documents" />
       <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\serial_protocol" />
       <recent name="D:\projects\zigbee_launcher\development-new\scripts" />
       <recent name="D:\projects\zigbee_launcher\development-new\dcf" />
-      <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\auto_scripts" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\eltha\PycharmProjects\wiser_zigbee_launcher\windows_component" />
@@ -274,7 +281,7 @@
       <workItem from="1678949432810" duration="3526000" />
       <workItem from="1683528194828" duration="1832000" />
       <workItem from="1683530251294" duration="66000" />
-      <workItem from="1683530328886" duration="3753000" />
+      <workItem from="1683530328886" duration="11877000" />
     </task>
     <task id="LOCAL-00001" summary="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish">
       <created>1675300799239</created>
@@ -304,7 +311,14 @@
       <option name="project" value="LOCAL" />
       <updated>1683706645427</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="1. service port set to 5000">
+      <created>1683706940772</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1683706940772</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -325,7 +339,8 @@
     <MESSAGE value="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish" />
     <MESSAGE value="1. edge client forward /info, /update message to local client&#10;2. fix windows executable issue" />
     <MESSAGE value="1. update port to 5050" />
-    <option name="LAST_COMMIT_MESSAGE" value="1. update port to 5050" />
+    <MESSAGE value="1. service port set to 5000" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. service port set to 5000" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -345,6 +360,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1683706826556" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684379052376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

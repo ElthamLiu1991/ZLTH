@@ -1,5 +1,19 @@
 # ZIGBEE Launcher Test Harness
 ZIGBEE Launcher Test Harness is a local web service
+## Communication Structure
+## File Structure
+- launcher.py: main entry
+- config.json
+- requirements.txt
+- version.py
+- version_file.txt
+- zigbeeLauncher\
+- templates\
+- scripts\
+- version\
+- windows_component\
+- documents\
+
 ## Prepare
 **python**: 3.9 or later\
 **ZLTH dongle**: work with ZLTH service and run zigbee stack\
