@@ -202,6 +202,7 @@ def handler_command(message: Message, ip, sender):
     try:
         command = from_dict(data_class=CommandSimulator, data=message.data)
     except Exception as e:
+        logger.exception("simulator handle error")
         raise InvalidPayload(message.data)
     if command.label is not None:
         # label handle
@@ -217,7 +218,8 @@ def handler_command(message: Message, ip, sender):
             dongle.handle(message, sender)
     elif command.config is not None:
         # config handle
-        for mac in command.config.device:
+        message.data['config'] = command.config.config
+        for mac in command.config.devices:
             dongle = dongles.get(mac)
             if not dongle:
                 raise DeviceNotFound(mac)

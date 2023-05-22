@@ -158,6 +158,7 @@ class CommandSimulator:
 
 @dataclass
 class CommandDevice:
+
     firmware: Optional[Firmware]
     label: Optional[Label]
     config: Optional[Config]

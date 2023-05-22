@@ -1,18 +1,26 @@
 # ZIGBEE Launcher Test Harness
 ZIGBEE Launcher Test Harness is a local web service
 ## Communication Structure
+![](/documents/ZLTH%20Communication%20Structure.png)
 ## File Structure
-- launcher.py: main entry
-- config.json
-- requirements.txt
-- version.py
-- version_file.txt
-- zigbeeLauncher\
-- templates\
-- scripts\
-- version\
-- windows_component\
-- documents\
+- **launcher.py**: application entry
+- **config.json**: port and log configuration file
+- **requirements.txt**: python libraries
+- **version.py**: version control
+- **version_file.txt**: windows application version configuration
+- **zigbeeLauncher**
+  - **api_2**: RESTFUL API definition
+  - **auto_scripts**: automation testing
+  - **database**: database definition
+  - **dongle**: dongle operation
+  - **logging**: logging configuration
+  - **serial_protocol**: ZLTH serial protocol definition
+  - **simulator**: MQTT client and client
+  - **zigbee**: zigbee data type table
+- **templates**: Web UI templates
+- **scripts**: automation testing script configuration
+- **version**: version file
+- **windows_component**: dongle driver, EMQX MQTT broker
 
 ## Prepare
 **python**: 3.9 or later\

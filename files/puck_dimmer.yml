@@ -853,7 +853,7 @@ endpoints:
       server: true
       type: uint8
       writable: false
-    - default: 235
+    - default: 0
       id: 285
       mandatory: false
       manufacturer: false

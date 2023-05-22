@@ -567,29 +567,30 @@ class ConfigFileResource(Resource):
     /configs/files/<filename>
     """
 
-    def get(self, filename):
+    def get(self, file):
         """
         获取模板文件
         """
 
         @exception
         def handle():
+            print("filename:", file)
             try:
-                with open(os.path.join(base_dir, './files') + '/' + filename, 'r') as f:
+                with open(os.path.join(base_dir, './files') + '/' + file, 'r') as f:
                     try:
                         y = yaml.safe_load(f.read())
                     except Exception as e:
                         raise InvalidPayload(repr(e))
                     return {
-                        'filename': filename,
+                        'filename': file,
                         'config': y
                     }
             except FileNotFoundError:
-                raise NotFound(filename)
+                raise NotFound(file)
 
         return handle()
 
-    def delete(self, filename):
+    def delete(self, file):
         """
         删除当前模板文件
         :return:
@@ -597,8 +598,8 @@ class ConfigFileResource(Resource):
 
         @exception
         def handle():
-            if os.path.isfile(os.path.join(base_dir, './files') + '/' + filename):
-                os.remove(os.path.join(base_dir, './files') + '/' + filename)
+            if os.path.isfile(os.path.join(base_dir, './files') + '/' + file):
+                os.remove(os.path.join(base_dir, './files') + '/' + file)
             return {}
 
         return handle()

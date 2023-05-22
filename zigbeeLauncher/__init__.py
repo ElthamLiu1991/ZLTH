@@ -1,5 +1,4 @@
 import os
-
 from engineio.async_drivers import threading
 from flask import Flask, render_template
 from .database import db, ma
@@ -20,7 +19,6 @@ app.jinja_env.variable_end_string = ']}'
 CORS(app, supports_credentials=True)
 
 socketio = SocketIO(app, async_mode="threading")
-
 
 @app.route('/')
 def index():
