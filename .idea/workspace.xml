@@ -4,18 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. add port config to config.json">
-      <change afterPath="$PROJECT_DIR$/documents/ZLTH Communication Structure.png" afterDir="false" />
+    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. fix configure issue">
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/api/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/api/devices/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/api/devices/item_view.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/api/devices/view.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/api/docs/devices/devices_specs.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/puck_dimmer.yml" beforeDir="false" afterPath="$PROJECT_DIR$/files/puck_dimmer.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/autos.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/autos.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/records.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/records.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/version.py" beforeDir="false" afterPath="$PROJECT_DIR$/version.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/version_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version_file.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/simulator/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/handler.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -84,7 +87,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/projects/zigbee_launcher/development-new/dist",
+    "last_opened_file_path": "D:/projects/zigbee_launcher/development-new/zigbeeLauncher/api/devices",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -96,11 +99,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\api\devices" />
+      <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher" />
       <recent name="D:\projects\zigbee_launcher\development-new\dist" />
       <recent name="C:\Users\eltha\PycharmProjects\wiser_zigbee_launcher\documents" />
       <recent name="D:\projects\zigbee_launcher\development-new\zigbeeLauncher\serial_protocol" />
-      <recent name="D:\projects\zigbee_launcher\development-new\scripts" />
-      <recent name="D:\projects\zigbee_launcher\development-new\dcf" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\projects\zigbee_launcher\development-new\documents" />
@@ -284,7 +287,7 @@
       <workItem from="1678949432810" duration="3526000" />
       <workItem from="1683528194828" duration="1832000" />
       <workItem from="1683530251294" duration="66000" />
-      <workItem from="1683530328886" duration="24785000" />
+      <workItem from="1683530328886" duration="47137000" />
     </task>
     <task id="LOCAL-00001" summary="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish">
       <created>1675300799239</created>
@@ -328,7 +331,14 @@
       <option name="project" value="LOCAL" />
       <updated>1684383075984</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="1. fix configure issue">
+      <created>1684717966721</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1684717966721</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -351,7 +361,8 @@
     <MESSAGE value="1. update port to 5050" />
     <MESSAGE value="1. service port set to 5000" />
     <MESSAGE value="1. add port config to config.json" />
-    <option name="LAST_COMMIT_MESSAGE" value="1. add port config to config.json" />
+    <MESSAGE value="1. fix configure issue" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. fix configure issue" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -371,6 +382,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684488067697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684745617089" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

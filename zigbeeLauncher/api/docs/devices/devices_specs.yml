@@ -1,0 +1,12 @@
+tags:
+  - Devices
+summary: Get all devices info
+description: Get all device information include connected and disconnected
+responses:
+  200:
+    description: Successful operation
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/DevicesResponse'
+

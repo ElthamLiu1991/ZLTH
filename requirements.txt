@@ -10,7 +10,7 @@ colorama==0.4.6
 crcmod==1.7
 dacite==1.6.0
 docopt==0.6.2
-Flask==2.2.2
+Flask==2.3.2
 Flask-Cors==3.0.10
 flask-marshmallow==0.14.0
 Flask-MQTT==1.1.1
@@ -59,3 +59,4 @@ zeroconf==0.39.4
 paramiko~=2.12.0
 pexpect~=4.8.0
 scp~=0.14.4
+flasgger~=0.9.7.1

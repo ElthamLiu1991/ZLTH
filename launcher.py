@@ -5,6 +5,8 @@ import time
 import socket
 import json
 
+from flasgger import Swagger
+
 from zigbeeLauncher import create_app
 # port = 5001
 
@@ -38,5 +40,5 @@ if __name__ == "__main__":
         os.mkdir('./records')
     if not os.path.exists('./hub/'):
         os.mkdir('./hub')
-    socketio, app = create_app()
+    socketio, app = create_app(port)
     socketio.run(app, host='0.0.0.0', port=port, use_reloader=False, allow_unsafe_werkzeug=True)

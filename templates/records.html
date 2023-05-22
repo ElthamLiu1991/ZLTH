@@ -8,8 +8,8 @@
     <h1>ZLTH Auto Testing Records</h1>
     <p>
         {% for record, status in records.items() %}
-        <a id={[record]} href="/api/2/auto/records/" onclick="open_record(this)">{[record]}</a>
-        <b><span>: {[status]}</span></b><br>
+        <a id={{record}} href="/api/2/auto/records/" onclick="open_record(this)">{{record}}</a>
+        <b><span>: {{status}}</span></b><br>
         {% endfor %}
     </p>
     <div id="records_are">
