@@ -4,30 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. add port config to config.json">
+    <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. update README">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dcf/puck_dimmer.json" beforeDir="false" afterPath="$PROJECT_DIR$/dcf/puck_dimmer.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/capacity.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/capacity.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/capacity_local.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/compose.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/compose.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/stability.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/stability.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/version_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version_file.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/util.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/dcf_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/dcf_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/stability/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/stability/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_02.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_02.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/wait_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/wait_response.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/launcher.spec" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.spec" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -295,6 +275,7 @@
       <workItem from="1683528194828" duration="1832000" />
       <workItem from="1683530251294" duration="66000" />
       <workItem from="1683530328886" duration="24785000" />
+      <workItem from="1684824311950" duration="3521000" />
     </task>
     <task id="LOCAL-00001" summary="1. add stability script&#10;2. add compose script&#10;3. update capacity user configuration&#10;4. save hub database and containers log when capacity testing finish">
       <created>1675300799239</created>
@@ -338,7 +319,28 @@
       <option name="project" value="LOCAL" />
       <updated>1684383075984</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="1. fix config issue&#10;2. fix auto issue">
+      <created>1684822996458</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1684822996458</updated>
+    </task>
+    <task id="LOCAL-00008" summary="1. add dynamic module to windows package">
+      <created>1684825129600</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1684825129600</updated>
+    </task>
+    <task id="LOCAL-00009" summary="1. update README">
+      <created>1684827386917</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1684827386917</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -361,7 +363,10 @@
     <MESSAGE value="1. update port to 5050" />
     <MESSAGE value="1. service port set to 5000" />
     <MESSAGE value="1. add port config to config.json" />
-    <option name="LAST_COMMIT_MESSAGE" value="1. add port config to config.json" />
+    <MESSAGE value="1. fix config issue&#10;2. fix auto issue" />
+    <MESSAGE value="1. add dynamic module to windows package" />
+    <MESSAGE value="1. update README" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. update README" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
@@ -372,6 +377,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684820767808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684824330519" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
