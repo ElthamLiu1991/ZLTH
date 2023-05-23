@@ -10,9 +10,10 @@ from zigbeeLauncher.auto_scripts import State, Status, Result, ScriptName
 from zigbeeLauncher.auto_scripts.hub_api import HubAPI
 from zigbeeLauncher.auto_scripts.script import Script
 from zigbeeLauncher.auto_scripts.tuya_api import TUYAAPI
-from zigbeeLauncher.auto_scripts.zlth_api import ZLTHAPI, Device_base
+from zigbeeLauncher.auto_scripts.zlth_api import ZLTHAPI
 from zigbeeLauncher.logging import autoLogger as logger
 from zigbeeLauncher import base_dir
+from zigbeeLauncher.dongle.dongle import DongleMetaData
 
 
 @dataclass
@@ -20,7 +21,6 @@ class Config:
     vid: str
     repeat: int
     batch: int
-    ip: str
     count: Optional[int]
     dongles: Optional[list[str]]
     simulators: Optional[list[str]]
@@ -35,7 +35,7 @@ class Testing(Script):
         status_callback(State.READY, Status.INFO)
         self.tuya = None
         self.zlth = None
-        self.hub = None
+        # self.hub = None
         self.test_result = []
         self.joined = []
         self.pending = []
@@ -98,9 +98,10 @@ class Testing(Script):
             self.working()
 
     def stop(self):
+        self.log(Status.INFO, "Stopping")
         self.running = False
-        if self.hub:
-            self.hub.stop()
+        # if self.hub:
+        #     self.hub.stop()
         if self.tuya.is_permit(True):
             self.tuya.permit_join(0)
 
@@ -119,19 +120,21 @@ class Testing(Script):
         """
         self.log(Status.INFO, 'preparing testing environment')
         self.update(State.PREPARING, Result.SUCCESS)
-        # check hub ip is available
-        self.hub = HubAPI(self.record, self.setting.ip, self.tuya)
-        if not self.hub.connect:
-            raise Exception(f'cannot connect to hub: {self.setting.ip}')
-        if isinstance(self.zlth.dongles, bool) or not self.zlth.dongles:
+        if not self.zlth.dongles:
             raise Exception('ZLTH: no available dongles')
+        else:
+            self.log(Status.INFO, f'found {len(self.zlth.dongles)} dongles')
         if not self.tuya.token:
             raise Exception('HUB: failed to get tuya IOT token')
+        else:
+            self.log(Status.INFO, f'TUYA IOT token: {self.tuya.token}')
         if not self.tuya.is_online():
             raise Exception('HUB: hub is offline')
         self.channel = self.tuya.get_channel()
         if not self.channel:
             raise Exception('HUB: cannot get zigbee network channel')
+        else:
+            self.log(Status.INFO, f'Zigbee channel:{self.channel}')
         if self.setting.dongles and self.setting.simulators:
             raise Exception(f'assigned dongles and simulators both is unsupported')
         # count, dongles, simulators only can be assigned one of them
@@ -152,12 +155,12 @@ class Testing(Script):
                 raise Exception(f'only find {len(self.zlth.dongles)} dongles, less than {len(self.setting.dongles)}')
             # check setting.dongles all can be found in zlth.dongles
             for mac in self.setting.dongles:
-                if not self.zlth.has_device(mac):
+                if not self.zlth.get_device(mac):
                     raise Exception(f'cannot find {mac} in dongle list')
             self.dongles = self.setting.dongles.copy()
         elif self.setting.simulators:
             for ip in self.setting.simulators:
-                simulator = self.zlth.has_simulator(ip)
+                simulator = self.zlth.get_simulator(ip)
                 if not simulator:
                     raise Exception(f'cannot find {ip} in simulator list')
                 self.dongles.extend(simulator.devices)
@@ -198,14 +201,15 @@ class Testing(Script):
                     self.tuya.permit_join(0)
                 self.setting.repeat -= 1
             finally:
+                pass
                 # store hub files
-                if self.hub.is_connected():
-                    self.hub.set_folder(self.setting.repeat+1)
-                    self.hub.get_hub_files()
-                else:
-                    self.log(Status.WARNING, f"hub {self.setting.ip} not connect")
-                if not self.hub.connect() and not self.running:
-                    self.log(Status.ERROR, f"connect to hub {self.setting.ip} failed")
+                # if self.hub.is_connected():
+                #     self.hub.set_folder(self.setting.repeat+1)
+                #     self.hub.get_hub_files()
+                # else:
+                #     self.log(Status.WARNING, f"hub {self.setting.ip} not connect")
+                # if not self.hub.connect() and not self.running:
+                #     self.log(Status.ERROR, f"connect to hub {self.setting.ip} failed")
         if self.running:
             self.log(Status.INFO, "Finish")
             self.result = Result.SUCCESS
@@ -216,13 +220,13 @@ class Testing(Script):
             self.update(State.FINISH, self.result)
             self.log(Status.INFO, json.dumps(self.test_result, indent=4))
             self.running = False
-
-            # store hub files
-            if self.hub.is_connected():
-                self.hub.set_folder(self.setting.repeat + 1)
-                self.hub.get_hub_files()
-            else:
-                self.log(Status.WARNING, f"hub {self.setting.ip} not connect")
+            #
+            # # store hub files
+            # if self.hub.is_connected():
+            #     self.hub.set_folder(self.setting.repeat + 1)
+            #     self.hub.get_hub_files()
+            # else:
+            #     self.log(Status.WARNING, f"hub {self.setting.ip} not connect")
 
     # self.update(State.WORKING, Result.SUCCESS)
         # if self.setting.repeat:
@@ -291,7 +295,7 @@ class Testing(Script):
                         self.log(Status.ERROR, f'{mac} disconnected')
                         self.ready_dongles.remove(mac)
                         continue
-                    elif dongle.state != 4:
+                    elif dongle.state != DongleMetaData.DongleState.PAIRING:
                         self.log(Status.ERROR, f'{mac} is not in commission mode, {dongle.state}')
                         self.ready_dongles.remove(mac)
                         continue
@@ -322,8 +326,8 @@ class Testing(Script):
                     raise Exception("HUB: permit join window not close")
             self.joining()
 
-    def _device_join_and_register(self, device: Device_base):
-        if device.state == 6 or device.state == 7:
+    def _device_join_and_register(self, device):
+        if device.state in [DongleMetaData.DongleState.JOINED, DongleMetaData.DongleState.ORPHAN]:
             if self.tuya.is_register(device.mac):
                 if device.mac not in self.joined:
                     self.joined.append(device.mac)
@@ -364,7 +368,7 @@ class Testing(Script):
                     self.log(Status.WARNING, f"{mac} disconnected")
                     # remove device from pending
                     self.pending.remove(mac)
-                if device.state == 1:
+                if device.state == DongleMetaData.DongleState.UN_COMMISSIONED:
                     self.log(Status.WARNING, f"{mac} not in joining mode")
                     self.zlth.join(mac, [self.channel])
                 elif self._device_join_and_register(device):
@@ -420,7 +424,7 @@ class Testing(Script):
                 result = False
                 self.log(Status.ERROR, f"No.{index} dongle {mac} is offline")
                 self.update_result(Result.FAILED, f'No.{index} dongle {mac} is offline')
-            elif dongle.state == 1:
+            elif dongle.state == DongleMetaData.DongleState.UN_COMMISSIONED:
                 result = False
                 if mac in self.joined:
                     self.log(Status.ERROR, f"No.{index} device {mac} left")
@@ -429,12 +433,12 @@ class Testing(Script):
                 else:
                     self.log(Status.ERROR, f"No.{index} device {mac} is not joined")
                     self.update_result(Result.FAILED, f'No.{index} device {mac} is not joined')
-            elif dongle.state == 4:
+            elif dongle.state == DongleMetaData.DongleState.PAIRING:
                 result = False
                 self.log(Status.ERROR, f"No.{index} dongle {mac} still in commission mode")
             else:
-                if dongle.state == 7:
-                    self.log(Status.ERROR, f"No.{index} dongle {mac} state is 7")
+                if dongle.state == DongleMetaData.DongleState.ORPHAN:
+                    self.log(Status.ERROR, f"No.{index} dongle {mac} state is ORPHAN")
                 # check dongle register or not
                 if not self.tuya.is_register(mac):
                     result = False
@@ -481,7 +485,8 @@ class Testing(Script):
             else:
                 if not dongle.connected:
                     self.log(Status.ERROR, f"ZLTH: {mac} is disconnected")
-                elif dongle.state != 1:
+                elif dongle.state != DongleMetaData.DongleState.UN_COMMISSIONED:
+                    self.log(Status.INFO, f"leaving {mac}")
                     self.zlth.leave(mac)
         time.sleep(5)
 

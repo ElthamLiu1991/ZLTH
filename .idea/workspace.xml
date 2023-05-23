@@ -5,17 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. add port config to config.json">
-      <change afterPath="$PROJECT_DIR$/documents/ZLTH Communication Structure.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/files/puck_dimmer.yml" beforeDir="false" afterPath="$PROJECT_DIR$/files/puck_dimmer.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dcf/puck_dimmer.json" beforeDir="false" afterPath="$PROJECT_DIR$/dcf/puck_dimmer.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/capacity.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/capacity.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/capacity_local.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/compose.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/compose.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/stability.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/stability.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/version_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version_file.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/configs/view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/autos/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/util.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/dcf_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/dcf_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/stability/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/stability/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/data_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/config.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/dongle/dongle.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/simulator/handler.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/handler.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_02.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_02.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/wait_response.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/wait_response.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,11 +70,9 @@
     <setting file="file://$PROJECT_DIR$/scripts/stability.json" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/version/version.txt" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity/__init__.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/capacity_local/__init__.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/info.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/management.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_01.py" root0="FORCE_HIGHLIGHTING" />
@@ -79,21 +89,21 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/projects/zigbee_launcher/development-new/dist",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/projects/zigbee_launcher/development-new/dist&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\projects\zigbee_launcher\development-new\dist" />
@@ -354,15 +364,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="1. add port config to config.json" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/compose/__init__.py</url>
-          <line>45</line>
-          <option name="timeStamp" value="59" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="data" language="Python" />
@@ -371,6 +372,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684488067697" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684820767808" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

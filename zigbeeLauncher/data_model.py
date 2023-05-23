@@ -72,10 +72,10 @@ class Attribute:
     cluster: int
     server: bool
     manufacturer: bool
-    manufacturer_code: Optional[int]
     attribute: int
-    type: Optional[str]
-    value: Optional[Any]
+    manufacturer_code: Optional[int] = field(default=0)
+    type: Optional[str] = field(default=None)
+    value: Optional[Any] = field(default=None)
 
 
 @dataclass
@@ -121,13 +121,19 @@ class Config:
                 self.server_commands = []
                 self.client_commands = []
                 server_commands = self.commands.get('S->C')
+                print(f"self.commands.get('S->C'):{self.commands.get('S->C')}")
                 if server_commands:
                     for command in server_commands:
+                        print(f"{self.id}, command:{command}")
                         self.server_commands.append(from_dict(data_class=self.Command, data=command))
+                print(f"{self.id}, server_commands:{self.server_commands}")
                 client_commands = self.commands.get('C->S')
+                print(f"self.commands.get('C->S'):{self.commands.get('C->S')}")
                 if client_commands:
                     for command in client_commands:
+                        print(f"{self.id}, command:{command}")
                         self.client_commands.append(from_dict(data_class=self.Command, data=command))
+                print(f"{self.id}, client_commands:{self.client_commands}")
 
         id: int
         profile_id: int
@@ -158,15 +164,14 @@ class CommandSimulator:
 
 @dataclass
 class CommandDevice:
+    firmware: Optional[Firmware] = field(default=None)
+    label: Optional[Label] = field(default=None)
+    config: Optional[Config] = field(default=None)
+    get_config: Optional[Any] = field(default=None)
 
-    firmware: Optional[Firmware]
-    label: Optional[Label]
-    config: Optional[Config]
-    get_config: Optional[Any]
-
-    identify: Optional[Any]
-    reset: Optional[Any]
-    join: Optional[Join]
-    leave: Optional[Any]
-    data_request: Optional[Any]
-    attribute: Optional[Attribute]
+    identify: Optional[Any] = field(default=None)
+    reset: Optional[Any] = field(default=None)
+    join: Optional[Join] = field(default=None)
+    leave: Optional[Any] = field(default=None)
+    data_request: Optional[Any] = field(default=None)
+    attribute: Optional[Attribute] = field(default=None)

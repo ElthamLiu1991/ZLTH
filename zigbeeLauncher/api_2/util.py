@@ -23,16 +23,16 @@ def send_command(ip=None, mac=None, command=None, timeout=10):
     # 加入request等待队列
     task = wait_response(timestamp, uid, timeout)
     message = Message(uuid=uid, timestamp=timestamp, data=command, code=0, message="")
-    # if ip == get_ip_address():
-    if False:
+    if ip == get_ip_address():
+    # if False:
         logger.info(f'local command:{command}')
         if mac:
             # device command
-            handle_device_command(message, ip, mac)
+            handle_device_command(message, ip, mac, ip)
             pass
         else:
             # simulator command
-            handler_command(message, ip)
+            handler_command(message, ip, ip)
     else:
         logger.info(f'remote command:{command}')
         simulator = Global.get(Global.SIMULATOR)

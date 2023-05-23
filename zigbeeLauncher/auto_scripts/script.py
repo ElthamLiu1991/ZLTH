@@ -180,24 +180,4 @@ class Http:
             else:
                 logger.info(f"HTTP response success: {r.json()}")
                 self.response = r.json()
-
-
-def wait_and_retry(timeout=5, retry=3):
-
-    async def _wait():
-        await asyncio.sleep(timeout)
-
-    def wait_handle(func):
-        @wraps(func)
-        def retry_handle(*args, **kwargs):
-            # do something
-            for i in range(0, retry):
-                if not func(*args, **kwargs):
-                    task = Tasks()
-                    task.add(_wait()).result()
-                    # asyncio.run(_wait())
-                else:
-                    return True
-            return False
-        return retry_handle
-    return wait_handle
+                return True

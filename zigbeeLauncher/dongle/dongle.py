@@ -388,11 +388,14 @@ class Dongle(DongleMetaData, Request):
         request = None
         self._sender = sender
         try:
-            try:
-                command = from_dict(data_class=CommandDevice, data=message.data)
-            except Exception as e:
-                logger.exception("device handle error")
-                raise InvalidPayload(repr(e))
+            if not isinstance(message.data, CommandDevice):
+                try:
+                    command = from_dict(data_class=CommandDevice, data=message.data)
+                except Exception as e:
+                    logger.exception("device handle error")
+                    raise InvalidPayload(repr(e))
+            else:
+                command = message.data
             if command.firmware is not None:
                 file = WiserFile(f'./firmwares/{command.firmware.filename}')
                 # update Update class

@@ -9,7 +9,7 @@ from hashlib import sha256
 
 from dacite import from_dict
 
-from zigbeeLauncher.auto_scripts.script import Http, wait_and_retry
+from zigbeeLauncher.auto_scripts.script import Http
 from zigbeeLauncher.tasks import Tasks
 from zigbeeLauncher.logging import autoLogger as logger
 
@@ -109,6 +109,7 @@ class TUYAAPI(Http):
     schema = "sewiserdemo"
     sign_method = "HMAC-SHA256"
     uid = "ay1600225458332csTDL"
+    counter = 3
 
     def __init__(self, vid):
         Http.__init__(self,
@@ -147,7 +148,6 @@ class TUYAAPI(Http):
 
     @staticmethod
     def _decode(data):
-
         def send(func, *args, **kwargs):
             func(*args, **kwargs)
             obj = args[0]
@@ -156,9 +156,15 @@ class TUYAAPI(Http):
                 task.add(obj.send()).result()
             except Exception as e:
                 logger.error("TUYA request error: {}".format(repr(e)))
-                return None
-            logger.debug(f"TUYA response:{obj.response}")
+                if TUYAAPI.counter == 0:
+                    TUYAAPI.counter = 3
+                    return None
+                else:
+                    TUYAAPI.counter -= 1
+                    return send(func, *args, **kwargs)
+            logger.info(f"TUYA response:{obj.response}")
             if obj.response.get('success'):
+                TUYAAPI.counter = 3
                 return from_dict(data_class=data, data=obj.response).result
             else:
                 if obj.response.get('msg') == 'token invalid':
@@ -205,7 +211,6 @@ class TUYAAPI(Http):
             return info.online
         return None
 
-    @wait_and_retry()
     def is_permit(self, permit):
         info = self.get_device_info(self.gateway)
         if info:

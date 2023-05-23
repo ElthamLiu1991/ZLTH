@@ -13,7 +13,8 @@ from zigbeeLauncher.auto_scripts.dcf_api import DCFZLTHSetting, DCFAPI, DCFZLTHR
 from zigbeeLauncher.auto_scripts.hub_api import HubAPI
 from zigbeeLauncher.auto_scripts.script import Script
 from zigbeeLauncher.auto_scripts.tuya_api import TUYAAPI, DPStatus, DeviceResponse
-from zigbeeLauncher.auto_scripts.zlth_api import ZLTHAPI, AttributeQuery, Attribute
+from zigbeeLauncher.auto_scripts.zlth_api import ZLTHAPI
+from zigbeeLauncher.data_model import Attribute
 from zigbeeLauncher.logging import autoLogger as logger
 
 
@@ -36,7 +37,6 @@ class Device:
 class Config:
     duration: int
     vid: str
-    ip: str
     interval: int
     validation: int
     devices: list[Device]
@@ -50,7 +50,7 @@ class Testing(Script):
         status_callback(State.READY, Status.INFO)
         self.tuya = None
         self.zlth = None
-        self.hub = None
+        # self.hub = None
         self.test_result = {}
         self.devices = {}
         self.summary = 0
@@ -129,15 +129,19 @@ class Testing(Script):
         self.log(Status.INFO, "preparing testing environment")
         self.update(State.PREPARING, Result.SUCCESS)
         # check hub ip is available
-        self.hub = HubAPI(self.record, self.setting.ip)
-        if not self.hub.connection:
-            raise Exception(f'cannot connect to hub: {self.setting.ip}')
+        # self.hub = HubAPI(self.record, self.setting.ip)
+        # if not self.hub.connection:
+        #     raise Exception(f'cannot connect to hub: {self.setting.ip}')
+        if not self.zlth.dongles:
+            raise Exception('ZLTH: no available dongles')
+        else:
+            self.log(Status.INFO, f'found {len(self.zlth.dongles)} dongles')
         if not self.tuya.token:
             raise Exception('HUB: failed to get tuya IOT token')
+        else:
+            self.log(Status.INFO, f'TUYA IOT token: {self.tuya.token}')
         if not self.tuya.is_online():
             raise Exception('HUB: hub is offline')
-        if isinstance(self.zlth.dongles, bool) or not self.zlth.dongles:
-            raise Exception('ZLTH: no available dongles')
         # load DCF setting based on config
         for device in self.setting.devices:
             dcf = DCFAPI(device.name, device.functions)
@@ -162,8 +166,8 @@ class Testing(Script):
                         item.mac_vid = [MacVid(mac=device.node_id, vid=device.id)]
                         self.devices[item.name] = 1
                     break
-            if not item.mac_vid:
-                raise Exception(f"TUYA: cannot found {item.pid} in device list")
+                if not item.mac_vid:
+                    raise Exception(f"TUYA: cannot found {item.pid} in device list")
         self.log(Status.INFO, "preparing done")
         self.working()
 
@@ -200,11 +204,11 @@ class Testing(Script):
             self.running = False
 
             # store hub files
-            if self.hub.is_connected():
-                self.hub.set_folder()
-                self.hub.get_hub_files()
-            else:
-                self.log(Status.ERROR, f"hub {self.setting.ip} not connect")
+            # if self.hub.is_connected():
+            #     self.hub.set_folder()
+            #     self.hub.get_hub_files()
+            # else:
+            #     self.log(Status.ERROR, f"hub {self.setting.ip} not connect")
 
     def _timeout(self):
         if int(time.time()) - self.start_time < self.test_duration:
@@ -260,33 +264,33 @@ class Testing(Script):
                 time.sleep(self.setting.validation)
                 self.log(Status.INFO, f'verifying')
                 # verify on ZLTH dongle
-                response = self.zlth.get_attribute(device.mac, AttributeQuery(
+                response = self.zlth.read(device.mac, Attribute(
                     endpoint=endpoint,
-                    cluster=request.attribute.cluster,
-                    server=1,
-                    attribute=request.attribute.attribute,
-                    manufacturer=int(request.attribute.manufacturer),
-                    manufacturer_code=request.attribute.manufacturer_code
+                    cluster=request.attr.cluster,
+                    server=True,
+                    attribute=request.attr.attribute,
+                    manufacturer=request.attr.manufacturer,
+                    manufacturer_code=request.attr.manufacturer_code
                 ))
-                if not response:
-                    raise Exception(f"get {endpoint}:{request.attribute.cluster_name}:"
-                                    f"{request.attribute.attribute_name} from {device} failed")
-                if response.value == item.verify:
+                if response is None:
+                    raise Exception(f"get {endpoint}:{request.attr.cluster_name}:"
+                                    f"{request.attr.attribute_name} from {device} failed")
+                if response == item.verify:
                     self.success += 1
                     self.log(Status.INFO, f'verifying success, counter: {self.success}/{self.summary}')
                 else:
                     raise Exception(f'request: {device} '
                                     f'endpoint:{endpoint}:'
-                                    f'cluster:{request.attribute.cluster_name}:'
-                                    f'attribute:{request.attribute.attribute_name} '
+                                    f'cluster:{request.attr.cluster_name}:'
+                                    f'attribute:{request.attr.attribute_name} '
                                     f'verifying failed,'
-                                    f'expect {item.verify}, actually {response.value}')
+                                    f'expect {item.verify}, actually {response}')
             except Exception as e:
                 self.failed += 1
                 self.log(Status.ERROR, str(e))
                 self.update_result(Result.FAILED, f'{str(e)}, {self.success}/{self.summary}')
 
-    def _get_code_value(self, info: DeviceResponse, code):
+    def _get_code_value(self, info: Device, code):
         if not info:
             return None
         for item in info.status:
@@ -301,16 +305,16 @@ class Testing(Script):
             timestamp = int(time.time())
             # update attribute
             self.log(Status.INFO,
-                     f'trigger {device}:{endpoint}:{report.attribute.cluster_name}:{report.attribute.attribute_name} update to {item.value}')
+                     f'trigger {device}:{endpoint}:{report.attr.cluster_name}:{report.attr.attribute_name} update to {item.value}')
             if not self.zlth.write(device.mac, Attribute(
                     endpoint=endpoint,
-                    cluster=report.attribute.cluster,
+                    cluster=report.attr.cluster,
                     server=True,
-                    attribute=report.attribute.attribute,
-                    type=report.attribute.type_name,
+                    attribute=report.attr.attribute,
+                    type=report.attr.type_name,
                     value=item.value,
-                    manufacturer=report.attribute.manufacturer,
-                    manufacturer_code=report.attribute.manufacturer_code
+                    manufacturer=report.attr.manufacturer,
+                    manufacturer_code=report.attr.manufacturer_code
             )):
                 self.log(Status.WARNING,
                          f"trigger update failed")

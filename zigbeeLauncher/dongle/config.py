@@ -177,6 +177,7 @@ class SetConfig(Request):
 
     async def set_commands(self):
         async def _set_commands(endpoint, cluster, server, commands):
+            print("_set_commands:", endpoint.id, cluster.id, server, commands)
             request = self.dongle.pack_request(
                 message=self.message,
                 request=AddCommands(
@@ -190,6 +191,7 @@ class SetConfig(Request):
                 timeout=self.timeout,
                 retry=self.retry
             )
+            print("request:", request)
             await request.send()
             if not request.result:
                 return False
@@ -198,19 +200,22 @@ class SetConfig(Request):
         endpoints = self.config.endpoints
         for endpoint in endpoints:
             for cluster in endpoint.server_clusters:
-                logger.info(f"set command:{endpoint.id}, {cluster.id}")
+                logger.info(f"server, set server command:{endpoint.id}, {cluster.id}, {cluster.server_commands}")
                 commands = []
                 for command in cluster.server_commands:
+                    print(f"server command:", command)
                     commands.append(SPCommand(
                         command=command.id,
                         mask=1,
                         manufacturer_code=command.manufacturer_code if command.manufacturer else 0,
 
                     ))
-                if not commands:
-                    continue
-                if not await _set_commands(endpoint, cluster, True, commands):
-                    return
+                print("commands:", commands)
+                if commands:
+                    if not await _set_commands(endpoint, cluster, True, commands):
+                        print("set command failed")
+                        return
+                logger.info(f"server, set client command:{endpoint.id}, {cluster.id}, {cluster.client_commands}")
                 commands = []
                 for command in cluster.client_commands:
                     commands.append(SPCommand(
@@ -219,11 +224,13 @@ class SetConfig(Request):
                         manufacturer_code=command.manufacturer_code if command.manufacturer else 0,
 
                     ))
-                if not commands:
-                    continue
-                if not await _set_commands(endpoint, cluster, True, commands):
-                    return
+                print("commands:", commands)
+                if commands:
+                    if not await _set_commands(endpoint, cluster, True, commands):
+                        print("set command failed")
+                        return
             for cluster in endpoint.client_clusters:
+                logger.info(f"client, set server command:{endpoint.id}, {cluster.id}, {cluster.server_commands}")
                 commands = []
                 for command in cluster.server_commands:
                     commands.append(SPCommand(
@@ -232,10 +239,12 @@ class SetConfig(Request):
                         manufacturer_code=command.manufacturer_code if command.manufacturer else 0,
 
                     ))
-                if not commands:
-                    continue
-                if not await _set_commands(endpoint, cluster, False, commands):
-                    return
+                print("commands:", commands)
+                if commands:
+                    if not await _set_commands(endpoint, cluster, False, commands):
+                        print("set command failed")
+                        return
+                logger.info(f"client, set client command:{endpoint.id}, {cluster.id}, {cluster.client_commands}")
                 commands = []
                 for command in cluster.client_commands:
                     commands.append(SPCommand(
@@ -244,10 +253,11 @@ class SetConfig(Request):
                         manufacturer_code=command.manufacturer_code if command.manufacturer else 0,
 
                     ))
-                if not commands:
-                    continue
-                if not await _set_commands(endpoint, cluster, False, commands):
-                    return
+                print("commands:", commands)
+                if commands:
+                    if not await _set_commands(endpoint, cluster, False, commands):
+                        print("set command failed")
+                        return
         await self.stop()
 
     async def stop(self):

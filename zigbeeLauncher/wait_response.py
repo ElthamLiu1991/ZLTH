@@ -40,7 +40,7 @@ def init():
 
 
 def wait_response(timestamp, uid, timeout):
-    print(f"wait response for {uid}")
+    logger.info(f"wait response for {uid}")
     return asyncio.run_coroutine_threadsafe(_insert_request(uid, timestamp, timeout), thread_loop)
 
 

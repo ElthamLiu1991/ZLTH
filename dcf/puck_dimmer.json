@@ -199,8 +199,8 @@
                         "verify": 254
                     },
                     {
-                        "value": "10",
-                        "verify": 3
+                        "value": "100",
+                        "verify": 24
                     }
                 ]
             },
@@ -214,8 +214,8 @@
                         "verify": "1000"
                     },
                     {
-                        "value": 3,
-                        "verify": "10"
+                        "value": 24,
+                        "verify": "100"
                     }
                 ]
             }

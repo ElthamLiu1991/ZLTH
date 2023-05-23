@@ -35,6 +35,7 @@ class DCFZLTHRequest:
     domain: str
     attribute: str
     data: list[DCFZLTHData]
+    attr: Optional[DCFAttribute]
 
 
 @dataclass
@@ -75,7 +76,8 @@ class DCFAPI:
                         if not dcf_attribute:
                             logger.error(f"dcf attribute decode {setting.request.domain} {setting.request.attribute} failed")
                             break
-                        setting.request.__dict__.update({'attribute': dcf_attribute})
+                        # setting.request.__dict__.update({'attribute': dcf_attribute})
+                        setting.request.attr = dcf_attribute
                     if setting.report:
                         dcf_attribute = self.load_attribute(setting.report.domain, setting.report.attribute)
                         if not dcf_attribute:
@@ -83,7 +85,8 @@ class DCFAPI:
                             break
                         dcf_attribute.type_name = data_type_name_table.get(dcf_attribute.type)
                         dcf_attribute.attribute_name = k
-                        setting.report.__dict__.update({'attribute': dcf_attribute})
+                        # setting.report.__dict__.update({'attribute': dcf_attribute})
+                        setting.report.attr = dcf_attribute
                     # get pid
                     for env, pid in dcf_device['tuya']['pid'].items():
                         if setting.pid:

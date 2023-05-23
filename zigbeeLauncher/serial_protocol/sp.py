@@ -90,7 +90,10 @@ def decode_str(data: bytes):
     :param data: bytes data
     :return: str
     """
-    return data.decode()[:data.find(b'\x00')]
+    if data.find(b'\x00') != -1:
+        return data.decode()[:data.find(b'\x00')]
+    else:
+        return data.decode()
 
 
 class SPType:

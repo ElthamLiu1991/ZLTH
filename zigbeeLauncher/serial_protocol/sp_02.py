@@ -404,7 +404,8 @@ class AttributeResponse(SerialProtocol):
                 value = name
             elif key == "value":
                 if isinstance(value, str):
-                    value = value[1:]
+                    # value = value[1:]
+                    pass
                 else:
                     # 判断是否为负数
                     id, name, length = get_data_type(name=self.type)
@@ -415,6 +416,7 @@ class AttributeResponse(SerialProtocol):
         self.__dict__[key] = value
         if key == 'value' and value is not None:
             self.sp_response.data = asdict(from_dict(data_class=Attribute, data=self.__dict__))
+
     def __init__(self):
         super().__init__(self.id)
         self.register('endpoint', SPType.INT, 1)

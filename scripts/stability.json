@@ -1,13 +1,12 @@
 {
     "duration": 1,
-    "vid": "6ce8e7bfca90878970akyr",
-    "ip": "192.168.121.1",
+    "vid": "6cd8e93b0faf75330bigp1",
     "interval": 20,
     "validation": 5,
     "devices": [
         {
             "name": "puck_dimmer",
-            "pid": "bat2u3vq",
+            "pid": "moexciiq",
             "functions": [
                 "switch_led_1",
                 "bright_value_1"
