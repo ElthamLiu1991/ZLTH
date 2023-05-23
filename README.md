@@ -47,9 +47,24 @@ Before running ZLTH service, please make sure a MQTT broker service already runn
 #### python
 `python launcher.py`
 #### EXE
-double click ***launcher.exe***
+double click ***launcher.exe*** or ***run.bat***
 ### Linux
 `python launcher.py`
 ### Docker
 ## How to Use
-Open web browser and enter: http://localhost:5000, or any ZLTH service IP address instead of *localhost*, **http://{ip}:5000**, enjoy!
+Open web browser and enter: http://localhost:{port}(defined in *config.json*), or any ZLTH service IP address instead of *localhost*, **http://{ip}:{port}**
+### Clients
+ZLTH simulators information table.
+### Device
+ZLTH dongles information table.
+### Update
+Upgrade ZLTH dongle firmware.
+### Operator
+Interface to operate on or more ZLTH dongles, current support "join", "leave", "write" feature.
+### Configure
+Update dongle application, simulating to any existing or new zigbee product.
+### Automation Testing
+Opening automation testing script by /api/2/auto/scripts/{script name}, currently support "capacity", "stability" and "compose".
+#### capacity
+#### stability
+#### compose
