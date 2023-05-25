@@ -14,7 +14,6 @@ def exception(func):
         response = RequestException(0, "")
         try:
             data = func(*args, **kwargs)
-            print(f"func return:{data}")
             if isinstance(data, Message):
                 response.error = data
             else:

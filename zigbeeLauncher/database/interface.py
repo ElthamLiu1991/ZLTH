@@ -1,5 +1,5 @@
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 
 from flask import current_app
 
@@ -83,6 +83,8 @@ class DBDevice(DBInterface):
             log.warning("inset device to database failed:%s", e)
 
     def update(self, data):
+        if 'process' in data.keys():
+            return
         self._update(data)
 
     def delete(self):
@@ -105,6 +107,7 @@ class DBSimulator(DBInterface):
         name: str
         connected: bool
         broker: str
+        port: int
 
     def add(self, instance: DataModel):
         try:

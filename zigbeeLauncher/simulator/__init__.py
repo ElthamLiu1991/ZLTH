@@ -5,7 +5,7 @@ from zigbeeLauncher.util import get_ip_address, get_mac_address, get_version, Gl
 from zigbeeLauncher.simulator.simulator import Simulator
 from zigbeeLauncher.logging import simulatorLogger as logger
 
-def init():
+def init(port):
     client_ip = get_ip_address()
     client_mac = get_mac_address()
     version = get_version()
@@ -20,5 +20,5 @@ def init():
     DBZigbee().delete()
     # DBAuto().delete()
     # get current version
-    simulator = Simulator(client_ip, client_mac, user_label, version)
+    simulator = Simulator(client_ip, client_mac, user_label, version, port)
 

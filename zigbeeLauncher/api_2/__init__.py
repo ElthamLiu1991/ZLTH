@@ -4,6 +4,7 @@ from .autos.view import AutoResource, AutoScriptsResource, \
     AutoScriptsConfigResource, AutoOperationResource, AutoOperationRecordsResource
 from .configs.view import ConfigFilesResource, ConfigFileResource, ConfigDevicesResource, ConfigResource
 from .devices import DeviceResource, DevicesResource, DeviceConfigResource
+from .logs import LogsResource
 from .simulators import SimulatorResource, SimulatorsResource
 from .firmwares import firmwares, FirmwareResource
 from .zigbees import ZigbeesResource, ZigbeeResource, ZigbeeAttributesResource
@@ -38,5 +39,8 @@ auto_api.add_resource(AutoOperationResource, '/auto/<string:operation>')
 auto_api.add_resource(AutoOperationRecordsResource, '/auto/records/<string:record>')
 auto_api.add_resource(AutoScriptsResource, '/auto/scripts/<string:script>')
 auto_api.add_resource(AutoScriptsConfigResource, '/auto/scripts/<string:script>/config')
+
+logs_api = Api(api)
+logs_api.add_resource(LogsResource, '/logs')
 
 from . import *

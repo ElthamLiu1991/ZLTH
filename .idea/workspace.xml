@@ -5,9 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="45d0330b-a8e4-4697-835d-2502f30e6ddf" name="Default Changelist" comment="1. update README">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RelateNote.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/logs.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/launcher.spec" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.spec" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/launcher.py" beforeDir="false" afterPath="$PROJECT_DIR$/launcher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/capacity.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/capacity.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/compose.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/compose.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/stability.json" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/stability.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/version/version.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version/version.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/version_file.txt" beforeDir="false" afterPath="$PROJECT_DIR$/version_file.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/api_2/firmwares/view.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/api_2/firmwares/view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/interface.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/interface.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/database/simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/database/simulator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/exceptions.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/exceptions.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/simulator/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/zigbeeLauncher/simulator/simulator.py" beforeDir="false" afterPath="$PROJECT_DIR$/zigbeeLauncher/simulator/simulator.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -53,6 +69,7 @@
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/script.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/tuya_api.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/wiser_api.py" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/zigbeeLauncher/auto_scripts/zlth_api.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/info.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/dongle/management.py" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/zigbeeLauncher/serial_protocol/sp_01.py" root0="FORCE_HIGHLIGHTING" />
@@ -377,6 +394,6 @@
     </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684824330519" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/development_new$launcher.coverage" NAME="launcher Coverage Results" MODIFIED="1684985573056" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

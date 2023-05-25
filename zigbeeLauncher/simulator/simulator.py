@@ -64,7 +64,7 @@ class ServicesListener:
 
 
 class SimulatorMetaData:
-    def __init__(self, ip, mac, label, version, update_cb):
+    def __init__(self, ip, mac, label, version, port, update_cb):
         self.update_cb = update_cb
         self._info = SimulatorInfo(
             ip=ip,
@@ -74,6 +74,7 @@ class SimulatorMetaData:
             name='simulator-'+ip,
             connected=True,
             broker="",
+            port=port,
             devices=[]
         )
         Global.set(Global.DONGLES, {})
@@ -153,8 +154,8 @@ class Simulator(SimulatorMetaData):
     #         cls._instance = super().__new__(cls, *args, **kwargs)
     #     return cls._instance
 
-    def __init__(self, ip=None, mac=None, label=None, version=None):
-        super().__init__(ip, mac, label, version, self._update)
+    def __init__(self, ip=None, mac=None, label=None, version=None, port=None):
+        super().__init__(ip, mac, label, version, port, self._update)
 
         self._zeroconf = None
         self.client = None

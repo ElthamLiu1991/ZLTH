@@ -212,6 +212,8 @@ class TUYAAPI(Http):
         return None
 
     def is_permit(self, permit):
+        # wait 5 seconds
+        time.sleep(5)
         info = self.get_device_info(self.gateway)
         if info:
             for item in info.status:

@@ -34,7 +34,7 @@ def fallback(fallback):       # Vue Router 的 mode 为 'hash' 时可移除该�
         return app.render_template('index.html')
 
 
-def create_app():
+def create_app(port):
     app.config.from_object(DevelopmentConfig)
 
     db.init_app(app)
@@ -48,7 +48,7 @@ def create_app():
     app.register_blueprint(v2)
     # run Simulator
     from .simulator import init
-    init()
+    init(port)
     from . import wait_response
     wait_response.init()
     #return app

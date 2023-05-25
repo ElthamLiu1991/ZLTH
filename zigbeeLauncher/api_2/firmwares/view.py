@@ -73,22 +73,34 @@ class FirmwareResource(Resource):
                     device = device[0]
                 if not device.get('connected'):
                     raise DeviceOffline(mac)
-                simulator = device.get('ip')
-                if simulator not in simulators:
-                    simulators.update({simulator: [mac]})
+                ip = device.get('ip')
+                if ip not in simulators:
+                    simulators.update({ip: [mac]})
                 else:
-                    simulators[simulator].append(mac)
+                    simulators[ip].append(mac)
+
+                # simulator = DBSimulator(ip=ip).retrieve()
+                # if not simulator:
+                #     raise NotFound(f'simulator:{ip}')
+                # simulator = device.get('ip')
+                # if simulator not in simulators:
+                #     simulators.update({simulator: [mac]})
+                # else:
+                #     simulators[simulator].append(mac)
             # if device belongs to another simulator, post file to that simulator first
-            for simulator, devices in simulators.items():
-                if simulator != get_ip_address():
-                    url = f'http://{simulator}:5000/api/2/firmwares'
-                    files = {'file': open(file, 'r')}
+            for ip, devices in simulators.items():
+                if ip != get_ip_address():
+                    simulator = DBSimulator(ip=ip).retrieve()
+                    if not simulator:
+                        continue
+                    url = f'http://{ip}:{simulator[0].get("port")}/api/2/firmwares'
+                    files = {'file': open(file, 'rb')}
                     try:
                         r = requests.post(url, files=files)
                     except Exception as e:
-                        raise Unreachable(simulator)
+                        raise Unreachable(ip)
                     logger.info(r.json())
-                result = send_command(ip=simulator, command={
+                result = send_command(ip=ip, command={
                     'firmware': {
                         'filename': filename,
                         'devices': devices

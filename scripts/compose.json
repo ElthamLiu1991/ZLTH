@@ -2,7 +2,7 @@
     "capacity": {
         "vid": "6cd8e93b0faf75330bigp1",
         "repeat": 1,
-        "batch": 4
+        "batch": 3
     },
     "stability": {
         "duration": 1,
@@ -20,7 +20,7 @@
             },
             {
                 "name": "door_window_sensor",
-                "pid": "jdknwriz",
+                "pid": "hoe95iu0",
                 "functions": [
                     "doorcontact_state"
                 ]
