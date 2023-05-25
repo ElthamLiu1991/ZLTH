@@ -62,6 +62,7 @@ services:
             - ./files:/usr/local/app/files
             - ./firmwares:/usr/local/app/firmwares
             - ./logs:/usr/local/app/logs
+            - ./records:/usr/local/app/records
             - /dev:/dev
         privileged:
             true

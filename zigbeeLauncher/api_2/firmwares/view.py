@@ -60,6 +60,7 @@ class FirmwareResource(Resource):
                 filename = request.get_json()['filename']
                 file = f'./firmwares/{filename}'
                 devices = request.get_json()['devices']
+                print("devices:", devices)
             except Exception as e:
                 raise InvalidPayload('missing filename or devices')
             if not os.path.isfile(file):
@@ -89,9 +90,11 @@ class FirmwareResource(Resource):
                 #     simulators[simulator].append(mac)
             # if device belongs to another simulator, post file to that simulator first
             for ip, devices in simulators.items():
+                print(f'ip:{ip}, devices:{devices}')
                 if ip != get_ip_address():
                     simulator = DBSimulator(ip=ip).retrieve()
                     if not simulator:
+                        print(f"cannot find {ip} in simulator database")
                         continue
                     url = f'http://{ip}:{simulator[0].get("port")}/api/2/firmwares'
                     files = {'file': open(file, 'rb')}
@@ -106,7 +109,7 @@ class FirmwareResource(Resource):
                         'devices': devices
                     }
                 })
-                if result != {}:
+                if result.code != 0:
                     return result
             return {}
         return handle()

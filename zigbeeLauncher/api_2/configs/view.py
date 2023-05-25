@@ -1093,7 +1093,7 @@ class ConfigDevicesResource(Resource):
                         'devices': devices
                     }
                 })
-                if result != {}:
+                if result.code != 0:
                     return result
             return {}
         return handle()

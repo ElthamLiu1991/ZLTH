@@ -158,6 +158,7 @@ class Testing(Script):
             if not self.tuya.is_online(device.id):
                 raise Exception(f'TUYA: {device.node_id} is offline')
             for item in self.setting.devices:
+                print(f"item.pid:{item.pid}, device.product_id:{device.product_id}")
                 if device.product_id == item.pid:
                     if item.mac_vid:
                         item.mac_vid.append(MacVid(mac=device.node_id, vid=device.id))
@@ -166,8 +167,8 @@ class Testing(Script):
                         item.mac_vid = [MacVid(mac=device.node_id, vid=device.id)]
                         self.devices[item.name] = 1
                     break
-                if not item.mac_vid:
-                    raise Exception(f"TUYA: cannot found {item.pid} in device list")
+                # if not item.mac_vid:
+                #     raise Exception(f"TUYA: cannot found {item.pid} in device list")
         self.log(Status.INFO, "preparing done")
         self.working()
 

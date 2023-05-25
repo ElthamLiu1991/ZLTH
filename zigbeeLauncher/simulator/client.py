@@ -115,6 +115,7 @@ class MQTTClient:
         if self._client and self._connected:
             props = mqtt.Properties(PacketTypes.PUBLISH)
             props.UserProperty = ('ip', self.ip)
+            logger.info(f'send MQTT topic:{topic}')
             info = self._client.publish(
                 topic=self._topic,
                 payload=json.dumps(self._payload),

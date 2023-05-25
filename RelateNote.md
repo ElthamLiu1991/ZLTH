@@ -2,6 +2,7 @@
 ## 1.5.6
 ___
 - Add **/logs** API to load running log 
+- Add **port** information on simulator data model
 - Fix the issue of not being able to upgrade device firmware across simulators 
 - Fix the issue of open Wiser Hub permit join window failed
 
